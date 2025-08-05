@@ -1,0 +1,9 @@
+{
+  "hooks": {
+    "qa-eval-pass": {
+      "command": ".git/hooks/post-qa-eval",
+      "description": "Auto-commit and push after successful QA evaluation",
+      "trigger": "after-qa-eval-pass"
+    }
+  }
+}

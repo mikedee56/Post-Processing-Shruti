@@ -1,0 +1,82 @@
+# File Naming Configuration for ASR Post-Processing System
+# Story 1.1: File Naming Conventions & Storage Management
+
+file_naming:
+  # SRT file naming pattern: {lecture_id}_{date}_{speaker}.srt
+  srt_files:
+    pattern: "{lecture_id}_{date}_{speaker}.srt"
+    example: "VED001_20241201_SwamiBrahmananda.srt"
+    components:
+      lecture_id:
+        format: "VED{number:03d}"  # VED001, VED002, etc.
+        description: "Vedanta lecture identifier with zero-padded 3-digit number"
+      date:
+        format: "YYYYMMDD"
+        description: "Date of lecture in ISO format without separators"
+      speaker:
+        format: "CamelCase"
+        description: "Speaker name in CamelCase without spaces"
+        examples:
+          - "SwamiBrahmananda"
+          - "SwamiBrahmavidyananda"
+          - "AcharyaRamesh"
+
+  # Processed file naming patterns
+  processed_files:
+    pattern: "{original_name}_processed_{version}.srt"
+    example: "VED001_20241201_SwamiBrahmananda_processed_v1.srt"
+    version_format: "v{number}"
+    description: "Preserves original name with processing metadata"
+
+  # Lexicon file naming patterns
+  lexicon_files:
+    sanskrit_terms: "sanskrit_lexicon_{version}.json"
+    hindi_terms: "hindi_lexicon_{version}.json"
+    proper_nouns: "vedanta_proper_nouns_{version}.json"
+    scriptural_verses: "scriptural_verses_{version}.json"
+    version_format: "{YYYY}_{MM}_{DD}"
+    example: "sanskrit_lexicon_2024_12_01.json"
+
+  # Golden dataset naming patterns
+  golden_dataset:
+    pattern: "{lecture_id}_{date}_{speaker}_golden.srt"
+    example: "VED001_20241201_SwamiBrahmananda_golden.srt"
+    description: "Manually perfected reference transcripts"
+
+  # Metadata and tracking files
+  metadata:
+    processing_log: "processing_log_{date}.json"
+    error_log: "error_log_{date}.json"
+    quality_metrics: "quality_metrics_{date}.json"
+
+# Directory structure validation
+directories:
+  input: "data/raw_srts"
+  output: "data/processed_srts"
+  lexicons: "data/lexicons"
+  golden: "data/golden_dataset"
+  config: "config"
+  logs: "logs"  # To be created as needed
+
+# File validation rules
+validation:
+  srt_files:
+    max_size_mb: 50
+    required_extensions: [".srt"]
+    encoding: "utf-8"
+  
+  lexicon_files:
+    required_extensions: [".json", ".yaml"]
+    encoding: "utf-8"
+    
+  naming_constraints:
+    max_filename_length: 255
+    forbidden_chars: ["<", ">", ":", "\"", "|", "?", "*"]
+    case_sensitive: true
+
+# Processing metadata tracking
+processing:
+  track_original_filename: true
+  preserve_directory_structure: true
+  create_processing_manifest: true
+  backup_original: false  # Originals preserved in raw_srts/

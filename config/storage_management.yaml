@@ -1,0 +1,136 @@
+# Storage Management Configuration for ASR Post-Processing System
+# Story 1.1: File Naming Conventions & Storage Management
+
+storage:
+  # Directory structure configuration
+  directories:
+    base_path: "data"
+    subdirectories:
+      raw_srts:
+        path: "data/raw_srts"
+        description: "Input SRT files from ASR system"
+        auto_create: true
+        permissions: "read-only"  # Protect original files
+        
+      processed_srts:
+        path: "data/processed_srts"
+        description: "Output processed files maintaining original structure"
+        auto_create: true
+        mirror_input_structure: true
+        permissions: "read-write"
+        
+      lexicons:
+        path: "data/lexicons"
+        description: "Externalized Sanskrit/Hindi dictionaries"
+        auto_create: true
+        version_control: true
+        backup_on_update: true
+        
+      golden_dataset:
+        path: "data/golden_dataset"
+        description: "Manually perfected reference transcripts"
+        auto_create: true
+        permissions: "read-only"  # Protect reference data
+        
+      config:
+        path: "config"
+        description: "System configuration files"
+        auto_create: true
+        
+      logs:
+        path: "logs"
+        description: "Processing and error logs"
+        auto_create: true
+        retention_days: 30
+        max_size_mb: 100
+
+  # File organization rules
+  organization:
+    preserve_input_structure: true
+    create_date_folders: false  # Keep flat structure for now
+    separate_by_speaker: false  # Can be enabled later
+    
+  # File processing queue management
+  queue_management:
+    batch_size: 10
+    max_concurrent_files: 3
+    priority_order: ["golden_dataset", "high_confidence", "standard"]
+    skip_existing_processed: true
+    
+  # Storage limits and cleanup
+  limits:
+    max_total_size_gb: 100
+    max_files_per_directory: 1000
+    cleanup_processed_older_than_days: 90
+    archive_old_logs: true
+    
+  # Backup and versioning
+  backup:
+    enable_automatic_backup: false  # Manual backup for MVP
+    lexicon_versioning: true
+    keep_processing_history: true
+    max_versions_per_lexicon: 5
+    
+# File discovery and ingestion
+ingestion:
+  # File discovery patterns
+  discovery:
+    scan_subdirectories: true
+    file_patterns: ["*.srt"]
+    ignore_patterns: ["*_backup*", "*_temp*", ".*"]
+    
+  # File validation before processing
+  validation:
+    check_file_format: true
+    validate_timestamps: true
+    check_encoding: true
+    min_file_size_bytes: 100
+    max_file_size_mb: 50
+    
+  # Error handling
+  error_handling:
+    quarantine_invalid_files: true
+    quarantine_path: "data/quarantine"
+    log_validation_errors: true
+    continue_on_single_file_error: true
+
+# Output management
+output:
+  # Directory mirroring logic
+  mirroring:
+    preserve_relative_paths: true
+    create_missing_directories: true
+    maintain_file_permissions: false  # Use default permissions
+    
+  # Processed file management
+  processed_files:
+    add_processing_metadata: true
+    include_timestamp_in_filename: false  # Use version numbers
+    overwrite_existing: false  # Create new versions
+    
+  # Metadata tracking
+  metadata:
+    create_processing_manifest: true
+    manifest_filename: "processing_manifest.json"
+    include_file_checksums: true
+    track_processing_time: true
+    log_quality_metrics: true
+
+# Integration with processing pipeline
+pipeline_integration:
+  # Hooks for processing stages
+  pre_processing_hooks:
+    - validate_file_format
+    - check_available_space
+    - create_output_directory
+    
+  post_processing_hooks:
+    - verify_output_quality
+    - update_manifest
+    - log_completion
+    
+  # Error recovery
+  error_recovery:
+    retry_failed_files: true
+    max_retry_attempts: 3
+    retry_delay_seconds: 60
