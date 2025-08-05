@@ -9,6 +9,7 @@ Sanskrit and Hindi terminology, IAST transliteration, and scriptural verses.
 import re
 import json
 import yaml
+import time
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
@@ -17,6 +18,12 @@ import logging
 import pysrt
 import pandas as pd
 from fuzzywuzzy import fuzz, process
+
+# Import new components
+from ..utils.srt_parser import SRTParser, SRTSegment
+from ..utils.text_normalizer import TextNormalizer
+from ..utils.metrics_collector import MetricsCollector, ProcessingMetrics
+from ..utils.logger_config import get_logger
 
 
 @dataclass
@@ -69,8 +76,13 @@ class SanskritPostProcessor:
         Args:
             config_path: Path to configuration file (optional)
         """
-        self.logger = logging.getLogger(__name__)
         self.config = self._load_config(config_path)
+        self.logger = get_logger(__name__, self.config.get('logging', {}))
+        
+        # Initialize new components
+        self.srt_parser = SRTParser()
+        self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
+        self.metrics_collector = MetricsCollector(self.config.get('metrics', {}))
         
         # Initialize lexicons
         self.corrections: Dict[str, LexiconEntry] = {}
@@ -83,15 +95,6 @@ class SanskritPostProcessor:
         
         # Fuzzy matching threshold
         self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
-        
-        # Common English filler words to remove
-        self.filler_words = {
-            'um', 'uh', 'uhm', 'er', 'ah', 'oh', 'you know', 
-            'like', 'actually', 'basically', 'literally'
-        }
-        
-        # Number word mappings for conversion
-        self.number_words = self._build_number_mappings()
 
     def _load_config(self, config_path: Optional[Path]) -> Dict[str, Any]:
         """Load configuration from file or use defaults."""
@@ -149,103 +152,179 @@ class SanskritPostProcessor:
         except Exception as e:
             self.logger.error(f"Error loading lexicon {file_path}: {e}")
 
-    def _build_number_mappings(self) -> Dict[str, str]:
-        """Build mappings for converting spoken numbers to digits."""
-        return {
-            'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
-            'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
-            'ten': '10', 'eleven': '11', 'twelve': '12', 'thirteen': '13',
-            'fourteen': '14', 'fifteen': '15', 'sixteen': '16', 'seventeen': '17',
-            'eighteen': '18', 'nineteen': '19', 'twenty': '20', 'thirty': '30',
-            'forty': '40', 'fifty': '50', 'sixty': '60', 'seventy': '70',
-            'eighty': '80', 'ninety': '90', 'hundred': '100', 'thousand': '1000',
-            'million': '1000000', 'billion': '1000000000'
-        }
 
-    def process_srt_file(self, input_path: Path, output_path: Path) -> Dict[str, Any]:
+    def process_srt_file(self, input_path: Path, output_path: Path, session_id: Optional[str] = None) -> ProcessingMetrics:
         """
-        Process an SRT file with Sanskrit/Hindi corrections.
+        Process an SRT file with comprehensive text corrections and metrics.
         
         Args:
             input_path: Path to input SRT file
             output_path: Path to output SRT file
+            session_id: Optional session ID for metrics tracking
             
         Returns:
-            Dictionary with processing results and metrics
+            ProcessingMetrics with detailed results
         """
+        # Start timing
+        start_time = time.time()
+        
+        # Create metrics object
+        metrics = self.metrics_collector.create_file_metrics(str(input_path))
+        
         try:
-            # Load SRT file
-            subs = pysrt.open(input_path, encoding='utf-8')
+            self.logger.info(f"Starting processing: {input_path}")
             
-            processing_results = {
-                'input_file': str(input_path),
-                'output_file': str(output_path),
-                'total_segments': len(subs),
-                'corrections_made': 0,
-                'flagged_segments': 0,
-                'confidence_scores': []
-            }
+            # Step 1: Parse SRT file
+            self.metrics_collector.start_timer('parsing')
+            segments = self.srt_parser.parse_file(str(input_path))
+            metrics.parsing_time = self.metrics_collector.end_timer('parsing')
             
-            # Process each subtitle segment
-            for i, sub in enumerate(subs):
-                segment = TranscriptSegment(
-                    id=f"seg_{i:04d}",
-                    text=sub.text,
-                    start_time=self._time_to_seconds(sub.start),
-                    end_time=self._time_to_seconds(sub.end)
-                )
-                
-                # Apply corrections
-                processed_segment = self._process_segment(segment)
-                
-                # Update subtitle text
-                sub.text = processed_segment.text
-                
-                # Track metrics
-                if processed_segment.correction_history:
-                    processing_results['corrections_made'] += len(processed_segment.correction_history)
-                
-                if processed_segment.is_flagged:
-                    processing_results['flagged_segments'] += 1
-                
-                processing_results['confidence_scores'].append(processed_segment.confidence_score)
+            if not segments:
+                raise ValueError("No valid segments found in SRT file")
             
-            # Save processed SRT
-            subs.save(output_path, encoding='utf-8')
+            metrics.total_segments = len(segments)
+            self.logger.info(f"Parsed {len(segments)} segments")
             
-            # Calculate average confidence
-            if processing_results['confidence_scores']:
-                processing_results['average_confidence'] = sum(processing_results['confidence_scores']) / len(processing_results['confidence_scores'])
-            else:
-                processing_results['average_confidence'] = 0.0
+            # Step 2: Validate timestamps
+            self.metrics_collector.start_timer('validation')
+            timestamp_valid = self.srt_parser.validate_timestamps(segments)
+            metrics.timestamp_integrity_verified = timestamp_valid
+            metrics.validation_time = self.metrics_collector.end_timer('validation')
             
-            self.logger.info(f"Processed {input_path} -> {output_path}")
-            self.logger.info(f"Corrections: {processing_results['corrections_made']}, Flagged: {processing_results['flagged_segments']}")
+            if not timestamp_valid:
+                metrics.warnings_encountered.append("Timestamp integrity issues detected")
+                self.logger.warning("Timestamp integrity issues detected")
             
-            return processing_results
+            # Calculate original statistics
+            metrics.original_word_count = sum(len(seg.text.split()) for seg in segments)
+            metrics.original_char_count = sum(len(seg.text) for seg in segments)
+            
+            # Step 3: Process segments
+            processed_segments = []
+            
+            for i, segment in enumerate(segments):
+                try:
+                    processed_segment = self._process_srt_segment(segment, metrics)
+                    processed_segments.append(processed_segment)
+                    
+                    # Track confidence scores
+                    if hasattr(processed_segment, 'confidence') and processed_segment.confidence is not None:
+                        metrics.confidence_scores.append(processed_segment.confidence)
+                    
+                    # Count modifications
+                    if segment.text != processed_segment.text:
+                        metrics.segments_modified += 1
+                    
+                except Exception as e:
+                    error_msg = f"Error processing segment {i}: {e}"
+                    metrics.errors_encountered.append(error_msg)
+                    self.logger.error(error_msg)
+                    # Use original segment if processing fails
+                    processed_segments.append(segment)
+            
+            # Calculate processed statistics
+            metrics.processed_word_count = sum(len(seg.text.split()) for seg in processed_segments)
+            metrics.processed_char_count = sum(len(seg.text) for seg in processed_segments)
+            
+            # Calculate quality metrics
+            self.metrics_collector.calculate_quality_metrics(metrics)
+            
+            # Step 4: Generate output SRT
+            output_srt = self.srt_parser.to_srt_string(processed_segments)
+            
+            # Save to file
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(output_srt)
+            
+            # Final timing
+            metrics.processing_time = time.time() - start_time
+            
+            # Add to metrics collector
+            self.metrics_collector.add_file_metrics(metrics)
+            
+            self.logger.info(f"Processing completed: {output_path}")
+            self.logger.info(f"Segments: {metrics.total_segments}, Modified: {metrics.segments_modified}, "
+                           f"Confidence: {metrics.average_confidence:.3f}")
+            
+            return metrics
             
         except Exception as e:
-            self.logger.error(f"Error processing SRT file {input_path}: {e}")
+            error_msg = f"Error processing SRT file {input_path}: {e}"
+            metrics.errors_encountered.append(error_msg)
+            metrics.processing_time = time.time() - start_time
+            self.logger.error(error_msg)
+            
+            # Still add metrics even if processing failed
+            self.metrics_collector.add_file_metrics(metrics)
             raise
 
-    def _process_segment(self, segment: TranscriptSegment) -> TranscriptSegment:
-        """Process a single transcript segment."""
+    def _process_srt_segment(self, segment: SRTSegment, metrics: ProcessingMetrics) -> SRTSegment:
+        """
+        Process a single SRT segment with the new pipeline.
+        
+        Args:
+            segment: SRT segment to process
+            metrics: ProcessingMetrics object to update
+            
+        Returns:
+            Processed SRT segment
+        """
         original_text = segment.text
         
-        # Step 1: Remove filler words
-        segment.text = self._remove_filler_words(segment.text)
+        # Step 1: Text normalization using new TextNormalizer
+        self.metrics_collector.start_timer('normalization')
+        normalization_result = self.text_normalizer.normalize_with_tracking(segment.text)
+        segment.text = normalization_result.normalized_text
+        metrics.normalization_time += self.metrics_collector.end_timer('normalization')
         
-        # Step 2: Convert spoken numbers to digits
-        segment.text = self._convert_numbers(segment.text)
+        # Track normalization changes
+        for change in normalization_result.changes_applied:
+            self.metrics_collector.update_correction_count(metrics, f"normalization_{change}")
         
-        # Step 3: Apply Sanskrit/Hindi corrections
-        segment.text, corrections = self._apply_lexicon_corrections(segment.text)
+        # Step 2: Apply Sanskrit/Hindi corrections
+        self.metrics_collector.start_timer('correction')
+        corrected_text, corrections = self._apply_lexicon_corrections(segment.text)
+        segment.text = corrected_text
+        metrics.correction_time += self.metrics_collector.end_timer('correction')
         
-        # Step 4: Apply proper noun capitalization
+        # Track lexicon corrections
+        for correction in corrections:
+            self.metrics_collector.update_correction_count(metrics, "lexicon_correction")
+        
+        # Step 3: Apply proper noun capitalization
         segment.text = self._apply_proper_noun_capitalization(segment.text)
         
-        # Step 5: Normalize punctuation and spacing
-        segment.text = self._normalize_punctuation(segment.text)
+        # Add processing flags for significant changes
+        if original_text != segment.text:
+            change_ratio = len(segment.text) / len(original_text) if original_text else 1.0
+            if abs(change_ratio - 1.0) > 0.2:  # More than 20% change
+                segment.processing_flags.append("significant_change")
+        
+        # Calculate confidence score
+        confidence = self._calculate_confidence(segment.text, corrections)
+        segment.confidence = confidence
+        
+        # Flag low confidence segments
+        confidence_threshold = self.config.get('confidence_threshold', 0.6)
+        if confidence < confidence_threshold:
+            segment.processing_flags.append("low_confidence")
+            metrics.flagged_segments += 1
+        
+        return segment
+
+    def _process_segment(self, segment: TranscriptSegment) -> TranscriptSegment:
+        """Legacy method for processing TranscriptSegment objects."""
+        original_text = segment.text
+        
+        # Use text normalizer
+        segment.text = self.text_normalizer.normalize_text(segment.text)
+        
+        # Apply Sanskrit/Hindi corrections
+        segment.text, corrections = self._apply_lexicon_corrections(segment.text)
+        
+        # Apply proper noun capitalization
+        segment.text = self._apply_proper_noun_capitalization(segment.text)
         
         # Track changes
         if original_text != segment.text:
@@ -265,18 +344,29 @@ class SanskritPostProcessor:
         
         return segment
 
-    def _remove_filler_words(self, text: str) -> str:
-        """Remove common English filler words."""
-        words = text.split()
-        filtered_words = [word for word in words if word.lower() not in self.filler_words]
-        return ' '.join(filtered_words)
-
-    def _convert_numbers(self, text: str) -> str:
-        """Convert spoken numbers to digits."""
-        # Simple implementation - can be enhanced for complex number phrases
-        for word_num, digit in self.number_words.items():
-            text = re.sub(rf'\b{word_num}\b', digit, text, flags=re.IGNORECASE)
-        return text
+    def start_processing_session(self, session_id: Optional[str] = None) -> str:
+        """
+        Start a new processing session for batch operations.
+        
+        Args:
+            session_id: Optional custom session ID
+            
+        Returns:
+            Session ID
+        """
+        return self.metrics_collector.start_session(session_id)
+    
+    def end_processing_session(self) -> Optional[Dict[str, Any]]:
+        """
+        End the current processing session and return metrics.
+        
+        Returns:
+            Session metrics dictionary or None
+        """
+        session = self.metrics_collector.end_session()
+        if session:
+            return self.metrics_collector.generate_session_report(session)
+        return None
 
     def _apply_lexicon_corrections(self, text: str) -> Tuple[str, List[str]]:
         """Apply lexicon-based corrections using fuzzy matching."""
@@ -332,14 +422,17 @@ class SanskritPostProcessor:
         
         return text
 
-    def _normalize_punctuation(self, text: str) -> str:
-        """Normalize punctuation and spacing."""
-        # Fix spacing around punctuation
-        text = re.sub(r'\s+([.!?])', r'\1', text)  # Remove space before punctuation
-        text = re.sub(r'([.!?])([A-Z])', r'\1 \2', text)  # Add space after punctuation before capital
-        text = re.sub(r'\s+', ' ', text)  # Normalize multiple spaces
+    def get_processing_report(self, metrics: ProcessingMetrics) -> Dict[str, Any]:
+        """
+        Generate a comprehensive processing report for a file.
         
-        return text.strip()
+        Args:
+            metrics: ProcessingMetrics to report on
+            
+        Returns:
+            Processing report dictionary
+        """
+        return self.metrics_collector.generate_processing_report(metrics)
 
     def _preserve_case_and_punctuation(self, original_word: str, replacement: str) -> str:
         """Preserve case and punctuation from original word."""
