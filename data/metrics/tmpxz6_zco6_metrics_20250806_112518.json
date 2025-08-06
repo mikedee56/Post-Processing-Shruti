@@ -1,0 +1,34 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpxz6_zco6.srt",
+  "processing_time": 0.04593491554260254,
+  "total_segments": 2,
+  "segments_modified": 2,
+  "corrections_applied": {
+    "sanskrit_hindi_transliteration": 2,
+    "removed_filler_words": 1,
+    "legacy_lexicon_correction": 2,
+    "converted_numbers": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.415) in segment"
+  ],
+  "original_word_count": 20,
+  "processed_word_count": 18,
+  "original_char_count": 112,
+  "processed_char_count": 93,
+  "confidence_scores": [
+    0.6103846153846154,
+    0.575
+  ],
+  "average_confidence": 0.5926923076923076,
+  "flagged_segments": 1,
+  "parsing_time": 0.0,
+  "normalization_time": 0.011600017547607422,
+  "correction_time": 0.03333020210266113,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T15:25:18.211509+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

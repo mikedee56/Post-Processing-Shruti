@@ -1,0 +1,184 @@
+# Contextual Modeling Configuration
+# Configuration for Story 2.2 - Hybrid Language & Contextual Modeling
+
+# N-gram Language Model Configuration
+ngram_model:
+  n: 3  # Trigram model
+  smoothing_method: "laplace"
+  smoothing_parameter: 0.01
+  min_count: 2
+  vocabulary_size: 10000
+  use_unk_token: true
+  unk_threshold: 1
+  context_window_size: 10
+
+# Phonetic Encoding Configuration
+phonetic_encoder:
+  algorithm: "sanskrit_phonetic"
+  max_code_length: 8
+  enable_devanagari_mapping: true
+  enable_aspiration_normalization: true
+  enable_vowel_length_normalization: true
+  similarity_threshold: 0.8
+  enable_compound_encoding: true
+
+# Contextual Matching Configuration
+contextual_matcher:
+  context_weight: 0.3
+  fuzzy_weight: 0.7
+  min_combined_confidence: 0.6
+  max_context_window: 10
+  enable_context_filtering: true
+  context_boost_threshold: 0.8
+
+# Contextual Rules Configuration
+contextual_rules:
+  rules:
+    - id: "karma_yoga_standardization"
+      name: "Karma Yoga Compound Standardization"
+      rule_type: "compound_term"
+      priority: 1
+      pattern: '\b(karma)\s+(yog[a]?)\b'
+      replacement: "karma yoga"
+      context_patterns: ["practice", "path", "teaching", "philosophy"]
+      confidence_boost: 0.15
+      enabled: true
+      description: "Standardize karma yoga compound term"
+      examples:
+        - "karma yog -> karma yoga"
+        - "karm yoga -> karma yoga"
+
+    - id: "bhakti_yoga_standardization"
+      name: "Bhakti Yoga Compound Standardization"
+      rule_type: "compound_term"
+      priority: 1
+      pattern: '\b(bhakti)\s+(yog[a]?)\b'
+      replacement: "bhakti yoga"
+      context_patterns: ["devotion", "love", "surrender", "practice"]
+      confidence_boost: 0.15
+      enabled: true
+
+    - id: "bhagavad_gita_standardization"
+      name: "Bhagavad Gita Compound Standardization"
+      rule_type: "compound_term"
+      priority: 1
+      pattern: '\b(bhagavad?|bhagwad)\s+(git[a]?|geet[a]?)\b'
+      replacement: "Bhagavad Gita"
+      context_patterns: ["scripture", "text", "verse", "chapter"]
+      confidence_boost: 0.2
+      enabled: true
+
+    - id: "deity_capitalization"
+      name: "Deity Name Capitalization"
+      rule_type: "category_consistency"
+      priority: 2
+      pattern: '\b(krishna|arjuna|rama|shiva|hanuman)\b'
+      replacement: '\1'
+      context_patterns: ["lord", "god", "deity", "divine"]
+      conditions:
+        check_capitalization: true
+      confidence_boost: 0.05
+      enabled: true
+
+  category_dependencies:
+    scripture: ["verse", "chapter", "text", "teaching"]
+    deity: ["worship", "devotion", "prayer", "lord"]
+    practice: ["meditation", "yoga", "discipline", "path"]
+    philosophy: ["concept", "principle", "teaching", "wisdom"]
+
+# Spelling Normalization Configuration
+spelling_normalization:
+  normalization_rules:
+    - id: "sanskrit_shortenings"
+      pattern: '\b(gita|geeta)\b'
+      replacement: "Bhagavad Gita"
+      rule_type: "expansion"
+      context_required: ["bhagavad", "scripture", "verse", "chapter"]
+      confidence: 0.8
+      enabled: true
+      description: "Expand Gita to Bhagavad Gita when in scripture context"
+
+    - id: "yoga_expansion"
+      pattern: '\byog\b'
+      replacement: "yoga"
+      rule_type: "expansion"
+      context_required: ["practice", "path", "karma", "bhakti", "raja"]
+      confidence: 0.9
+      enabled: true
+      description: "Expand yog to yoga in practice context"
+
+    - id: "dharma_expansion"
+      pattern: '\bdhrm\b'
+      replacement: "dharma"
+      rule_type: "expansion"
+      context_required: ["duty", "righteous", "law", "virtue"]
+      confidence: 0.85
+      enabled: true
+      description: "Expand dhrm to dharma"
+
+    - id: "concept_standardization"
+      pattern: '\b(dharama|dhrama)\b'
+      replacement: "dharma"
+      rule_type: "standardization"
+      confidence: 0.9
+      enabled: true
+      description: "Standardize dharma spelling variants"
+
+  expansion_mappings:
+    gita: "Bhagavad Gita"
+    yog: "yoga"
+    dhrm: "dharma"
+    krsna: "Krishna"
+    arjun: "Arjuna"
+
+  variant_groups:
+    dharma: ["dharma", "dharama", "dhrama", "dhrma"]
+    yoga: ["yoga", "yog", "yogaa", "yogh"]
+    krishna: ["krishna", "krsna", "krshna", "krisna"]
+    arjuna: ["arjuna", "arjun", "arjuuna"]
+    karma: ["karma", "karm", "karmaa"]
+    bhakti: ["bhakti", "bhakti", "bhakthi"]
+    gita: ["gita", "geeta", "geet"]
+    upanishad: ["upanishad", "upanishads", "upanisad"]
+    vedanta: ["vedanta", "vedant", "vedaanta"]
+    meditation: ["meditation", "dhyana", "dhyan"]
+
+# Processing Pipeline Configuration
+processing_pipeline:
+  enable_ngram_context: true
+  enable_phonetic_matching: true
+  enable_contextual_rules: true
+  enable_spelling_normalization: true
+  
+  # Processing order (1=first, 4=last)
+  processing_order:
+    contextual_rules: 1
+    phonetic_matching: 2
+    ngram_context: 3
+    spelling_normalization: 4
+
+  # Confidence thresholds
+  min_confidence_thresholds:
+    ngram_prediction: 0.5
+    phonetic_match: 0.7
+    contextual_rule: 0.6
+    spelling_normalization: 0.6
+
+# Model Training Configuration
+model_training:
+  enable_auto_training: true
+  training_data_sources:
+    - "data/lexicons/"
+    - "data/raw_srts/"
+  
+  corpus_enhancement:
+    generate_synthetic_sentences: true
+    domain_weight: 1.5
+    max_synthetic_per_term: 3
+
+# Performance Configuration
+performance:
+  enable_caching: true
+  cache_size_mb: 100
+  enable_parallel_processing: false
+  batch_size: 50
