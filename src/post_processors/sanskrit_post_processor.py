@@ -29,6 +29,13 @@ from utils.processing_quality_validator import ProcessingQualityValidator
 from utils.metrics_collector import MetricsCollector, ProcessingMetrics
 from utils.logger_config import get_logger
 
+# Import Story 2.1 components
+from sanskrit_hindi_identifier.word_identifier import SanskritHindiIdentifier
+from sanskrit_hindi_identifier.lexicon_manager import LexiconManager
+from sanskrit_hindi_identifier.correction_applier import CorrectionApplier
+from utils.fuzzy_matcher import FuzzyMatcher, MatchingConfig
+from utils.iast_transliterator import IASTTransliterator
+
 
 @dataclass
 class TranscriptSegment:
@@ -100,16 +107,69 @@ class SanskritPostProcessor:
         
         self.metrics_collector = MetricsCollector(self.config.get('metrics', {}))
         
-        # Initialize lexicons
+        # Initialize Story 2.1 components
+        lexicon_dir = Path(self.config.get('lexicon_dir', 'data/lexicons'))
+        
+        # Initialize enhanced lexicon management
+        self.lexicon_manager = LexiconManager(
+            lexicon_dir=lexicon_dir, 
+            enable_caching=self.config.get('enable_lexicon_caching', True)
+        )
+        
+        # Initialize Sanskrit/Hindi word identifier
+        self.word_identifier = SanskritHindiIdentifier(
+            lexicon_dir=lexicon_dir,
+            english_words_file=self.config.get('english_words_file')
+        )
+        
+        # Initialize fuzzy matcher with enhanced configuration
+        lexicon_data = self.lexicon_manager.get_all_entries()
+        matching_config = MatchingConfig(
+            min_confidence=self.config.get('fuzzy_min_confidence', 0.75),
+            levenshtein_threshold=self.config.get('levenshtein_threshold', 0.80),
+            phonetic_threshold=self.config.get('phonetic_threshold', 0.85),
+            max_edit_distance=self.config.get('max_edit_distance', 3),
+            enable_phonetic_matching=self.config.get('enable_phonetic_matching', True),
+            enable_compound_matching=self.config.get('enable_compound_matching', True)
+        )
+        
+        # Convert LexiconEntry objects to dict format for FuzzyMatcher
+        lexicon_dict = {}
+        for term, entry in lexicon_data.items():
+            lexicon_dict[term] = {
+                'transliteration': entry.transliteration,
+                'variations': entry.variations,
+                'is_proper_noun': entry.is_proper_noun,
+                'category': entry.category,
+                'confidence': entry.confidence,
+                'source_authority': entry.source_authority
+            }
+        
+        self.fuzzy_matcher = FuzzyMatcher(lexicon_dict, matching_config)
+        
+        # Initialize IAST transliterator
+        self.iast_transliterator = IASTTransliterator(
+            strict_mode=self.config.get('iast_strict_mode', True)
+        )
+        
+        # Initialize correction applier
+        self.correction_applier = CorrectionApplier(
+            min_confidence=self.config.get('correction_min_confidence', 0.80),
+            critical_confidence=self.config.get('correction_critical_confidence', 0.95),
+            enable_context_validation=self.config.get('enable_context_validation', True),
+            max_corrections_per_segment=self.config.get('max_corrections_per_segment', 10)
+        )
+        
+        # Legacy lexicons for backward compatibility
         self.corrections: Dict[str, LexiconEntry] = {}
         self.proper_nouns: Dict[str, LexiconEntry] = {}
         self.phrases: Dict[str, LexiconEntry] = {}
         self.verses: Dict[str, LexiconEntry] = {}
         
-        # Load lexicons from external files
+        # Load legacy lexicons from external files
         self._load_lexicons()
         
-        # Fuzzy matching threshold
+        # Fuzzy matching threshold (legacy)
         self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
 
     def _load_config(self, config_path: Optional[Path]) -> Dict[str, Any]:
@@ -126,6 +186,30 @@ class SanskritPostProcessor:
             'fuzzy_threshold': 80,
             'confidence_threshold': 0.6,
             'use_advanced_normalization': True,
+            
+            # Story 2.1: Lexicon-based correction system configuration
+            'lexicon_dir': 'data/lexicons',
+            'enable_lexicon_caching': True,
+            'english_words_file': None,  # Optional English dictionary file
+            
+            # Fuzzy matching configuration
+            'fuzzy_min_confidence': 0.75,
+            'levenshtein_threshold': 0.80,
+            'phonetic_threshold': 0.85,
+            'max_edit_distance': 3,
+            'enable_phonetic_matching': True,
+            'enable_compound_matching': True,
+            
+            # IAST transliteration configuration
+            'iast_strict_mode': True,
+            
+            # Correction application configuration
+            'correction_min_confidence': 0.80,
+            'correction_critical_confidence': 0.95,
+            'enable_context_validation': True,
+            'max_corrections_per_segment': 10,
+            
+            # Legacy lexicon paths (for backward compatibility)
             'lexicon_paths': {
                 'corrections': 'data/lexicons/corrections.yaml',
                 'proper_nouns': 'data/lexicons/proper_nouns.yaml',
@@ -350,21 +434,33 @@ class SanskritPostProcessor:
                 self.metrics_collector.update_correction_count(metrics, f"contextual_number_{conversion.number_context.value}")
                 all_corrections_applied.append(f"contextual_number_{conversion.number_context.value}")
         
-        # Step 3: Apply Sanskrit/Hindi corrections (existing lexicon-based approach)
-        self.metrics_collector.start_timer('correction')
+        # Step 3: Enhanced Sanskrit/Hindi corrections (Story 2.1)
+        self.metrics_collector.start_timer('sanskrit_hindi_correction')
+        sanskrit_corrections = self._apply_enhanced_sanskrit_hindi_corrections(processed_segment.text)
+        processed_segment.text = sanskrit_corrections['corrected_text']
+        metrics.correction_time += self.metrics_collector.end_timer('sanskrit_hindi_correction')
+        
+        # Track Sanskrit/Hindi corrections
+        for correction in sanskrit_corrections['corrections_applied']:
+            correction_type = f"sanskrit_hindi_{correction.correction_type.value}"
+            self.metrics_collector.update_correction_count(metrics, correction_type)
+            all_corrections_applied.append(correction_type)
+        
+        # Step 4: Apply legacy Sanskrit/Hindi corrections (backward compatibility)
+        self.metrics_collector.start_timer('legacy_correction')
         corrected_text, lexicon_corrections = self._apply_lexicon_corrections(processed_segment.text)
         processed_segment.text = corrected_text
-        metrics.correction_time += self.metrics_collector.end_timer('correction')
+        metrics.correction_time += self.metrics_collector.end_timer('legacy_correction')
         
-        # Track lexicon corrections
+        # Track legacy lexicon corrections
         for correction in lexicon_corrections:
-            self.metrics_collector.update_correction_count(metrics, "lexicon_correction")
-            all_corrections_applied.append("lexicon_correction")
+            self.metrics_collector.update_correction_count(metrics, "legacy_lexicon_correction")
+            all_corrections_applied.append("legacy_lexicon_correction")
         
-        # Step 4: Apply proper noun capitalization (existing approach)
+        # Step 5: Apply proper noun capitalization (existing approach)
         processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
         
-        # Step 5: Quality validation and semantic drift check
+        # Step 6: Quality validation and semantic drift check
         if original_text != processed_segment.text:
             # Calculate semantic drift for this segment
             if isinstance(self.text_normalizer, AdvancedTextNormalizer):
@@ -381,7 +477,7 @@ class SanskritPostProcessor:
             if abs(change_ratio - 1.0) > 0.2:  # More than 20% change
                 processed_segment.processing_flags.append("significant_change")
         
-        # Step 6: Calculate enhanced confidence score
+        # Step 7: Calculate enhanced confidence score
         confidence = self._calculate_enhanced_confidence(
             processed_segment.text, 
             all_corrections_applied,
@@ -400,6 +496,98 @@ class SanskritPostProcessor:
             self.metrics_collector.update_correction_count(metrics, correction_type)
         
         return processed_segment
+
+    def _apply_enhanced_sanskrit_hindi_corrections(self, text: str) -> Dict[str, Any]:
+        """
+        Apply enhanced Sanskrit/Hindi corrections using Story 2.1 components.
+        
+        Args:
+            text: Input text to correct
+            
+        Returns:
+            Dictionary with corrected text and metadata
+        """
+        try:
+            # Step 1: Identify Sanskrit/Hindi words
+            identified_words = self.word_identifier.identify_words(text)
+            
+            # Step 2: Find fuzzy matches for potential corrections
+            words = [word.strip() for word in text.split() if word.strip()]
+            fuzzy_matches = []
+            
+            for word in words:
+                matches = self.fuzzy_matcher.find_matches(word, context=text)
+                fuzzy_matches.extend(matches)
+            
+            # Step 3: Create correction candidates
+            correction_candidates = []
+            
+            # From identified words
+            word_candidates = self.correction_applier.create_candidates_from_identified_words(
+                identified_words, text
+            )
+            correction_candidates.extend(word_candidates)
+            
+            # From fuzzy matches
+            fuzzy_candidates = self.correction_applier.create_candidates_from_fuzzy_matches(
+                fuzzy_matches, text
+            )
+            correction_candidates.extend(fuzzy_candidates)
+            
+            # Step 4: Apply IAST transliteration if needed
+            iast_result = self.iast_transliterator.transliterate_to_iast(text)
+            if iast_result.changes_made:
+                # Add IAST corrections as candidates
+                from sanskrit_hindi_identifier.correction_applier import CorrectionCandidate, CorrectionType, CorrectionPriority
+                
+                for original, target in iast_result.changes_made:
+                    # Find position of the change
+                    position = text.find(original)
+                    if position != -1:
+                        candidate = CorrectionCandidate(
+                            original_text=original,
+                            corrected_text=target,
+                            position=position,
+                            length=len(original),
+                            confidence=iast_result.confidence,
+                            correction_type=CorrectionType.TRANSLITERATION,
+                            priority=CorrectionPriority.HIGH,
+                            source="iast_transliterator",
+                            metadata={'rules_applied': len(iast_result.rules_applied)}
+                        )
+                        correction_candidates.append(candidate)
+            
+            # Step 5: Apply corrections
+            correction_result = self.correction_applier.apply_corrections(text, correction_candidates)
+            
+            return {
+                'original_text': text,
+                'corrected_text': correction_result.corrected_text,
+                'corrections_applied': correction_result.corrections_applied,
+                'corrections_skipped': correction_result.corrections_skipped,
+                'overall_confidence': correction_result.overall_confidence,
+                'warnings': correction_result.warnings,
+                'identified_words_count': len(identified_words),
+                'fuzzy_matches_count': len(fuzzy_matches),
+                'candidates_count': len(correction_candidates),
+                'iast_changes': len(iast_result.changes_made)
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error in enhanced Sanskrit/Hindi corrections: {e}")
+            # Return original text with no corrections on error
+            return {
+                'original_text': text,
+                'corrected_text': text,
+                'corrections_applied': [],
+                'corrections_skipped': [],
+                'overall_confidence': 1.0,
+                'warnings': [f"Error in corrections: {str(e)}"],
+                'identified_words_count': 0,
+                'fuzzy_matches_count': 0,
+                'candidates_count': 0,
+                'iast_changes': 0
+            }
 
     def _process_segment(self, segment: TranscriptSegment) -> TranscriptSegment:
         """Legacy method for processing TranscriptSegment objects."""
@@ -680,9 +868,9 @@ class SanskritPostProcessor:
         return time_obj.hours * 3600 + time_obj.minutes * 60 + time_obj.seconds + time_obj.milliseconds / 1000.0
 
     def get_processing_stats(self) -> Dict[str, Any]:
-        """Get statistics about loaded lexicons and processor state."""
-        return {
-            'lexicons': {
+        """Get comprehensive statistics about loaded lexicons and processor state."""
+        stats = {
+            'legacy_lexicons': {
                 'corrections': len(self.corrections),
                 'proper_nouns': len(self.proper_nouns),
                 'phrases': len(self.phrases),
@@ -691,3 +879,85 @@ class SanskritPostProcessor:
             'config': self.config,
             'fuzzy_threshold': self.fuzzy_threshold
         }
+        
+        # Add Story 2.1 component statistics
+        try:
+            # Lexicon manager stats
+            stats['enhanced_lexicons'] = self.lexicon_manager.get_lexicon_statistics()
+            stats['lexicon_metadata'] = {
+                name: {
+                    'entries_count': meta.entries_count,
+                    'version': meta.version,
+                    'last_updated': meta.last_updated,
+                    'categories': meta.categories
+                }
+                for name, meta in self.lexicon_manager.get_metadata().items()
+            }
+            
+            # Word identifier stats
+            stats['word_identifier'] = self.word_identifier.get_lexicon_stats()
+            
+            # Fuzzy matcher stats
+            stats['fuzzy_matcher'] = self.fuzzy_matcher.get_matching_stats()
+            
+            # Correction applier stats
+            stats['correction_applier'] = self.correction_applier.get_correction_stats()
+            
+        except Exception as e:
+            self.logger.error(f"Error getting Story 2.1 statistics: {e}")
+            stats['story_2_1_error'] = str(e)
+        
+        return stats
+
+    def get_sanskrit_hindi_processing_report(self) -> Dict[str, Any]:
+        """
+        Get a detailed report on Sanskrit/Hindi processing capabilities.
+        
+        Returns:
+            Comprehensive report on lexicon-based correction system
+        """
+        try:
+            report = {
+                'system_info': {
+                    'story_version': '2.1',
+                    'components': [
+                        'SanskritHindiIdentifier',
+                        'LexiconManager', 
+                        'FuzzyMatcher',
+                        'IASTTransliterator',
+                        'CorrectionApplier'
+                    ],
+                    'capabilities': [
+                        'Sanskrit/Hindi word identification',
+                        'Fuzzy matching with Levenshtein distance',
+                        'IAST transliteration enforcement', 
+                        'High-confidence correction application',
+                        'Externalized lexicon management'
+                    ]
+                },
+                'lexicon_summary': self.lexicon_manager.get_lexicon_statistics(),
+                'configuration': {
+                    'fuzzy_min_confidence': self.config.get('fuzzy_min_confidence'),
+                    'correction_min_confidence': self.config.get('correction_min_confidence'),
+                    'iast_strict_mode': self.config.get('iast_strict_mode'),
+                    'enable_phonetic_matching': self.config.get('enable_phonetic_matching'),
+                    'max_corrections_per_segment': self.config.get('max_corrections_per_segment')
+                },
+                'validation_results': {}
+            }
+            
+            # Validate lexicon integrity
+            all_entries = self.lexicon_manager.get_all_entries()
+            sample_entry = next(iter(all_entries.values())) if all_entries else None
+            if sample_entry:
+                validation_issues = self.word_identifier.validate_lexicon_integrity()
+                report['validation_results'] = validation_issues
+            
+            return report
+            
+        except Exception as e:
+            self.logger.error(f"Error generating Sanskrit/Hindi processing report: {e}")
+            return {
+                'error': str(e),
+                'system_info': {'story_version': '2.1', 'status': 'error'}
+            }

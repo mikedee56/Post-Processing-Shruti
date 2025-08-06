@@ -16,15 +16,33 @@ This directory contains all data files for the ASR Post-Processing system.
 - **Versioning**: Files include version suffixes (`_v1`, `_v2`, etc.)
 - **Naming**: `{original_name}_processed_{version}.srt`
 
-### `lexicons/`
-- **Purpose**: Externalized Sanskrit/Hindi dictionaries
-- **File types**: JSON and YAML files
-- **Version control**: Date-based versioning (`YYYY_MM_DD`)
+### `lexicons/` ✅ Enhanced (Story 2.1)
+- **Purpose**: Externalized Sanskrit/Hindi dictionaries with advanced correction capabilities
+- **File types**: JSON and YAML files with comprehensive validation
+- **Version control**: Automated metadata tracking and checksum validation
 - **Categories**:
-  - Sanskrit terms
-  - Hindi terms  
-  - Vedanta proper nouns
-  - Scriptural verses
+  - `corrections.yaml` - Common term corrections and variations
+  - `proper_nouns.yaml` - Deities, teachers, places with proper capitalization
+  - `phrases.yaml` - Sanskrit/Hindi phrases and expressions
+  - `verses.yaml` - Scriptural verse references with canonical text
+
+#### Lexicon Entry Format (Story 2.1)
+```yaml
+entries:
+  - original_term: "krishna"
+    variations: ["krsna", "krshna", "krisna"] 
+    transliteration: "Kṛṣṇa"
+    is_proper_noun: true
+    category: "deity"
+    confidence: 1.0
+    source_authority: "academic_standard"
+```
+
+#### Advanced Features
+- **Fuzzy Matching**: Levenshtein distance and phonetic pattern matching
+- **IAST Compliance**: Automatic transliteration standard enforcement  
+- **Validation System**: Entry integrity checks and duplicate detection
+- **Performance Optimization**: In-memory caching and indexed search structures
 
 ### `golden_dataset/`
 - **Purpose**: Manually perfected reference transcripts
