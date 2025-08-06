@@ -1,0 +1,47 @@
+{
+  "file_path": "data\\test_samples\\conversational_test.srt",
+  "processing_time": 0.03154897689819336,
+  "total_segments": 10,
+  "segments_modified": 10,
+  "corrections_applied": {
+    "conversational_rescinded": 6,
+    "handled_conversational_nuances": 8,
+    "removed_filler_words": 6,
+    "converted_numbers": 2,
+    "fixed_capitalization": 4,
+    "lexicon_correction": 4,
+    "conversational_partial_phrase": 6,
+    "conversational_filler_context": 4
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.446) in segment",
+    "High semantic drift (0.305) in segment"
+  ],
+  "original_word_count": 140,
+  "processed_word_count": 115,
+  "original_char_count": 809,
+  "processed_char_count": 666,
+  "confidence_scores": [
+    0.20066666666666663,
+    0.5529411764705883,
+    0.3822222222222223,
+    0.4507784986098239,
+    0.3722857142857142,
+    0.3472470978441128,
+    0.5511722488038276,
+    0.4119047619047619,
+    0.4426707000864304,
+    0.41
+  ],
+  "average_confidence": 0.4121889086894147,
+  "flagged_segments": 10,
+  "parsing_time": 0.0,
+  "normalization_time": 0.011638164520263672,
+  "correction_time": 0.019910812377929688,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T14:19:59.214261+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

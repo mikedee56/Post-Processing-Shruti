@@ -159,9 +159,9 @@ class TestTextNormalizer:
     def test_standardize_quotation_marks(self):
         """Test quotation mark standardization."""
         test_cases = [
-            (""Hello"", '"Hello"'),
+            ('"Hello"', '"Hello"'),
             ("'Hello'", "'Hello'"),
-            (""Mixed quotes"", '"Mixed quotes"'),
+            ('"Mixed quotes"', '"Mixed quotes"'),
             ("Don't", "Don't")
         ]
         

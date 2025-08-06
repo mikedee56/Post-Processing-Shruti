@@ -1,0 +1,42 @@
+{
+  "file_path": "data\\test_samples\\numbers_context_test.srt",
+  "processing_time": 0.03227376937866211,
+  "total_segments": 10,
+  "segments_modified": 10,
+  "corrections_applied": {
+    "converted_numbers": 10,
+    "lexicon_correction": 6
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.338) in segment",
+    "High semantic drift (0.389) in segment",
+    "High semantic drift (0.500) in segment"
+  ],
+  "original_word_count": 121,
+  "processed_word_count": 117,
+  "original_char_count": 727,
+  "processed_char_count": 638,
+  "confidence_scores": [
+    0.6409090909090908,
+    0.6576923076923076,
+    0.5955244755244755,
+    0.6646153846153846,
+    0.5910045662100456,
+    0.6281183932346722,
+    0.632186732186732,
+    0.5801139601139601,
+    0.6639285714285714,
+    0.6661904761904761
+  ],
+  "average_confidence": 0.6320283958105716,
+  "flagged_segments": 3,
+  "parsing_time": 0.0005161762237548828,
+  "normalization_time": 0.011659383773803711,
+  "correction_time": 0.018085718154907227,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T14:23:23.355479+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

@@ -1,0 +1,27 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp3bmrkkhw\\test_input.srt",
+  "processing_time": 0.004111528396606445,
+  "total_segments": 2,
+  "segments_modified": 0,
+  "corrections_applied": {},
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [
+    "Error processing segment 0: unterminated character set at position 0",
+    "Error processing segment 1: unterminated character set at position 0"
+  ],
+  "warnings_encountered": [],
+  "original_word_count": 23,
+  "processed_word_count": 23,
+  "original_char_count": 146,
+  "processed_char_count": 146,
+  "confidence_scores": [],
+  "average_confidence": 0.0,
+  "flagged_segments": 0,
+  "parsing_time": 0.0,
+  "normalization_time": 0.0,
+  "correction_time": 0.0,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T12:10:40.237701+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

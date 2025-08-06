@@ -1,0 +1,67 @@
+# Proper Nouns Lexicon
+# This file contains proper nouns specific to Yoga Vedanta tradition
+
+entries:
+  - original_term: "shiva"
+    variations: ["siva", "shiv", "shiiva"]
+    transliteration: "Śiva"
+    is_proper_noun: true
+    category: "deity"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "vishnu"
+    variations: ["visnu", "vishnu", "vishnuu"]
+    transliteration: "Viṣṇu"
+    is_proper_noun: true
+    category: "deity"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "upanishads"
+    variations: ["upanishads", "upanisads", "upanishad"]
+    transliteration: "Upaniṣads"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "vedas"
+    variations: ["veds", "vedaas"]
+    transliteration: "Vedas"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "mahabharata"
+    variations: ["mahabharat", "mahaabharata"]
+    transliteration: "Mahābhārata"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "ramayana"
+    variations: ["ramayan", "raamayana"]
+    transliteration: "Rāmāyaṇa"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "shankaracharya"
+    variations: ["sankaracharya", "shankara", "sankara"]
+    transliteration: "Śaṅkarācārya"
+    is_proper_noun: true
+    category: "teacher"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "gaudapada"
+    variations: ["goudapada", "gaudapaada"]
+    transliteration: "Gauḍapāda"
+    is_proper_noun: true
+    category: "teacher"
+    confidence: 1.0
+    source_authority: "IAST"

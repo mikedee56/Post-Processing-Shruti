@@ -1,0 +1,33 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpxe3w8id2.srt",
+  "processing_time": 0.009523391723632812,
+  "total_segments": 1,
+  "segments_modified": 0,
+  "corrections_applied": {
+    "lexicon_correction": 2,
+    "removed_filler_words": 1,
+    "converted_numbers": 1,
+    "fixed_capitalization": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.447) in segment"
+  ],
+  "original_word_count": 10,
+  "processed_word_count": 9,
+  "original_char_count": 56,
+  "processed_char_count": 43,
+  "confidence_scores": [
+    0.4092460317460317
+  ],
+  "average_confidence": 0.4092460317460317,
+  "flagged_segments": 1,
+  "parsing_time": 0.0,
+  "normalization_time": 0.009523391723632812,
+  "correction_time": 0.0,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T12:17:16.434759+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

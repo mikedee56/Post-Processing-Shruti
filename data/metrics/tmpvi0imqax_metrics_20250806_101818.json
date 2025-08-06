@@ -1,0 +1,39 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpvi0imqax.srt",
+  "processing_time": 0.0213930606842041,
+  "total_segments": 5,
+  "segments_modified": 5,
+  "corrections_applied": {
+    "conversational_rescinded": 2,
+    "handled_conversational_nuances": 2,
+    "removed_filler_words": 5,
+    "converted_numbers": 3,
+    "fixed_capitalization": 3
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.446) in segment",
+    "High semantic drift (0.347) in segment"
+  ],
+  "original_word_count": 81,
+  "processed_word_count": 65,
+  "original_char_count": 462,
+  "processed_char_count": 363,
+  "confidence_scores": [
+    0.20066666666666663,
+    0.5359705159705159,
+    0.526060606060606,
+    0.4014380530973451,
+    0.5617021276595745
+  ],
+  "average_confidence": 0.4451675938909417,
+  "flagged_segments": 5,
+  "parsing_time": 0.0,
+  "normalization_time": 0.009240388870239258,
+  "correction_time": 0.007863759994506836,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T14:18:18.339374+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

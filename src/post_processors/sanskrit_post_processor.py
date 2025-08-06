@@ -20,10 +20,14 @@ import pandas as pd
 from fuzzywuzzy import fuzz, process
 
 # Import new components
-from ..utils.srt_parser import SRTParser, SRTSegment
-from ..utils.text_normalizer import TextNormalizer
-from ..utils.metrics_collector import MetricsCollector, ProcessingMetrics
-from ..utils.logger_config import get_logger
+from utils.srt_parser import SRTParser, SRTSegment
+from utils.text_normalizer import TextNormalizer
+from utils.advanced_text_normalizer import AdvancedTextNormalizer
+from utils.conversational_pattern_detector import ConversationalPatternDetector
+from utils.contextual_number_processor import ContextualNumberProcessor
+from utils.processing_quality_validator import ProcessingQualityValidator
+from utils.metrics_collector import MetricsCollector, ProcessingMetrics
+from utils.logger_config import get_logger
 
 
 @dataclass
@@ -81,7 +85,19 @@ class SanskritPostProcessor:
         
         # Initialize new components
         self.srt_parser = SRTParser()
-        self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
+        
+        # Choose between basic and advanced text normalizer based on config
+        use_advanced_normalization = self.config.get('use_advanced_normalization', True)
+        if use_advanced_normalization:
+            self.text_normalizer = AdvancedTextNormalizer(self.config.get('text_normalization', {}))
+        else:
+            self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
+        
+        # Initialize additional foundational correction components
+        self.conversational_detector = ConversationalPatternDetector(self.config.get('conversational_patterns', {}))
+        self.number_processor = ContextualNumberProcessor(self.config.get('contextual_numbers', {}))
+        self.quality_validator = ProcessingQualityValidator(self.config.get('quality_validation', {}))
+        
         self.metrics_collector = MetricsCollector(self.config.get('metrics', {}))
         
         # Initialize lexicons
@@ -109,11 +125,35 @@ class SanskritPostProcessor:
         return {
             'fuzzy_threshold': 80,
             'confidence_threshold': 0.6,
+            'use_advanced_normalization': True,
             'lexicon_paths': {
                 'corrections': 'data/lexicons/corrections.yaml',
                 'proper_nouns': 'data/lexicons/proper_nouns.yaml',
                 'phrases': 'data/lexicons/phrases.yaml',
                 'verses': 'data/lexicons/verses.yaml'
+            },
+            'text_normalization': {
+                'remove_fillers': True,
+                'convert_numbers': True,
+                'standardize_punctuation': True,
+                'fix_capitalization': True,
+                'preserve_meaningful_discourse': True,
+                'semantic_drift_threshold': 0.3,
+                'min_confidence_score': 0.7
+            },
+            'conversational_patterns': {
+                'min_confidence_threshold': 0.7,
+                'context_window_size': 50
+            },
+            'contextual_numbers': {
+                'min_confidence_threshold': 0.7,
+                'preserve_uncertainty': True
+            },
+            'quality_validation': {
+                'validation_level': 'moderate',
+                'max_semantic_drift': 0.3,
+                'max_timestamp_deviation': 0.001,
+                'min_quality_score': 0.7
             }
         }
 
@@ -261,57 +301,105 @@ class SanskritPostProcessor:
 
     def _process_srt_segment(self, segment: SRTSegment, metrics: ProcessingMetrics) -> SRTSegment:
         """
-        Process a single SRT segment with the new pipeline.
+        Process a single SRT segment with the enhanced foundational corrections pipeline.
         
         Args:
             segment: SRT segment to process
             metrics: ProcessingMetrics object to update
             
         Returns:
-            Processed SRT segment
+            Processed SRT segment with foundational corrections applied
         """
-        original_text = segment.text
+        # Create a copy of the segment to avoid mutating the original
+        import copy
+        processed_segment = copy.deepcopy(segment)
         
-        # Step 1: Text normalization using new TextNormalizer
+        original_text = segment.text  # Keep reference to original text
+        all_corrections_applied = []
+        
+        # Step 1: Enhanced Text Normalization with conversational nuance handling
         self.metrics_collector.start_timer('normalization')
-        normalization_result = self.text_normalizer.normalize_with_tracking(segment.text)
-        segment.text = normalization_result.normalized_text
+        
+        if isinstance(self.text_normalizer, AdvancedTextNormalizer):
+            # Use advanced normalization with conversational pattern handling
+            advanced_result = self.text_normalizer.normalize_with_advanced_tracking(processed_segment.text)
+            processed_segment.text = advanced_result.corrected_text
+            all_corrections_applied.extend(advanced_result.corrections_applied)
+            
+            # Track conversational fixes
+            for conv_fix in advanced_result.conversational_fixes:
+                self.metrics_collector.update_correction_count(metrics, f"conversational_{conv_fix.pattern_type}")
+                all_corrections_applied.append(f"conversational_{conv_fix.pattern_type}")
+        else:
+            # Use basic normalization
+            normalization_result = self.text_normalizer.normalize_with_tracking(processed_segment.text)
+            processed_segment.text = normalization_result.normalized_text
+            all_corrections_applied.extend(normalization_result.changes_applied)
+        
         metrics.normalization_time += self.metrics_collector.end_timer('normalization')
         
-        # Track normalization changes
-        for change in normalization_result.changes_applied:
-            self.metrics_collector.update_correction_count(metrics, f"normalization_{change}")
+        # Step 2: Enhanced contextual number processing for spiritual contexts
+        self.metrics_collector.start_timer('number_processing')
+        number_result = self.number_processor.process_numbers(processed_segment.text, context="spiritual")
+        processed_segment.text = number_result.processed_text
+        metrics.normalization_time += self.metrics_collector.end_timer('number_processing')
         
-        # Step 2: Apply Sanskrit/Hindi corrections
+        # Track number conversions
+        for conversion in number_result.conversions:
+            if conversion.confidence_score >= 0.7:  # Only count high-confidence conversions
+                self.metrics_collector.update_correction_count(metrics, f"contextual_number_{conversion.number_context.value}")
+                all_corrections_applied.append(f"contextual_number_{conversion.number_context.value}")
+        
+        # Step 3: Apply Sanskrit/Hindi corrections (existing lexicon-based approach)
         self.metrics_collector.start_timer('correction')
-        corrected_text, corrections = self._apply_lexicon_corrections(segment.text)
-        segment.text = corrected_text
+        corrected_text, lexicon_corrections = self._apply_lexicon_corrections(processed_segment.text)
+        processed_segment.text = corrected_text
         metrics.correction_time += self.metrics_collector.end_timer('correction')
         
         # Track lexicon corrections
-        for correction in corrections:
+        for correction in lexicon_corrections:
             self.metrics_collector.update_correction_count(metrics, "lexicon_correction")
+            all_corrections_applied.append("lexicon_correction")
         
-        # Step 3: Apply proper noun capitalization
-        segment.text = self._apply_proper_noun_capitalization(segment.text)
+        # Step 4: Apply proper noun capitalization (existing approach)
+        processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
         
-        # Add processing flags for significant changes
-        if original_text != segment.text:
-            change_ratio = len(segment.text) / len(original_text) if original_text else 1.0
+        # Step 5: Quality validation and semantic drift check
+        if original_text != processed_segment.text:
+            # Calculate semantic drift for this segment
+            if isinstance(self.text_normalizer, AdvancedTextNormalizer):
+                semantic_drift = self.text_normalizer.calculate_semantic_drift(original_text, processed_segment.text)
+                
+                # Flag segments with high semantic drift
+                max_drift = self.config.get('quality_validation', {}).get('max_semantic_drift', 0.3)
+                if semantic_drift > max_drift:
+                    processed_segment.processing_flags.append("high_semantic_drift")
+                    metrics.warnings_encountered.append(f"High semantic drift ({semantic_drift:.3f}) in segment")
+            
+            # Check for significant text length changes
+            change_ratio = len(processed_segment.text) / len(original_text) if original_text else 1.0
             if abs(change_ratio - 1.0) > 0.2:  # More than 20% change
-                segment.processing_flags.append("significant_change")
+                processed_segment.processing_flags.append("significant_change")
         
-        # Calculate confidence score
-        confidence = self._calculate_confidence(segment.text, corrections)
-        segment.confidence = confidence
+        # Step 6: Calculate enhanced confidence score
+        confidence = self._calculate_enhanced_confidence(
+            processed_segment.text, 
+            all_corrections_applied,
+            original_text
+        )
+        processed_segment.confidence = confidence
         
         # Flag low confidence segments
         confidence_threshold = self.config.get('confidence_threshold', 0.6)
         if confidence < confidence_threshold:
-            segment.processing_flags.append("low_confidence")
+            processed_segment.processing_flags.append("low_confidence")
             metrics.flagged_segments += 1
         
-        return segment
+        # Track all applied corrections in metrics
+        for correction_type in all_corrections_applied:
+            self.metrics_collector.update_correction_count(metrics, correction_type)
+        
+        return processed_segment
 
     def _process_segment(self, segment: TranscriptSegment) -> TranscriptSegment:
         """Legacy method for processing TranscriptSegment objects."""
@@ -368,6 +456,54 @@ class SanskritPostProcessor:
             return self.metrics_collector.generate_session_report(session)
         return None
 
+    def validate_processing_quality(
+        self, 
+        original_segments: List[SRTSegment], 
+        processed_segments: List[SRTSegment],
+        corrections_applied: List[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Validate the quality of processing results using the quality validator.
+        
+        Args:
+            original_segments: Original SRT segments before processing
+            processed_segments: Processed SRT segments
+            corrections_applied: List of correction types applied
+            
+        Returns:
+            Quality validation report dictionary
+        """
+        quality_report = self.quality_validator.validate_processing_quality(
+            original_segments, 
+            processed_segments, 
+            corrections_applied or []
+        )
+        
+        return {
+            'overall_quality_score': quality_report.overall_quality_score,
+            'timestamp_integrity_score': quality_report.timestamp_integrity_score,
+            'semantic_preservation_score': quality_report.semantic_preservation_score,
+            'correction_impact_score': quality_report.correction_impact_score,
+            'validation_passed': quality_report.passed_validation,
+            'total_issues': len(quality_report.validation_issues),
+            'critical_issues': len([i for i in quality_report.validation_issues if i.severity.value == 'failed']),
+            'warnings': len([i for i in quality_report.validation_issues if i.severity.value == 'warning']),
+            'recommendations': quality_report.recommendations,
+            'processing_metrics': quality_report.processing_metrics,
+            'validation_details': {
+                'issues': [
+                    {
+                        'type': issue.issue_type,
+                        'severity': issue.severity.value,
+                        'description': issue.description,
+                        'segment_index': issue.segment_index,
+                        'confidence': issue.confidence_score
+                    } 
+                    for issue in quality_report.validation_issues
+                ]
+            }
+        }
+
     def _apply_lexicon_corrections(self, text: str) -> Tuple[str, List[str]]:
         """Apply lexicon-based corrections using fuzzy matching."""
         corrections_applied = []
@@ -388,6 +524,13 @@ class SanskritPostProcessor:
             best_match = self._fuzzy_match_lexicon(clean_word)
             if best_match:
                 entry, score = best_match
+                
+                # Avoid replacing single words with multi-word phrases unless very high confidence
+                entry_word_count = len(entry.transliteration.split())
+                if entry_word_count > 1 and score < 95:
+                    # Skip this fuzzy match - too risky
+                    continue
+                    
                 words[i] = self._preserve_case_and_punctuation(word, entry.transliteration)
                 corrections_applied.append(f"{clean_word} -> {entry.transliteration} (fuzzy: {score})")
         
@@ -446,8 +589,73 @@ class SanskritPostProcessor:
         
         return leading_punct + replacement + trailing_punct
 
+    def _calculate_enhanced_confidence(self, text: str, corrections: List[str], original_text: str) -> float:
+        """
+        Calculate enhanced confidence score considering foundational corrections.
+        
+        Args:
+            text: Processed text
+            corrections: List of corrections applied
+            original_text: Original text before processing
+            
+        Returns:
+            Confidence score between 0.0 and 1.0
+        """
+        # Base confidence score
+        base_confidence = 0.85
+        
+        # Categorize corrections by impact
+        high_confidence_corrections = [
+            'converted_numbers', 'standardized_punctuation', 'fixed_capitalization',
+            'contextual_number_scriptural_reference', 'contextual_number_ordinal'
+        ]
+        
+        medium_confidence_corrections = [
+            'removed_filler_words', 'lexicon_correction',
+            'contextual_number_date', 'contextual_number_time'
+        ]
+        
+        low_confidence_corrections = [
+            'conversational_rescinded', 'conversational_partial_phrase',
+            'handled_conversational_nuances'
+        ]
+        
+        # Calculate correction impact
+        high_impact_count = sum(1 for c in corrections if any(hc in c for hc in high_confidence_corrections))
+        medium_impact_count = sum(1 for c in corrections if any(mc in c for mc in medium_confidence_corrections))
+        low_impact_count = sum(1 for c in corrections if any(lc in c for lc in low_confidence_corrections))
+        
+        # Apply penalties based on correction types
+        confidence_penalty = (
+            high_impact_count * 0.05 +    # Small penalty for high-confidence corrections
+            medium_impact_count * 0.08 +  # Medium penalty for medium-confidence corrections
+            low_impact_count * 0.12       # Higher penalty for risky corrections
+        )
+        
+        # Check for remaining potential issues (legacy approach)
+        words = text.split()
+        unknown_words = 0
+        for word in words:
+            clean_word = re.sub(r'[^\w]', '', word.lower())
+            if len(clean_word) > 3 and clean_word not in self.corrections and clean_word not in self.proper_nouns:
+                unknown_words += 1
+        
+        unknown_penalty = (unknown_words / len(words)) * 0.2 if words else 0
+        
+        # Additional penalty for excessive text length changes
+        if original_text:
+            length_change_ratio = abs(len(text) - len(original_text)) / len(original_text)
+            length_penalty = min(length_change_ratio * 0.3, 0.2)  # Cap at 0.2
+        else:
+            length_penalty = 0
+        
+        # Calculate final confidence
+        final_confidence = base_confidence - confidence_penalty - unknown_penalty - length_penalty
+        
+        return max(0.0, min(1.0, final_confidence))
+    
     def _calculate_confidence(self, text: str, corrections: List[str]) -> float:
-        """Calculate confidence score for the processed segment."""
+        """Calculate confidence score for the processed segment (legacy method)."""
         # Simple confidence calculation - can be enhanced
         base_confidence = 0.8
         

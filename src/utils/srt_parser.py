@@ -23,6 +23,11 @@ class SRTSegment:
     raw_text: str      # original before processing
     confidence: Optional[float] = None
     processing_flags: List[str] = field(default_factory=list)
+    
+    @property
+    def segment_id(self) -> int:
+        """Return segment_id as alias for index for backward compatibility."""
+        return self.index
 
 
 class SRTParseError(Exception):

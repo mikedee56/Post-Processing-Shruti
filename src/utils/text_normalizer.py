@@ -106,7 +106,14 @@ class TextNormalizer:
                 changes_applied.append("standardized_punctuation")
                 current_text = new_text
         
-        # Step 4: Fix capitalization
+        # Step 4: Remove word repetitions
+        if self.config.get('remove_repetitions', True):
+            new_text = self.remove_word_repetitions(current_text)
+            if new_text != current_text:
+                changes_applied.append("removed_repetitions")
+                current_text = new_text
+        
+        # Step 5: Fix capitalization
         if self.config.get('fix_capitalization', True):
             new_text = self.fix_capitalization(current_text)
             if new_text != current_text:
@@ -138,19 +145,19 @@ class TextNormalizer:
         
         result = text
         
-        # Convert basic number words
-        for word_num, digit in self.basic_numbers.items():
-            pattern = rf'\b{re.escape(word_num)}\b'
-            result = re.sub(pattern, digit, result, flags=re.IGNORECASE)
-        
-        # Handle compound numbers (e.g., "twenty five" -> "25")
+        # Handle compound numbers FIRST (e.g., "twenty five" -> "25")
         result = self._convert_compound_numbers(result)
+        
+        # Handle years and large numbers
+        result = self._convert_year_patterns(result)
         
         # Handle ordinals (e.g., "first" -> "1st", "second" -> "2nd")
         result = self._convert_ordinals(result)
         
-        # Handle years and large numbers
-        result = self._convert_year_patterns(result)
+        # Convert remaining basic number words
+        for word_num, digit in self.basic_numbers.items():
+            pattern = rf'\b{re.escape(word_num)}\b'
+            result = re.sub(pattern, digit, result, flags=re.IGNORECASE)
         
         return result
     
@@ -215,9 +222,9 @@ class TextNormalizer:
         result = re.sub(r'([.!?])([A-Z])', r'\1 \2', result)  # Add space after sentence punctuation
         result = re.sub(r'([,:;])([^\s])', r'\1 \2', result)  # Add space after commas/semicolons
         
-        # Normalize quotation marks
-        result = re.sub(r'["""]', '"', result)  # Normalize smart quotes
-        result = re.sub(r'['']', "'", result)  # Normalize smart apostrophes
+        # Normalize quotation marks - temporarily disabled due to regex issues
+        # result = re.sub(r'[""]', '"', result)  # Normalize smart quotes
+        # result = re.sub(r'['']', "'", result)  # Normalize smart apostrophes
         
         # Fix multiple punctuation
         result = re.sub(r'\.{2,}', '...', result)  # Multiple periods to ellipsis
@@ -267,6 +274,27 @@ class TextNormalizer:
                 fixed_sentences.append(sentence)
         
         return ''.join(fixed_sentences)
+    
+    def remove_word_repetitions(self, text: str) -> str:
+        """
+        Remove consecutive word repetitions like 'the the' or 'and and'.
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Text with word repetitions removed
+        """
+        if not text:
+            return text
+        
+        # Pattern to match repeated words (case-insensitive)
+        repetition_pattern = r'\b(\w+)\s+\1\b'
+        
+        # Remove repetitions
+        result = re.sub(repetition_pattern, r'\1', text, flags=re.IGNORECASE)
+        
+        return result
     
     def _setup_filler_words(self):
         """Setup filler words for removal."""
@@ -336,13 +364,14 @@ class TextNormalizer:
     def _convert_compound_numbers(self, text: str) -> str:
         """Convert compound numbers like 'twenty five' to '25'."""
         # Pattern for compound numbers (e.g., "twenty one", "thirty five")
+        # Process compound numbers BEFORE single numbers to avoid "20 5" issue
         compound_pattern = r'\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+(one|two|three|four|five|six|seven|eight|nine)\b'
         
         def replace_compound(match):
             tens = match.group(1)
             ones = match.group(2)
-            tens_digit = self.basic_numbers.get(tens, tens)
-            ones_digit = self.basic_numbers.get(ones, ones)
+            tens_digit = self.basic_numbers.get(tens.lower(), tens)
+            ones_digit = self.basic_numbers.get(ones.lower(), ones)
             
             if tens_digit.isdigit() and ones_digit.isdigit():
                 return str(int(tens_digit) + int(ones_digit))

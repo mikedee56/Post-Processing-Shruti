@@ -1,0 +1,36 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpk9r2elml\\test_input.srt",
+  "processing_time": 0.004999876022338867,
+  "total_segments": 2,
+  "segments_modified": 2,
+  "corrections_applied": {
+    "removed_filler_words": 2,
+    "converted_numbers": 1,
+    "fixed_capitalization": 2,
+    "conversational_rescinded": 2,
+    "handled_conversational_nuances": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.346) in segment",
+    "High semantic drift (0.303) in segment"
+  ],
+  "original_word_count": 23,
+  "processed_word_count": 18,
+  "original_char_count": 146,
+  "processed_char_count": 113,
+  "confidence_scores": [
+    0.5038235294117647,
+    0.21076923076923074
+  ],
+  "average_confidence": 0.3572963800904977,
+  "flagged_segments": 2,
+  "parsing_time": 0.0,
+  "normalization_time": 0.0010004043579101562,
+  "correction_time": 0.0029997825622558594,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T12:26:29.159809+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

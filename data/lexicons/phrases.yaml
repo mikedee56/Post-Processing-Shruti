@@ -1,0 +1,51 @@
+# Common Phrases Lexicon
+# This file contains common phrases and their corrections
+
+entries:
+  - original_term: "chapter two verse twenty five"
+    variations: ["chapter 2 verse 25", "second chapter verse twenty five"]
+    transliteration: "chapter 2 verse 25"
+    is_proper_noun: false
+    category: "reference"
+    confidence: 1.0
+    source_authority: "standard"
+
+  - original_term: "first chapter"
+    variations: ["chapter one", "chapter 1"]
+    transliteration: "chapter 1"
+    is_proper_noun: false
+    category: "reference"
+    confidence: 1.0
+    source_authority: "standard"
+
+  - original_term: "eternal nature of the soul"
+    variations: ["eternal nature of soul", "soul's eternal nature"]
+    transliteration: "eternal nature of the soul"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "standard"
+
+  - original_term: "imperishable and eternal"
+    variations: ["imperishable eternal", "eternal and imperishable"]
+    transliteration: "imperishable and eternal"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "standard"
+
+  - original_term: "ancient times"
+    variations: ["ancient time", "in ancient times"]
+    transliteration: "ancient times"
+    is_proper_noun: false
+    category: "temporal"
+    confidence: 1.0
+    source_authority: "standard"
+
+  - original_term: "verses one through ten"
+    variations: ["verse 1 through 10", "verses 1-10"]
+    transliteration: "verses 1 through 10"
+    is_proper_noun: false
+    category: "reference"
+    confidence: 1.0
+    source_authority: "standard"

@@ -1,0 +1,37 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp_0zvnz8_\\test_input.srt",
+  "processing_time": 0.0032765865325927734,
+  "total_segments": 3,
+  "segments_modified": 3,
+  "corrections_applied": {
+    "conversational_rescinded": 4,
+    "lexicon_correction": 2,
+    "handled_conversational_nuances": 2,
+    "removed_filler_words": 2,
+    "converted_numbers": 1,
+    "fixed_capitalization": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.457) in segment"
+  ],
+  "original_word_count": 45,
+  "processed_word_count": 34,
+  "original_char_count": 257,
+  "processed_char_count": 192,
+  "confidence_scores": [
+    0.1369230769230769,
+    0.5529411764705883,
+    0.3822222222222223
+  ],
+  "average_confidence": 0.3573621585386291,
+  "flagged_segments": 3,
+  "parsing_time": 0.0,
+  "normalization_time": 0.0032765865325927734,
+  "correction_time": 0.0,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T12:20:56.136814+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

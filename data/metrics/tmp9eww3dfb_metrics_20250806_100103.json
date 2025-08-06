@@ -1,0 +1,34 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp9eww3dfb.srt",
+  "processing_time": 0.015269041061401367,
+  "total_segments": 3,
+  "segments_modified": 3,
+  "corrections_applied": {
+    "removed_filler_words": 3,
+    "converted_numbers": 1,
+    "fixed_capitalization": 3
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.430) in segment"
+  ],
+  "original_word_count": 33,
+  "processed_word_count": 28,
+  "original_char_count": 187,
+  "processed_char_count": 150,
+  "confidence_scores": [
+    0.4646428571428571,
+    0.5739772727272726,
+    0.5282918739635156
+  ],
+  "average_confidence": 0.5223040012778818,
+  "flagged_segments": 3,
+  "parsing_time": 0.0,
+  "normalization_time": 0.0,
+  "correction_time": 0.0,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-06T14:01:03.437755+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}
