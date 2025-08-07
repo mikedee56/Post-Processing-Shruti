@@ -15,6 +15,7 @@ from enum import Enum
 import logging
 
 from utils.logger_config import get_logger
+from .sandhi_preprocessor import SandhiPreprocessor, SandhiSplitResult
 
 
 class WordCategory(Enum):
@@ -67,22 +68,28 @@ class SanskritHindiIdentifier:
     to be Sanskrit or Hindi terms requiring correction or transliteration.
     """
 
-    def __init__(self, lexicon_dir: Path = None, english_words_file: Path = None):
+    def __init__(self, lexicon_dir: Path = None, english_words_file: Path = None, 
+                 enable_sandhi_preprocessing: bool = True):
         """
         Initialize the Sanskrit/Hindi identifier.
         
         Args:
             lexicon_dir: Directory containing lexicon files
             english_words_file: Path to English dictionary file (optional)
+            enable_sandhi_preprocessing: Enable sandhi preprocessing for compound words
         """
         self.logger = get_logger(__name__)
         self.lexicon_dir = lexicon_dir or Path("data/lexicons")
         self.english_words_file = english_words_file
+        self.enable_sandhi_preprocessing = enable_sandhi_preprocessing
         
         # Initialize data structures
         self.sanskrit_hindi_lexicon: Dict[str, LexiconEntry] = {}
         self.variation_lookup: Dict[str, str] = {}  # variation -> original_term
         self.english_words: Set[str] = set()
+        
+        # Initialize sandhi preprocessor
+        self.sandhi_preprocessor = SandhiPreprocessor(enable_sandhi_preprocessing)
         
         # Load data
         self._load_lexicons()
@@ -90,6 +97,8 @@ class SanskritHindiIdentifier:
         
         self.logger.info(f"Loaded {len(self.sanskrit_hindi_lexicon)} Sanskrit/Hindi terms")
         self.logger.info(f"Loaded {len(self.english_words)} English words")
+        if enable_sandhi_preprocessing:
+            self.logger.info("Sandhi preprocessing enabled for compound word splitting")
 
     def _load_lexicons(self) -> None:
         """Load all lexicon files from the lexicon directory."""
@@ -174,6 +183,8 @@ class SanskritHindiIdentifier:
         """
         Identify Sanskrit/Hindi words in the given text.
         
+        Enhanced with sandhi preprocessing to split compound words before lexicon matching.
+        
         Args:
             text: Input text to analyze
             
@@ -182,8 +193,14 @@ class SanskritHindiIdentifier:
         """
         identified = []
         
+        # Apply sandhi preprocessing if enabled
+        if self.enable_sandhi_preprocessing:
+            processed_text = self._apply_sandhi_preprocessing(text)
+        else:
+            processed_text = text
+        
         # Clean and tokenize text
-        words = self._tokenize_text(text)
+        words = self._tokenize_text(processed_text)
         
         for word_info in words:
             word, position = word_info
@@ -220,6 +237,49 @@ class SanskritHindiIdentifier:
                     ))
         
         return identified
+
+    def _apply_sandhi_preprocessing(self, text: str) -> str:
+        """
+        Apply sandhi preprocessing to split compound words.
+        
+        Args:
+            text: Original text
+            
+        Returns:
+            Text with compound words split into components
+        """
+        try:
+            # Split text into sentences/phrases for processing
+            phrases = re.split(r'[.!?;]', text)
+            processed_phrases = []
+            
+            for phrase in phrases:
+                if not phrase.strip():
+                    continue
+                
+                # Apply sandhi splitting to the phrase
+                sandhi_result = self.sandhi_preprocessor.preprocess_text(phrase.strip())
+                
+                if sandhi_result.preprocessing_successful and not sandhi_result.fallback_used:
+                    # Use the primary candidate's segmentation
+                    primary_candidate = sandhi_result.primary_candidate
+                    processed_phrase = ' '.join(primary_candidate.segments)
+                    processed_phrases.append(processed_phrase)
+                    
+                    # Log successful sandhi preprocessing
+                    if len(primary_candidate.segments) > 1:
+                        self.logger.debug(
+                            f"Sandhi split: '{phrase.strip()}' → {primary_candidate.segments}"
+                        )
+                else:
+                    # Use original phrase if preprocessing failed or used fallback
+                    processed_phrases.append(phrase.strip())
+            
+            return '. '.join(processed_phrases) if processed_phrases else text
+            
+        except Exception as e:
+            self.logger.warning(f"Error in sandhi preprocessing: {e}")
+            return text  # Return original text on error
 
     def _tokenize_text(self, text: str) -> List[Tuple[str, int]]:
         """
@@ -332,3 +392,30 @@ class SanskritHindiIdentifier:
                 issues['unknown_category'].append(term)
         
         return issues
+
+    def get_sandhi_preprocessing_stats(self) -> Dict[str, Any]:
+        """Get statistics about sandhi preprocessing operations."""
+        return self.sandhi_preprocessor.get_processing_statistics()
+
+    def reset_sandhi_preprocessing_stats(self) -> None:
+        """Reset sandhi preprocessing statistics."""
+        self.sandhi_preprocessor.reset_statistics()
+
+    def validate_sandhi_preprocessing_config(self) -> Dict[str, Any]:
+        """Validate sandhi preprocessing configuration."""
+        return self.sandhi_preprocessor.validate_configuration()
+
+    def set_sandhi_preprocessing_enabled(self, enabled: bool) -> None:
+        """
+        Enable or disable sandhi preprocessing.
+        
+        Args:
+            enabled: True to enable, False to disable
+        """
+        self.enable_sandhi_preprocessing = enabled
+        self.sandhi_preprocessor.enable_preprocessing = enabled
+        
+        if enabled:
+            self.logger.info("Sandhi preprocessing enabled")
+        else:
+            self.logger.info("Sandhi preprocessing disabled")

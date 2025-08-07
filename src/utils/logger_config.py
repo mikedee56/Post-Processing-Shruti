@@ -232,60 +232,81 @@ class ProcessingLoggerConfig:
         """Create file handlers."""
         handlers = []
         
-        # Main log file (rotating)
-        main_log_file = self.log_dir / 'srt_processor.log'
-        main_handler = logging.handlers.RotatingFileHandler(
-            main_log_file,
-            maxBytes=self.effective_config['max_file_size'],
-            backupCount=self.effective_config['backup_count'],
-            encoding='utf-8'
-        )
+        try:
+            # Main log file (rotating)
+            main_log_file = self.log_dir / 'srt_processor.log'
+            main_handler = logging.handlers.RotatingFileHandler(
+                main_log_file,
+                maxBytes=self.effective_config['max_file_size'],
+                backupCount=self.effective_config['backup_count'],
+                encoding='utf-8',
+                delay=True  # Delay file creation until first emit
+            )
+            
+            file_level = getattr(logging, self.effective_config['file_level'].upper())
+            main_handler.setLevel(file_level)
+            
+            # Use detailed format for main log
+            format_type = self.effective_config.get('file_format', 'detailed')
+            if format_type in formatters:
+                main_handler.setFormatter(formatters[format_type])
+            else:
+                main_handler.setFormatter(formatters['detailed'])
+            
+            handlers.append(main_handler)
+            
+        except (OSError, PermissionError) as e:
+            # If file handler fails, log to console and continue
+            console_logger = logging.getLogger(__name__)
+            console_logger.warning(f"Could not create main log file handler: {e}")
         
-        file_level = getattr(logging, self.effective_config['file_level'].upper())
-        main_handler.setLevel(file_level)
-        
-        # Use detailed format for main log
-        format_type = self.effective_config.get('file_format', 'detailed')
-        if format_type in formatters:
-            main_handler.setFormatter(formatters[format_type])
-        else:
-            main_handler.setFormatter(formatters['detailed'])
-        
-        handlers.append(main_handler)
-        
-        # Error log file (errors and warnings only)
-        error_log_file = self.log_dir / 'errors.log'
-        error_handler = logging.handlers.RotatingFileHandler(
-            error_log_file,
-            maxBytes=self.effective_config['max_file_size'],
-            backupCount=self.effective_config['backup_count'],
-            encoding='utf-8'
-        )
-        
-        error_handler.setLevel(logging.WARNING)
-        error_handler.setFormatter(formatters['error'])
-        handlers.append(error_handler)
+        try:
+            # Error log file (errors and warnings only)
+            error_log_file = self.log_dir / 'errors.log'
+            error_handler = logging.handlers.RotatingFileHandler(
+                error_log_file,
+                maxBytes=self.effective_config['max_file_size'],
+                backupCount=self.effective_config['backup_count'],
+                encoding='utf-8',
+                delay=True  # Delay file creation until first emit
+            )
+            
+            error_handler.setLevel(logging.WARNING)
+            error_handler.setFormatter(formatters['error'])
+            handlers.append(error_handler)
+            
+        except (OSError, PermissionError) as e:
+            # If error handler fails, log to console and continue
+            console_logger = logging.getLogger(__name__)
+            console_logger.warning(f"Could not create error log file handler: {e}")
         
         # Processing metrics log (if JSON format enabled)
         if self.effective_config.get('log_format') == 'json' or self.effective_config.get('enable_metrics_log', False):
-            metrics_log_file = self.log_dir / f"processing_metrics_{datetime.now().strftime('%Y%m%d')}.log"
-            metrics_handler = logging.handlers.RotatingFileHandler(
-                metrics_log_file,
-                maxBytes=self.effective_config['max_file_size'],
-                backupCount=self.effective_config['backup_count'],
-                encoding='utf-8'
-            )
-            
-            metrics_handler.setLevel(logging.INFO)
-            metrics_handler.setFormatter(formatters['json'])
-            
-            # Create filter for metrics-related logs
-            class MetricsFilter(logging.Filter):
-                def filter(self, record):
-                    return hasattr(record, 'metrics') or 'metrics' in record.getMessage().lower()
-            
-            metrics_handler.addFilter(MetricsFilter())
-            handlers.append(metrics_handler)
+            try:
+                metrics_log_file = self.log_dir / f"processing_metrics_{datetime.now().strftime('%Y%m%d')}.log"
+                metrics_handler = logging.handlers.RotatingFileHandler(
+                    metrics_log_file,
+                    maxBytes=self.effective_config['max_file_size'],
+                    backupCount=self.effective_config['backup_count'],
+                    encoding='utf-8',
+                    delay=True  # Delay file creation until first emit
+                )
+                
+                metrics_handler.setLevel(logging.INFO)
+                metrics_handler.setFormatter(formatters['json'])
+                
+                # Create filter for metrics-related logs
+                class MetricsFilter(logging.Filter):
+                    def filter(self, record):
+                        return hasattr(record, 'metrics') or 'metrics' in record.getMessage().lower()
+                
+                metrics_handler.addFilter(MetricsFilter())
+                handlers.append(metrics_handler)
+                
+            except (OSError, PermissionError) as e:
+                # If metrics handler fails, log to console and continue
+                console_logger = logging.getLogger(__name__)
+                console_logger.warning(f"Could not create metrics log file handler: {e}")
         
         return handlers
     

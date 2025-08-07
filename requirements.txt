@@ -15,7 +15,7 @@ inltk>=0.1.0
 indic-nlp-library>=0.81
 
 # Story 2.4 Research Enhancement Dependencies
-# sanskrit_parser>=0.1.0  # Sanskrit sandhi splitting - Story 2.4.1 dependency
+sanskrit_parser>=0.1.0  # Sanskrit sandhi splitting - Story 2.4.1 dependency
 # indic-transliteration>=2.3.0  # Multi-scheme transliteration support
 # genalog>=0.1.0  # Smith-Waterman sequence alignment for research matching
 
