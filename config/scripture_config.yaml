@@ -1,0 +1,95 @@
+# Scripture Processing Configuration
+# Configuration for verse identification, canonical substitution, and IAST formatting
+
+# Scripture Identifier Configuration
+scripture_identifier:
+  min_verse_length: 10
+  min_confidence_threshold: 0.75
+  min_similarity_threshold: 0.6
+  min_sanskrit_density: 0.3
+  verse_boundary_patterns:
+    - '\|\|'    # Sanskrit verse endings
+    - '।।'      # Devanagari verse endings  
+    - '\n\s*\n' # Double line breaks
+
+# Canonical Text Manager Configuration
+canonical_manager:
+  scripture_sources:
+    - bhagavad_gita
+    - yoga_sutras
+    - upanishads
+  cache_canonical_texts: true
+  preload_common_verses: true
+
+# Verse Substitution Engine Configuration
+substitution_engine:
+  min_substitution_confidence: 0.8
+  require_validation: true
+  preserve_formatting: true
+  max_substitutions_per_segment: 3
+  verse_boundary_markers:
+    - '\|\|'    # Sanskrit verse endings
+    - '।।'      # Devanagari verse endings
+    - '\.\s*\n' # Period followed by newline
+    - '[।|]\s*\n' # Sanskrit punctuation followed by newline
+
+# Scripture Validator Configuration
+validator:
+  min_validation_confidence: 0.7
+  max_length_ratio: 3.0
+  min_word_overlap: 0.3
+  require_sanskrit_markers: true
+  enable_academic_standards: true
+
+# IAST Formatter Configuration
+iast_formatter:
+  default_formatting: academic  # traditional, academic, liturgical, scholarly
+  preserve_verse_markers: true
+  add_source_attribution: true
+  validate_consistency: true
+  strict_mode: true
+
+# Verse Selection System Configuration
+selection_system:
+  selection_strategy: hybrid  # automatic, interactive, confidence_based, hybrid
+  auto_select_threshold: 0.90
+  human_review_threshold: 0.70
+  max_candidates: 5
+  
+  # Confidence level thresholds
+  confidence_thresholds:
+    very_high: 0.95
+    high: 0.85
+    medium: 0.70
+    low: 0.50
+  
+  # Scoring weights for candidate ranking
+  scoring_weights:
+    confidence: 0.30
+    similarity: 0.25
+    semantic: 0.20
+    structure: 0.10
+    authority: 0.10
+    context: 0.05
+
+# Main Scripture Processor Configuration
+scripture_processor:
+  enable_substitution: true
+  enable_iast_formatting: true
+  enable_validation: true
+  formatting_style: academic  # traditional, academic, liturgical, scholarly
+  
+  # Processing pipeline settings
+  pipeline_steps:
+    - identification
+    - substitution
+    - iast_formatting
+    - validation
+  
+  # Error handling
+  continue_on_error: true
+  log_processing_details: true
+  
+  # Performance settings
+  max_concurrent_segments: 10
+  cache_processing_results: true

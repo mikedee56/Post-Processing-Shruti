@@ -11,6 +11,9 @@ A sophisticated post-processing system designed to transform ASR-generated trans
 ### Key Capabilities
 
 - **✨ Lexicon-Based Correction System** (Story 2.1): Advanced Sanskrit/Hindi word identification and fuzzy matching
+- **🧠 Contextual Modeling** (Story 2.2): N-gram language models and phonetic pattern matching
+- **📜 Scripture Processing** (Story 2.3): Canonical verse identification and substitution with IAST formatting
+- **🔬 Research-Grade Enhancement** (Story 2.4 - In Development): Hybrid matching with sandhi preprocessing and semantic similarity
 - **🎯 IAST Transliteration Enforcement**: Academic-standard transliteration with multiple input format support  
 - **🔧 Intelligent Text Normalization**: Context-aware number conversion and filler word removal
 - **📊 Quality Assurance Framework**: Comprehensive metrics and validation systems

@@ -1,0 +1,57 @@
+metadata:
+  source: yoga_sutras
+  version: '1.0'
+  authority: IAST
+  description: 'Canonical sutras from Patanjali Yoga Sutras'
+  created: '2025-08-06T10:00:00'
+
+verses:
+  - chapter: 1
+    verse: 1
+    canonical_text: "atha yoga-anuśāsanam ||"
+    transliteration: "atha yoga-anuśāsanam ||"
+    translation: "Now begins the instruction of yoga."
+    commentary: "The auspicious beginning of the yoga teaching"
+    source_authority: IAST
+    tags: [beginning, instruction, yoga]
+    variations: ["yoga sutras 1.1", "patanjali yoga sutras 1.1", "atha yoga anushasanam"]
+
+  - chapter: 1
+    verse: 2
+    canonical_text: "yogaś citta-vṛtti-nirodhaḥ ||"
+    transliteration: "yogaś citta-vṛtti-nirodhaḥ ||"
+    translation: "Yoga is the cessation of fluctuations of the mind."
+    commentary: "The fundamental definition of yoga"
+    source_authority: IAST
+    tags: [yoga, mind, cessation, definition]
+    variations: ["yoga sutras 1.2", "patanjali yoga sutras 1.2", "yoga definition"]
+
+  - chapter: 1
+    verse: 14
+    canonical_text: "sa tu dīrgha-kāla-nairantarya-satkārāsevito dṛḍha-bhūmiḥ ||"
+    transliteration: "sa tu dīrgha-kāla-nairantarya-satkārāsevito dṛḍha-bhūmiḥ ||"
+    translation: "Practice is firmly grounded when it is cultivated continuously for a long period with dedication."
+    commentary: "The requirements for establishing firm practice"
+    source_authority: IAST
+    tags: [practice, dedication, continuity, foundation]
+    variations: ["yoga sutras 1.14", "patanjali yoga sutras 1.14", "practice sutra"]
+
+  - chapter: 2
+    verse: 46
+    canonical_text: "sthira-sukham āsanam ||"
+    transliteration: "sthira-sukham āsanam ||"
+    translation: "The posture should be steady and comfortable."
+    commentary: "The fundamental principle of asana practice"
+    source_authority: IAST
+    tags: [asana, steady, comfortable, posture]
+    variations: ["yoga sutras 2.46", "patanjali yoga sutras 2.46", "asana sutra"]
+
+  - chapter: 2
+    verse: 47
+    canonical_text: "prayatna-śaithilya-ananta-samāpattibhyām ||"
+    transliteration: "prayatna-śaithilya-ananta-samāpattibhyām ||"
+    translation: "By relaxing effort and focusing on the infinite, the posture is mastered."
+    commentary: "The method for perfecting asana practice"
+    source_authority: IAST
+    tags: [effort, relaxation, infinite, mastery]
+    variations: ["yoga sutras 2.47", "patanjali yoga sutras 2.47", "asana mastery"]

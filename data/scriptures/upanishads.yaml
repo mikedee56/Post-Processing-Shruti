@@ -1,0 +1,24 @@
+metadata:
+  authority: IAST
+  created: '2025-08-06T16:23:12.092268'
+  description: Canonical verses from upanishads
+  source: upanishads
+  version: '1.0'
+verses:
+- canonical_text: avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ
+    nānuśocitum arhasi ||
+  chapter: 2
+  commentary: Sample commentary for demonstration
+  source_authority: IAST
+  tags:
+  - soul
+  - unchanging
+  - grief
+  translation: This soul is said to be unmanifest, unthinkable and unchanging. Therefore,
+    knowing this, you should not grieve.
+  transliteration: avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ
+    nānuśocitum arhasi ||
+  variations:
+  - upanishads 2.25
+  - upanishads chapter 2 verse 25
+  verse: 25

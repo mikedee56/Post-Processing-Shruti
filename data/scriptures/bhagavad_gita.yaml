@@ -1,0 +1,57 @@
+metadata:
+  source: bhagavad_gita
+  version: '1.0'
+  authority: IAST
+  description: 'Canonical verses from Bhagavad Gita'
+  created: '2025-08-06T10:00:00'
+
+verses:
+  - chapter: 2
+    verse: 25
+    canonical_text: "avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ nānuśocitum arhasi ||"
+    transliteration: "avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ nānuśocitum arhasi ||"
+    translation: "This soul is said to be unmanifest, unthinkable and unchanging. Therefore, knowing this, you should not grieve."
+    commentary: "The soul is beyond sensory perception and mental conception"
+    source_authority: IAST
+    tags: [soul, unchanging, grief, knowledge]
+    variations: ["bhagavad gita 2.25", "gita chapter 2 verse 25", "bhagavad gita chapter two verse twenty five"]
+
+  - chapter: 2
+    verse: 26
+    canonical_text: "atha cainaṃ nitya-jātaṃ nityaṃ vā manyase mṛtam | tathāpi tvaṃ mahā-bāho naivaṃ śocitum arhasi ||"
+    transliteration: "atha cainaṃ nitya-jātaṃ nityaṃ vā manyase mṛtam | tathāpi tvaṃ mahā-bāho naivaṃ śocitum arhasi ||"
+    translation: "Even if you consider the soul to be perpetually born and always dying, still you should not lament, O mighty-armed one."
+    commentary: "From any perspective, lamentation is inappropriate"
+    source_authority: IAST
+    tags: [soul, birth, death, lamentation]
+    variations: ["bhagavad gita 2.26", "gita chapter 2 verse 26", "bhagavad gita chapter two verse twenty six"]
+
+  - chapter: 2
+    verse: 47
+    canonical_text: "karmaṇy evādhikāras te mā phaleṣu kadācana | mā karma-phala-hetur bhūr mā te saṅgo 'stv akarmaṇi ||"
+    transliteration: "karmaṇy evādhikāras te mā phaleṣu kadācana | mā karma-phala-hetur bhūr mā te saṅgo 'stv akarmaṇi ||"
+    translation: "You have a right to perform your prescribed duty, but not to the fruits of actions. Never consider yourself the cause of the results of your activities, and never be attached to not doing your duty."
+    commentary: "The fundamental principle of karma yoga"
+    source_authority: IAST
+    tags: [karma, duty, detachment, action]
+    variations: ["bhagavad gita 2.47", "gita chapter 2 verse 47", "karma yoga verse"]
+
+  - chapter: 4
+    verse: 7
+    canonical_text: "yadā yadā hi dharmasya glānir bhavati bhārata | abhyutthānam adharmasya tadātmānaṃ sṛjāmy aham ||"
+    transliteration: "yadā yadā hi dharmasya glānir bhavati bhārata | abhyutthānam adharmasya tadātmānaṃ sṛjāmy aham ||"
+    translation: "Whenever and wherever there is a decline in dharma and a rise in adharma, at that time I manifest Myself, O Bharata."
+    commentary: "The divine promise of incarnation for dharma restoration"
+    source_authority: IAST
+    tags: [dharma, incarnation, divine, protection]
+    variations: ["bhagavad gita 4.7", "gita chapter 4 verse 7", "avatar verse"]
+
+  - chapter: 4
+    verse: 8
+    canonical_text: "paritrāṇāya sādhūnāṃ vināśāya ca duṣkṛtām | dharma-saṃsthāpanārthāya sambhavāmi yuge yuge ||"
+    transliteration: "paritrāṇāya sādhūnāṃ vināśāya ca duṣkṛtām | dharma-saṃsthāpanārthāya sambhavāmi yuge yuge ||"
+    translation: "To deliver the pious and to annihilate the miscreants, as well as to reestablish the principles of dharma, I appear millennium after millennium."
+    commentary: "The purpose of divine incarnations across ages"
+    source_authority: IAST
+    tags: [protection, dharma, incarnation, justice]
+    variations: ["bhagavad gita 4.8", "gita chapter 4 verse 8", "divine incarnation verse"]

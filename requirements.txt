@@ -7,11 +7,17 @@ python>=3.10
 # Data Processing Libraries
 pandas>=2.0.0
 numpy>=1.24.0
+scipy>=1.10.0
 
 # NLP and Language Processing
 # Note: iNLTK and IndicNLP Library for Indic language support
 inltk>=0.1.0
 indic-nlp-library>=0.81
+
+# Story 2.4 Research Enhancement Dependencies
+# sanskrit_parser>=0.1.0  # Sanskrit sandhi splitting - Story 2.4.1 dependency
+# indic-transliteration>=2.3.0  # Multi-scheme transliteration support
+# genalog>=0.1.0  # Smith-Waterman sequence alignment for research matching
 
 # Text Processing and Fuzzy Matching
 fuzzywuzzy>=0.18.0
