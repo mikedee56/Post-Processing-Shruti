@@ -48,8 +48,19 @@ class VerseMatch:
     match_start: int
     match_end: int
     word_matches: int
-    total_words: int
-    partial_match: bool
+
+
+@dataclass
+class ScriptureMatch:
+    """Represents a match between text and a scriptural passage."""
+    original_text: str
+    matched_text: str
+    scripture_reference: str
+    confidence_score: float
+    match_type: str
+    start_position: int
+    end_position: int
+    metadata: Optional[Dict] = None
     
 
 class ScriptureIdentifier:

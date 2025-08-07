@@ -18,6 +18,7 @@ from .verse_substitution_engine import VerseSubstitutionEngine, SubstitutionResu
 from .scripture_validator import ScriptureValidator
 from .scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
 from .verse_selection_system import VerseSelectionSystem, SelectionStrategy
+from .hybrid_matching_engine import HybridMatchingEngine, HybridPipelineConfig
 
 
 @dataclass
@@ -31,6 +32,11 @@ class ScriptureProcessingResult:
     validation_passed: bool
     processing_metadata: Dict[str, Any]
     detailed_results: Dict[str, Any]
+    
+    # Story 2.4.3 - Hybrid matching results
+    hybrid_matching_used: bool = False
+    hybrid_confidence: float = 0.0
+    hybrid_pipeline_stages: List[str] = None
 
 
 class ScriptureProcessor:
@@ -52,6 +58,10 @@ class ScriptureProcessor:
         """
         self.logger = get_logger(__name__)
         self.config = config or {}
+        
+        # Story 2.4.3 - Hybrid matching configuration
+        self.enable_hybrid_matching = self.config.get('enable_hybrid_matching', False)
+        self.hybrid_engine = None
         
         # Initialize components
         self.canonical_manager = CanonicalTextManager(
@@ -94,6 +104,28 @@ class ScriptureProcessor:
             self.config.get('formatting_style', 'academic')
         )
         
+        # Initialize hybrid matching engine if enabled (Story 2.4.3)
+        if self.enable_hybrid_matching:
+            try:
+                hybrid_config = HybridPipelineConfig()
+                if 'hybrid_pipeline' in self.config:
+                    # Update config with user settings
+                    for key, value in self.config['hybrid_pipeline'].items():
+                        if hasattr(hybrid_config, key):
+                            setattr(hybrid_config, key, value)
+                
+                self.hybrid_engine = HybridMatchingEngine(
+                    canonical_manager=self.canonical_manager,
+                    config=hybrid_config,
+                    cache_dir=scripture_dir / "hybrid_cache" if scripture_dir else None
+                )
+                
+                self.logger.info("Hybrid matching engine initialized (Story 2.4.3)")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to initialize hybrid matching engine: {e}")
+                self.enable_hybrid_matching = False
+        
         self.logger.info("Scripture processor initialized with all components")
     
     def process_text(self, text: str, context: Dict = None) -> ScriptureProcessingResult:
@@ -118,10 +150,48 @@ class ScriptureProcessor:
         validation_passed = True
         
         try:
-            # Step 1: Identify scripture passages
-            self.logger.info("Identifying scripture passages...")
-            verse_matches = self.scripture_identifier.identify_scripture_passages(text)
-            verses_identified = len(verse_matches)
+            # Story 2.4.3 - Use hybrid matching if enabled
+            hybrid_matching_used = False
+            hybrid_confidence = 0.0
+            hybrid_stages = []
+            
+            if self.enable_hybrid_matching and self.hybrid_engine:
+                self.logger.info("Using hybrid matching engine for scripture identification...")
+                
+                try:
+                    hybrid_result = self.hybrid_engine.match_verse_passage(text, context)
+                    
+                    if hybrid_result.pipeline_success and hybrid_result.matched_verse:
+                        # Use hybrid matching result
+                        verse_matches = [hybrid_result.traditional_match] if hybrid_result.traditional_match else []
+                        verses_identified = 1
+                        hybrid_matching_used = True
+                        hybrid_confidence = hybrid_result.composite_confidence
+                        hybrid_stages = [stage.value for stage in hybrid_result.stages_completed]
+                        
+                        detailed_results['hybrid_result'] = hybrid_result
+                        processing_metadata['hybrid_matching'] = True
+                        
+                        self.logger.info(
+                            f"Hybrid matching succeeded: {hybrid_confidence:.3f} confidence, "
+                            f"stages: {hybrid_stages}"
+                        )
+                    else:
+                        # Fall back to traditional identification
+                        self.logger.info("Hybrid matching failed, falling back to traditional identification")
+                        verse_matches = self.scripture_identifier.identify_scripture_passages(text)
+                        verses_identified = len(verse_matches)
+                        
+                except Exception as e:
+                    self.logger.error(f"Error in hybrid matching: {e}, falling back to traditional")
+                    verse_matches = self.scripture_identifier.identify_scripture_passages(text)
+                    verses_identified = len(verse_matches)
+            else:
+                # Step 1: Traditional scripture identification
+                self.logger.info("Identifying scripture passages...")
+                verse_matches = self.scripture_identifier.identify_scripture_passages(text)
+                verses_identified = len(verse_matches)
+            
             detailed_results['verse_matches'] = verse_matches
             processing_metadata['steps_completed'].append('identification')
             
@@ -135,7 +205,10 @@ class ScriptureProcessor:
                     iast_formatted=False,
                     validation_passed=True,
                     processing_metadata=processing_metadata,
-                    detailed_results=detailed_results
+                    detailed_results=detailed_results,
+                    hybrid_matching_used=hybrid_matching_used,
+                    hybrid_confidence=hybrid_confidence,
+                    hybrid_pipeline_stages=hybrid_stages
                 )
             
             # Step 2: Verse substitution (if enabled)
@@ -183,7 +256,10 @@ class ScriptureProcessor:
             iast_formatted=iast_formatted,
             validation_passed=validation_passed,
             processing_metadata=processing_metadata,
-            detailed_results=detailed_results
+            detailed_results=detailed_results,
+            hybrid_matching_used=hybrid_matching_used,
+            hybrid_confidence=hybrid_confidence,
+            hybrid_pipeline_stages=hybrid_stages
         )
     
     def process_srt_segment(self, segment: SRTSegment, 
@@ -324,3 +400,45 @@ class ScriptureProcessor:
                 self.selection_system.human_review_threshold = thresholds['human_review']
         
         self.logger.info(f"Updated selection strategy to {strategy.value}")
+    
+    def enable_hybrid_matching_engine(self, enabled: bool = True, config: Dict = None) -> None:
+        """
+        Enable or disable the hybrid matching engine (Story 2.4.3).
+        
+        Args:
+            enabled: Whether to enable hybrid matching
+            config: Optional configuration for hybrid pipeline
+        """
+        if enabled and not self.hybrid_engine:
+            try:
+                hybrid_config = HybridPipelineConfig()
+                if config:
+                    for key, value in config.items():
+                        if hasattr(hybrid_config, key):
+                            setattr(hybrid_config, key, value)
+                
+                self.hybrid_engine = HybridMatchingEngine(
+                    canonical_manager=self.canonical_manager,
+                    config=hybrid_config
+                )
+                
+                self.enable_hybrid_matching = True
+                self.logger.info("Hybrid matching engine enabled")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to enable hybrid matching: {e}")
+                self.enable_hybrid_matching = False
+        else:
+            self.enable_hybrid_matching = enabled
+            self.logger.info(f"Hybrid matching {'enabled' if enabled else 'disabled'}")
+    
+    def get_hybrid_performance_stats(self) -> Optional[Dict[str, Any]]:
+        """
+        Get performance statistics from hybrid matching engine.
+        
+        Returns:
+            Hybrid engine statistics or None if not enabled
+        """
+        if self.enable_hybrid_matching and self.hybrid_engine:
+            return self.hybrid_engine.get_performance_statistics()
+        return None

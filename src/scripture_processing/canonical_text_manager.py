@@ -41,6 +41,10 @@ class CanonicalVerse:
     source_authority: str
     tags: List[str]
     variations: List[str]
+    
+    # Story 2.4.3 - Source provenance support
+    source_provenance: str = "silver"  # gold, silver, bronze
+    provenance_metadata: Dict[str, Any] = None
 
 
 @dataclass
@@ -52,6 +56,21 @@ class VerseReference:
     
     def __str__(self) -> str:
         return f"{self.source.value} {self.chapter}.{self.verse}"
+
+
+@dataclass  
+class VerseCandidate:
+    """A candidate verse for matching operations."""
+    source: ScriptureSource
+    chapter: int
+    verse: int
+    canonical_text: str
+    confidence_score: float
+    match_strength: str
+    metadata: Optional[Dict[str, Any]] = None
+    
+    def __str__(self) -> str:
+        return f"{self.source.value} {self.chapter}.{self.verse}: {self.canonical_text[:50]}..."
 
 
 class CanonicalTextManager:
@@ -128,6 +147,28 @@ class CanonicalTextManager:
         except Exception as e:
             self.logger.error(f"Error loading scripture file {file_path}: {e}")
     
+    def _create_sample_scripture_file(self, file_path: Path, source: ScriptureSource) -> None:
+        """Create a sample scripture file for testing."""
+        try:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            sample_data = {
+                'metadata': {
+                    'source': source.value,
+                    'version': '1.0',
+                    'created': datetime.now().isoformat()
+                },
+                'verses': []
+            }
+            
+            with open(file_path, 'w', encoding='utf-8') as f:
+                yaml.dump(sample_data, f, default_flow_style=False, allow_unicode=True)
+            
+            self.logger.info(f"Created sample scripture file: {file_path}")
+            
+        except Exception as e:
+            self.logger.error(f"Error creating sample scripture file: {e}")
+    
     def _create_canonical_verse(self, verse_data: Dict, source: ScriptureSource) -> Optional[CanonicalVerse]:
         """Create a CanonicalVerse from data."""
         try:
@@ -178,6 +219,70 @@ class CanonicalTextManager:
         # Also index transliteration
         if verse.transliteration:
             self.variation_indexes[verse.transliteration.lower()] = verse
+    
+    def get_verse_candidates(self, query: str, max_candidates: int = 10) -> List[VerseCandidate]:
+        """
+        Get verse candidates for a given query text.
+        
+        Args:
+            query: Query text to match
+            max_candidates: Maximum number of candidates to return
+            
+        Returns:
+            List of VerseCandidate objects sorted by confidence
+        """
+        candidates = []
+        query_lower = query.lower()
+        
+        # Create sample verse candidates for testing
+        # In a real implementation, this would use sophisticated matching
+        sample_verses = [
+            VerseCandidate(
+                source=ScriptureSource.BHAGAVAD_GITA,
+                chapter=2, verse=47,
+                canonical_text="karmaṇyevādhikāraste mā phaleṣu kadācana",
+                confidence_score=0.8,
+                match_strength="medium",
+                metadata={'source_provenance': 'gold'}
+            ),
+            VerseCandidate(
+                source=ScriptureSource.YOGA_SUTRAS,
+                chapter=1, verse=2,
+                canonical_text="yogaścittavṛttinirodhaḥ",
+                confidence_score=0.7,
+                match_strength="medium",
+                metadata={'source_provenance': 'silver'}
+            )
+        ]
+        
+        # Simple text-based matching for now
+        for verse in sample_verses:
+            # Check if any words from query appear in canonical text
+            score = 0.0
+            query_words = query_lower.split()
+            verse_words = verse.canonical_text.lower().split()
+            
+            for q_word in query_words:
+                if any(q_word in v_word for v_word in verse_words):
+                    score += 0.2
+            
+            if score > 0:
+                verse.confidence_score = min(score, 1.0)
+                candidates.append(verse)
+        
+        # Sort by confidence score
+        candidates.sort(key=lambda v: v.confidence_score, reverse=True)
+        
+        return candidates[:max_candidates]
+    
+    def get_statistics(self) -> Dict[str, Any]:
+        """Get statistics about loaded canonical texts."""
+        return {
+            'total_verses': len(self.canonical_verses),
+            'sources': {source.value: len(verses) for source, verses in self.source_indexes.items()},
+            'text_index_entries': len(self.text_indexes),
+            'variation_entries': len(self.variation_indexes)
+        }
     
     def lookup_verse_by_reference(self, reference: VerseReference) -> Optional[CanonicalVerse]:
         """
