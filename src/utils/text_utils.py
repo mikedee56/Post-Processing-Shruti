@@ -18,6 +18,29 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
+def normalize_unicode(text: str) -> str:
+    """
+    Normalize Unicode text using NFKC normalization.
+    
+    Args:
+        text: Input text to normalize
+        
+    Returns:
+        Normalized text string
+    """
+    if not text:
+        return text
+    
+    # Apply Unicode normalization
+    normalized = unicodedata.normalize('NFKC', text)
+    
+    # Additional cleanup for common issues
+    normalized = re.sub(r'\s+', ' ', normalized)  # Normalize whitespace
+    normalized = normalized.strip()
+    
+    return normalized
+
+
 def normalize_text(text: str, remove_diacritics: bool = False) -> str:
     """
     Normalize text for processing.
@@ -389,7 +412,7 @@ def extract_quoted_text(text: str) -> List[Dict[str, Any]]:
         r'"([^"]+)"',           # Double quotes
         r"'([^']+)'",           # Single quotes
         r'"([^"]+)"',           # Smart quotes
-        r''([^']+)'',           # Smart single quotes
+        r"'([^']+)'",           # Smart single quotes
     ]
     
     for i, pattern in enumerate(quote_patterns):
