@@ -1,0 +1,56 @@
+# Academic Polish Enhancement Configuration
+enable_academic_polish: true
+fuzzy_threshold: 90
+confidence_threshold: 0.8
+use_advanced_normalization: true
+
+# Story 2.1: Lexicon-based correction system configuration  
+lexicon_dir: 'data/lexicons'
+enable_lexicon_caching: true
+
+# Fuzzy matching configuration
+fuzzy_min_confidence: 0.88
+levenshtein_threshold: 0.88
+phonetic_threshold: 0.90
+max_edit_distance: 2
+enable_phonetic_matching: true
+enable_compound_matching: true
+
+# IAST transliteration configuration
+iast_strict_mode: true
+
+# Correction application configuration
+correction_min_confidence: 0.88
+correction_critical_confidence: 0.95
+enable_context_validation: true
+max_corrections_per_segment: 5
+
+# Legacy lexicon paths
+lexicon_paths:
+  corrections: 'data/lexicons/corrections.yaml'
+  proper_nouns: 'data/lexicons/proper_nouns.yaml'  
+  phrases: 'data/lexicons/phrases.yaml'
+  verses: 'data/lexicons/verses.yaml'
+
+text_normalization:
+  remove_fillers: true
+  convert_numbers: true
+  standardize_punctuation: true
+  fix_capitalization: true
+  preserve_meaningful_discourse: true
+  semantic_drift_threshold: 0.3
+  min_confidence_score: 0.7
+
+conversational_patterns:
+  min_confidence_threshold: 0.7
+  context_window_size: 50
+
+contextual_numbers:
+  min_confidence_threshold: 0.7
+  preserve_uncertainty: true
+
+quality_validation:
+  validation_level: 'moderate'
+  max_semantic_drift: 0.3
+  max_timestamp_deviation: 0.001
+  min_quality_score: 0.7

@@ -84,15 +84,15 @@ def process_single(ctx, input_file: str, output_file: str, config: Optional[str]
         results = processor.process_srt_file(Path(input_file), Path(output_file))
         
         # Display results
-        click.echo(f"✅ Processing completed successfully!")
-        click.echo(f"📊 Corrections made: {results['corrections_made']}")
-        click.echo(f"🚩 Segments flagged: {results['flagged_segments']}")
-        click.echo(f"📈 Average confidence: {results['average_confidence']:.2f}")
+        click.echo(f"SUCCESS: Processing completed successfully!")
+        click.echo(f"Corrections made: {results.segments_modified}")
+        click.echo(f"Segments flagged: {results.flagged_segments}")
+        click.echo(f"Average confidence: {results.average_confidence:.2f}")
         
-        logger.info("Single file processing completed", results=results)
+        logger.info("Single file processing completed", results=vars(results))
         
     except Exception as e:
-        click.echo(f"❌ Error processing file: {e}", err=True)
+        click.echo(f"ERROR: Error processing file: {e}", err=True)
         logger.error("Processing failed", error=str(e), input_file=input_file)
         sys.exit(1)
 
@@ -166,14 +166,14 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                     except Exception as e:
                         logger.error("Failed to process file", 
                                    file_path=str(file_path), error=str(e))
-                        click.echo(f"❌ Failed to process {file_path}: {e}")
+                        click.echo(f"ERROR: Failed to process {file_path}: {e}")
                     
                     pbar.update(1)
         
         # Summary
-        click.echo(f"\n✅ Batch processing completed!")
-        click.echo(f"📊 Total corrections made: {total_corrections}")
-        click.echo(f"🚩 Total segments flagged: {total_flagged}")
+        click.echo(f"\nSUCCESS: Batch processing completed!")
+        click.echo(f"Total corrections made: {total_corrections}")
+        click.echo(f"Total segments flagged: {total_flagged}")
         
         logger.info("Batch processing completed", 
                    total_files=len(files_to_process),
@@ -181,7 +181,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                    total_flagged=total_flagged)
         
     except Exception as e:
-        click.echo(f"❌ Error in batch processing: {e}", err=True)
+        click.echo(f"ERROR: Error in batch processing: {e}", err=True)
         logger.error("Batch processing failed", error=str(e))
         sys.exit(1)
 
@@ -206,14 +206,14 @@ def stats(ctx):
             click.echo(f"  {lexicon_name.title()}: {count} entries")
         
         # Configuration
-        click.echo(f"\n⚙️  Configuration:")
+        click.echo(f"\nConfiguration:")
         click.echo(f"  Fuzzy matching threshold: {stats_data['fuzzy_threshold']}")
         click.echo(f"  Confidence threshold: {stats_data['config'].get('confidence_threshold', 'N/A')}")
         
         logger.info("Statistics displayed", stats=stats_data)
         
     except Exception as e:
-        click.echo(f"❌ Error retrieving statistics: {e}", err=True)
+        click.echo(f"ERROR: Error retrieving statistics: {e}", err=True)
         logger.error("Failed to get statistics", error=str(e))
         sys.exit(1)
 
@@ -257,19 +257,19 @@ def validate(directory: str):
                         
                 except Exception as e:
                     invalid_files += 1
-                    click.echo(f"❌ Error reading {file_path}: {e}")
+                    click.echo(f"ERROR: Error reading {file_path}: {e}")
                 
                 pbar.update(1)
         
-        click.echo(f"\n✅ Validation completed!")
+        click.echo(f"\nSUCCESS: Validation completed!")
         click.echo(f"📊 Valid files: {valid_files}")
-        click.echo(f"❌ Invalid files: {invalid_files}")
+        click.echo(f"ERROR: Invalid files: {invalid_files}")
         
         logger.info("Validation completed", 
                    valid_files=valid_files, invalid_files=invalid_files)
         
     except Exception as e:
-        click.echo(f"❌ Error during validation: {e}", err=True)
+        click.echo(f"ERROR: Error during validation: {e}", err=True)
         logger.error("Validation failed", error=str(e))
         sys.exit(1)
 

@@ -1,0 +1,186 @@
+
+FINAL QA VALIDATION REPORT
+==========================
+
+EXECUTIVE SUMMARY:
+- Files Processed: 15
+- Format Errors: 269
+- Academic Issues: 242  
+- Spiritual Content Issues: 80
+- Remaining Quality Issues: 0
+
+DETAILED RESULTS:
+
+FILE: HighlightsTulsiRamayana102816HQ#28_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 10
+Spiritual Issues: 16
+Quality Issues: 0
+Academic Issues:
+  - Line 115: Sentence should start with capital letter
+  - Line 215: Sentence should start with capital letter
+  - Line 323: Sentence should start with capital letter
+  - ... and 7 more
+
+FILE: HighlightsTulsiRamayana110416HQ#29_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 24
+Spiritual Issues: 0
+Quality Issues: 0
+Academic Issues:
+  - Line 39: Sentence should start with capital letter
+  - Line 207: Sentence should start with capital letter
+  - Line 551: Sentence should start with capital letter
+  - ... and 21 more
+
+FILE: Ramayana_2016-27 102116_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 10
+Spiritual Issues: 6
+Quality Issues: 0
+Academic Issues:
+  - Line 135: Sentence should start with capital letter
+  - Line 187: Sentence should start with capital letter
+  - Line 375: Sentence should start with capital letter
+  - ... and 7 more
+
+FILE: SrimadBhagavadGita112913_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 2
+Spiritual Issues: 2
+Quality Issues: 0
+Academic Issues:
+  - Line 731: Sentence should start with capital letter
+  - Line 863: Sentence should start with capital letter
+
+FILE: SrimadBhagavadGita122013#17_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 266
+Academic Issues: 6
+Spiritual Issues: 2
+Quality Issues: 0
+Format Errors:
+  - Line 41: Subtitle numbering error. Expected 11, got 12
+  - Line 45: Subtitle numbering error. Expected 12, got 13
+  - Line 49: Subtitle numbering error. Expected 13, got 14
+  - Line 53: Subtitle numbering error. Expected 14, got 15
+  - Line 57: Subtitle numbering error. Expected 15, got 16
+  - ... and 261 more
+Academic Issues:
+  - Line 63: Sentence should start with capital letter
+  - Line 91: Sentence should start with capital letter
+  - Line 375: Sentence should start with capital letter
+  - ... and 3 more
+
+FILE: Sunday103011SBS35_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 11
+Spiritual Issues: 6
+Quality Issues: 0
+Academic Issues:
+  - Line 123: Sentence should start with capital letter
+  - Line 343: Sentence should start with capital letter
+  - Line 751: Sentence should start with capital letter
+  - ... and 8 more
+
+FILE: WhisperX lg v2 dual pass_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 127
+Spiritual Issues: 6
+Quality Issues: 0
+Academic Issues:
+  - Line 15: Sentence should start with capital letter
+  - Line 19: Sentence should start with capital letter
+  - Line 35: Sentence should start with capital letter
+  - ... and 124 more
+
+FILE: Whisperx lg v2_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 2
+Academic Issues: 23
+Spiritual Issues: 7
+Quality Issues: 0
+Format Errors:
+  - Subtitle 109: Missing subtitle text
+  - Subtitle 280: Missing subtitle text
+Academic Issues:
+  - Line 3: Sentence should start with capital letter
+  - Line 19: Sentence should start with capital letter
+  - Line 67: Sentence should start with capital letter
+  - ... and 20 more
+
+FILE: YV_2018-61_080118_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 2
+Spiritual Issues: 1
+Quality Issues: 0
+Academic Issues:
+  - Line 331: Sentence should start with capital letter
+  - Line 471: Sentence should start with capital letter
+
+FILE: YV_2018-62_080718_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 4
+Spiritual Issues: 17
+Quality Issues: 0
+Academic Issues:
+  - Line 355: Sentence should start with capital letter
+  - Line 399: Sentence should start with capital letter
+  - Line 855: Sentence should start with capital letter
+  - ... and 1 more
+
+FILE: YV_2018-63_080818_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 4
+Spiritual Issues: 4
+Quality Issues: 0
+Academic Issues:
+  - Line 135: Sentence should start with capital letter
+  - Line 471: Sentence should start with capital letter
+  - Line 1059: Sentence should start with capital letter
+  - ... and 1 more
+
+FILE: YV_2018-64_081418_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 6
+Spiritual Issues: 7
+Quality Issues: 0
+Academic Issues:
+  - Line 7: Sentence should start with capital letter
+  - Line 27: Sentence should start with capital letter
+  - Line 583: Sentence should start with capital letter
+  - ... and 3 more
+
+FILE: YV_2018-65_081518_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 6
+Spiritual Issues: 0
+Quality Issues: 0
+Academic Issues:
+  - Line 219: Sentence should start with capital letter
+  - Line 495: Sentence should start with capital letter
+  - Line 515: Sentence should start with capital letter
+  - ... and 3 more
+
+FILE: YV_2018-66_082118_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 1
+Academic Issues: 3
+Spiritual Issues: 0
+Quality Issues: 0
+Format Errors:
+  - Subtitle 167: Missing subtitle text
+Academic Issues:
+  - Line 143: Sentence should start with capital letter
+  - Line 607: Sentence should start with capital letter
+  - Line 1311: Sentence should start with capital letter
+
+FILE: YV_2018-67_082218_QA_CORRECTED.srt - ISSUES FOUND
+Format Errors: 0
+Academic Issues: 4
+Spiritual Issues: 6
+Quality Issues: 0
+Academic Issues:
+  - Line 219: Sentence should start with capital letter
+  - Line 523: Sentence should start with capital letter
+  - Line 803: Sentence should start with capital letter
+  - ... and 1 more
+
+OVERALL ASSESSMENT: 591 ISSUES REQUIRE ATTENTION

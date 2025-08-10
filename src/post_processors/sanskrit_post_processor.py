@@ -36,6 +36,9 @@ from sanskrit_hindi_identifier.correction_applier import CorrectionApplier
 from utils.fuzzy_matcher import FuzzyMatcher, MatchingConfig
 from utils.iast_transliterator import IASTTransliterator
 
+# Import Story 2.6 Academic Polish components
+from post_processors.academic_polish_processor import AcademicPolishProcessor
+
 
 @dataclass
 class TranscriptSegment:
@@ -160,6 +163,10 @@ class SanskritPostProcessor:
             max_corrections_per_segment=self.config.get('max_corrections_per_segment', 10)
         )
         
+        # Initialize Story 2.6 Academic Polish Processor
+        self.academic_polish_processor = AcademicPolishProcessor()
+        self.enable_academic_polish = self.config.get('enable_academic_polish', False)
+        
         # Legacy lexicons for backward compatibility
         self.corrections: Dict[str, LexiconEntry] = {}
         self.proper_nouns: Dict[str, LexiconEntry] = {}
@@ -181,10 +188,10 @@ class SanskritPostProcessor:
                 else:
                     return json.load(f)
         
-        # Default configuration
+        # Default configuration - CONSERVATIVE ANTI-HALLUCINATION SETTINGS
         return {
-            'fuzzy_threshold': 80,
-            'confidence_threshold': 0.6,
+            'fuzzy_threshold': 90,  # Increased from 80 - much more conservative
+            'confidence_threshold': 0.8,  # Increased from 0.6 - more conservative
             'use_advanced_normalization': True,
             
             # Story 2.1: Lexicon-based correction system configuration
@@ -192,22 +199,22 @@ class SanskritPostProcessor:
             'enable_lexicon_caching': True,
             'english_words_file': None,  # Optional English dictionary file
             
-            # Fuzzy matching configuration
-            'fuzzy_min_confidence': 0.75,
-            'levenshtein_threshold': 0.80,
-            'phonetic_threshold': 0.85,
-            'max_edit_distance': 3,
+            # Fuzzy matching configuration - ANTI-HALLUCINATION THRESHOLDS
+            'fuzzy_min_confidence': 0.88,  # Increased from 0.75 - prevent false matches
+            'levenshtein_threshold': 0.88,  # Increased from 0.80 - more conservative
+            'phonetic_threshold': 0.90,    # Increased from 0.85 - prevent sound-alike errors
+            'max_edit_distance': 2,        # Decreased from 3 - less aggressive
             'enable_phonetic_matching': True,
-            'enable_compound_matching': True,
+            'enable_compound_matching': True,  # Will use improved logic
             
             # IAST transliteration configuration
             'iast_strict_mode': True,
             
-            # Correction application configuration
-            'correction_min_confidence': 0.80,
+            # Correction application configuration - ANTI-HALLUCINATION SETTINGS
+            'correction_min_confidence': 0.88,  # Increased from 0.80 - prevent low confidence corrections
             'correction_critical_confidence': 0.95,
             'enable_context_validation': True,
-            'max_corrections_per_segment': 10,
+            'max_corrections_per_segment': 5,   # Decreased from 10 - limit corrections per segment
             
             # Legacy lexicon paths (for backward compatibility)
             'lexicon_paths': {
@@ -329,6 +336,15 @@ class SanskritPostProcessor:
             for i, segment in enumerate(segments):
                 try:
                     processed_segment = self._process_srt_segment(segment, metrics)
+                    
+                    # CRITICAL FIX: Context-aware capitalization
+                    # Check if this segment should start with lowercase based on previous segment
+                    if i > 0 and processed_segments:
+                        previous_text = processed_segments[-1].text.strip()
+                        processed_segment.text = self._apply_context_aware_capitalization(
+                            processed_segment.text, previous_text
+                        )
+                    
                     processed_segments.append(processed_segment)
                     
                     # Track confidence scores
@@ -353,6 +369,11 @@ class SanskritPostProcessor:
             # Calculate quality metrics
             self.metrics_collector.calculate_quality_metrics(metrics)
             
+            # CRITICAL FIX: Apply QA validation rules as final step
+            self.metrics_collector.start_timer('qa_validation')
+            processed_segments = self._apply_qa_validation(processed_segments, metrics)
+            metrics.qa_validation_time = self.metrics_collector.end_timer('qa_validation')
+            
             # Step 4: Generate output SRT
             output_srt = self.srt_parser.to_srt_string(processed_segments)
             
@@ -360,6 +381,13 @@ class SanskritPostProcessor:
             output_path.parent.mkdir(parents=True, exist_ok=True)
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(output_srt)
+            
+            # Step 5 (Optional): Apply Academic Polish Enhancement
+            if self.enable_academic_polish:
+                polished_output_path = output_path.with_name(
+                    output_path.stem.replace('_QA_CORRECTED', '_POLISHED') + output_path.suffix
+                )
+                self._apply_academic_polish(output_path, polished_output_path, metrics)
             
             # Final timing
             metrics.processing_time = time.time() - start_time
@@ -496,6 +524,72 @@ class SanskritPostProcessor:
             self.metrics_collector.update_correction_count(metrics, correction_type)
         
         return processed_segment
+
+    def _apply_academic_polish(self, input_path: Path, output_path: Path, metrics: ProcessingMetrics) -> None:
+        """
+        Apply academic polish enhancements to create polished SRT output.
+        
+        Args:
+            input_path: Path to the processed SRT file
+            output_path: Path for the polished output file
+            metrics: Processing metrics to update
+        """
+        try:
+            start_time = time.time()
+            
+            # Read the processed SRT content
+            with open(input_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Apply academic polish enhancements
+            polished_content, polish_issues = self.academic_polish_processor.polish_srt_content(content)
+            
+            # Fix subtitle numbering
+            polished_content, numbering_issues = self.academic_polish_processor.fix_subtitle_numbering(polished_content)
+            
+            # Fix missing subtitle text
+            polished_content, missing_text_issues = self.academic_polish_processor.fix_missing_subtitle_text(polished_content)
+            
+            # Validate SRT format compliance
+            format_compliance_issues = self.academic_polish_processor.validate_srt_format_compliance(polished_content)
+            
+            # Validate spiritual respectfulness
+            respect_issues = self.academic_polish_processor.validate_spiritual_respectfulness(polished_content)
+            
+            # Combine all polish issues
+            all_polish_issues = polish_issues + numbering_issues + missing_text_issues + format_compliance_issues + respect_issues
+            
+            # Write polished content
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(polished_content)
+            
+            # Update metrics with polish information
+            polish_time = time.time() - start_time
+            metrics.configuration_used['academic_polish_applied'] = True
+            metrics.configuration_used['polish_issues_fixed'] = len(all_polish_issues)
+            metrics.configuration_used['polish_processing_time'] = polish_time
+            metrics.configuration_used['polished_file_path'] = str(output_path)
+            
+            # Log polish results
+            self.logger.info(f"Academic polish applied: {len(all_polish_issues)} enhancements made")
+            self.logger.info(f"Polished file created: {output_path}")
+            
+            # Generate polish report
+            polish_report = self.academic_polish_processor.generate_polish_report(all_polish_issues)
+            
+            # Save polish report
+            report_path = output_path.with_suffix('.polish_report.txt')
+            with open(report_path, 'w', encoding='utf-8') as f:
+                f.write(polish_report)
+            
+            self.logger.info(f"Polish report saved: {report_path}")
+            
+        except Exception as e:
+            error_msg = f"Error applying academic polish: {e}"
+            self.logger.error(error_msg)
+            metrics.errors_encountered.append(error_msg)
+            metrics.configuration_used['academic_polish_applied'] = False
+            metrics.configuration_used['polish_error'] = str(e)
 
     def _apply_enhanced_sanskrit_hindi_corrections(self, text: str) -> Dict[str, Any]:
         """
@@ -692,40 +786,269 @@ class SanskritPostProcessor:
             }
         }
 
+    def _validate_correction_context(self, original_word: str, proposed_correction: str, surrounding_text: str) -> bool:
+        """
+        Validate if a correction makes sense in the given context.
+        
+        Args:
+            original_word: The original word being corrected
+            proposed_correction: The proposed correction
+            surrounding_text: The surrounding text for context
+            
+        Returns:
+            True if the correction seems appropriate in context, False otherwise
+        """
+        # Skip validation for exact matches - they're always valid
+        if original_word.lower() == proposed_correction.lower():
+            return True
+        
+        # Get surrounding words for context analysis
+        words_in_context = surrounding_text.lower().split()
+        
+        # Sanskrit/Hindu context indicators
+        sanskrit_context_words = {
+            'yoga', 'vedanta', 'upanishad', 'gita', 'bhagavad', 'scripture', 'verse', 'chapter',
+            'meditation', 'dharma', 'karma', 'moksha', 'samadhi', 'pranayama', 'mantra',
+            'hindu', 'sanskrit', 'vedic', 'spiritual', 'divine', 'god', 'lord', 'deity',
+            'temple', 'ashram', 'guru', 'swami', 'yogi', 'sadhu', 'devotion', 'worship'
+        }
+        
+        # Check if we're in a Sanskrit/Hindu context
+        has_sanskrit_context = any(word in sanskrit_context_words for word in words_in_context)
+        
+        # If no Sanskrit context and we're trying to insert Sanskrit terms, be very cautious
+        if not has_sanskrit_context and any(char in proposed_correction for char in 'ṛṣṇāīūṅṭḍṇḷśṃḥ'):
+            return False
+        
+        # Don't replace common English function words with Sanskrit terms
+        english_function_words = {'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'under', 'over', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must'}
+        if original_word.lower() in english_function_words:
+            return False
+        
+        return True
+
+    def _is_likely_english_word(self, word: str) -> bool:
+        """
+        Determine if a word is likely English based on letter patterns and structure.
+        
+        Args:
+            word: Word to check
+            
+        Returns:
+            True if word appears to be English, False otherwise
+        """
+        # Convert to lowercase for analysis
+        word_lower = word.lower()
+        
+        # Very short words are often English function words
+        if len(word_lower) <= 3:
+            return True
+        
+        # Common English word endings
+        english_endings = {
+            'ed', 'ing', 'ly', 'er', 'est', 'tion', 'sion', 'ment', 'ness', 
+            'able', 'ible', 'ful', 'less', 'ward', 'wise', 'like', 'ship'
+        }
+        
+        # Check if word ends with common English suffixes
+        for ending in english_endings:
+            if word_lower.endswith(ending):
+                return True
+        
+        # Common English prefixes
+        english_prefixes = {
+            'un', 're', 'pre', 'dis', 'mis', 'over', 'under', 'out', 'up', 'in', 'im'
+        }
+        
+        # Check if word starts with common English prefixes
+        for prefix in english_prefixes:
+            if word_lower.startswith(prefix):
+                return True
+        
+        # English words typically don't have certain letter combinations common in Sanskrit
+        # But be conservative - only flag obvious English patterns
+        if word_lower.count('th') > 0 or word_lower.count('ck') > 0 or word_lower.count('qu') > 0:
+            return True
+        
+        # Double letters more common in English
+        if any(word_lower.count(letter) > 1 for letter in 'llssttffpp'):
+            return True
+        
+        return False
+    
+    def _validate_sanskrit_context(self, text: str) -> bool:
+        """
+        Check if the text has sufficient Sanskrit/spiritual context to justify corrections.
+        
+        Args:
+            text: Full text segment to check for context
+            
+        Returns:
+            True if Sanskrit context is present, False otherwise
+        """
+        # Convert to lowercase for analysis
+        text_lower = text.lower()
+        
+        # Sanskrit/spiritual context indicators
+        sanskrit_indicators = {
+            'yoga', 'vedanta', 'upanishad', 'gita', 'bhagavad', 'scripture', 'verse', 'chapter',
+            'meditation', 'dharma', 'karma', 'moksha', 'samadhi', 'pranayama', 'mantra',
+            'hindu', 'sanskrit', 'vedic', 'spiritual', 'divine', 'god', 'lord', 'deity',
+            'temple', 'ashram', 'guru', 'swami', 'yogi', 'sadhu', 'devotion', 'worship',
+            'consciousness', 'enlightenment', 'liberation', 'realization', 'transcendence'
+        }
+        
+        # Also check for existing Sanskrit diacritics (suggests Sanskrit context)
+        sanskrit_chars = 'ṛṣṇāīūṅṭḍṇḷśṃḥ'
+        has_sanskrit_chars = any(char in text for char in sanskrit_chars)
+        
+        # Check for Sanskrit words in the text
+        words_in_text = set(text_lower.split())
+        sanskrit_context_count = len(words_in_text.intersection(sanskrit_indicators))
+        
+        # Require either Sanskrit characters OR multiple Sanskrit context words
+        return has_sanskrit_chars or sanskrit_context_count >= 2
+
     def _apply_lexicon_corrections(self, text: str) -> Tuple[str, List[str]]:
         """Apply lexicon-based corrections using fuzzy matching."""
         corrections_applied = []
         words = text.split()
         
+        # ULTRA-CONSERVATIVE ANTI-HALLUCINATION SAFEGUARDS
+        # Comprehensive English stopwords and common words that should NEVER be converted
+        english_protected_words = {
+            # Function words - CRITICAL: These must NEVER be touched
+            'who', 'what', 'when', 'where', 'why', 'how', 'and', 'the', 'is', 'are', 'was', 'were', 
+            'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 
+            'should', 'may', 'might', 'can', 'must', 'shall', 'ought',
+            
+            # Pronouns
+            'i', 'me', 'my', 'mine', 'myself', 'you', 'your', 'yours', 'yourself', 'he', 'him', 
+            'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'we', 'us', 
+            'our', 'ours', 'ourselves', 'they', 'them', 'their', 'theirs', 'themselves',
+            
+            # Determiners and articles
+            'this', 'that', 'these', 'those', 'a', 'an', 'some', 'any', 'all', 'every', 'each',
+            
+            # Prepositions
+            'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 
+            'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'under', 
+            'over', 'across', 'beside', 'behind', 'beyond', 'within', 'without', 'against',
+            
+            # Conjunctions  
+            'but', 'or', 'nor', 'so', 'yet', 'because', 'since', 'unless', 'while', 'although', 
+            'though', 'if', 'when', 'where', 'whether',
+            
+            # Common adverbs
+            'very', 'quite', 'rather', 'too', 'more', 'most', 'less', 'least', 'much', 'many', 
+            'few', 'little', 'enough', 'only', 'just', 'even', 'also', 'already', 'still', 'yet', 
+            'again', 'once', 'twice', 'here', 'there', 'now', 'then', 'today', 'tomorrow', 'yesterday',
+            
+            # Common verbs that could be mismatched
+            'see', 'look', 'hear', 'listen', 'feel', 'think', 'know', 'understand', 'remember', 
+            'forget', 'learn', 'teach', 'tell', 'say', 'speak', 'talk', 'ask', 'answer', 'call',
+            'come', 'go', 'bring', 'take', 'get', 'give', 'put', 'make', 'let', 'help',
+            
+            # Spiritual/religious context words that should remain English
+            'chapter', 'verse', 'entitled', 'text', 'scripture', 'book', 'page', 'line',
+            'meditation', 'practice', 'teaching', 'lesson', 'study', 'read', 'recite',
+            'prayer', 'worship', 'devotion', 'faith', 'belief', 'truth', 'wisdom',
+            
+            # Numbers and time
+            'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+            'first', 'second', 'third', 'fourth', 'fifth', 'last', 'next', 'previous',
+            'hour', 'minute', 'second', 'day', 'week', 'month', 'year', 'time',
+            
+            # Common adjectives
+            'good', 'bad', 'big', 'small', 'great', 'little', 'long', 'short', 'high', 'low',
+            'new', 'old', 'young', 'ancient', 'modern', 'early', 'late', 'fast', 'slow',
+            'hot', 'cold', 'warm', 'cool', 'light', 'dark', 'bright', 'clear', 'clean', 'dirty'
+        }
+        
         for i, word in enumerate(words):
             # Clean word for matching
             clean_word = re.sub(r'[^\w]', '', word.lower())
             
-            # Try exact match first
-            if clean_word in self.corrections:
-                entry = self.corrections[clean_word]
-                words[i] = self._preserve_case_and_punctuation(word, entry.transliteration)
-                corrections_applied.append(f"{clean_word} -> {entry.transliteration}")
+            # ULTRA-CONSERVATIVE FILTERING
+            # ABSOLUTE PROTECTION: Skip very short words (ultra-conservative)
+            if len(clean_word) <= 6:  # Increased from 5 to 6 - much more conservative
+                continue
+                
+            # ABSOLUTE PROTECTION: Skip ALL protected English words - NO EXCEPTIONS EVER
+            if clean_word in english_protected_words:
                 continue
             
-            # Try fuzzy matching
+            # ABSOLUTE PROTECTION: Skip ANY word that contains protected substrings
+            if any(protected in clean_word for protected in ['is', 'as', 'and', 'the', 'who', 'one', 'two', 'three']):
+                continue
+            
+            # Skip words that look like English (contain only ASCII letters)
+            if clean_word.isalpha() and all(ord(c) < 128 for c in clean_word):
+                # Additional check: skip if word is likely English based on letter patterns
+                if self._is_likely_english_word(clean_word):
+                    continue
+            
+            # Try exact match first - but ONLY if it passes additional validation
+            if clean_word in self.corrections:
+                entry = self.corrections[clean_word]
+                
+                # Multiple layers of validation for exact matches
+                if (self._validate_correction_context(clean_word, entry.transliteration, text) and
+                    self._validate_sanskrit_context(text) and
+                    not self._is_likely_english_word(clean_word)):
+                    
+                    words[i] = self._preserve_case_and_punctuation(word, entry.transliteration)
+                    corrections_applied.append(f"{clean_word} -> {entry.transliteration}")
+                continue
+            
+            # FUZZY MATCHING - EXTREMELY CONSERVATIVE
             best_match = self._fuzzy_match_lexicon(clean_word)
             if best_match:
                 entry, score = best_match
                 
-                # Avoid replacing single words with multi-word phrases unless very high confidence
+                # ULTRA-STRICT requirements for fuzzy matching - PREVENT ALL HALLUCINATION
                 entry_word_count = len(entry.transliteration.split())
-                if entry_word_count > 1 and score < 95:
-                    # Skip this fuzzy match - too risky
+                
+                # COMPLETELY DISABLE multi-word replacements - too dangerous
+                if entry_word_count > 1:
                     continue
+                
+                # Require EXTREMELY high confidence for single word replacements
+                if score < 98:  # Increased from 95 to 98 - nearly exact match required
+                    continue
+                
+                # MUCH STRICTER length similarity requirement
+                length_ratio = min(len(clean_word), len(entry.original_term)) / max(len(clean_word), len(entry.original_term))
+                if length_ratio < 0.9:  # Increased from 0.8 to 0.9 - must be very similar length
+                    continue
+                
+                # ADDITIONAL SAFETY: Character composition similarity
+                word_chars = set(clean_word.lower())
+                entry_chars = set(entry.original_term.lower())
+                char_overlap = len(word_chars.intersection(entry_chars)) / len(word_chars.union(entry_chars))
+                if char_overlap < 0.8:  # At least 80% character overlap required
+                    continue
+                
+                # Multiple layers of validation
+                if (self._validate_correction_context(clean_word, entry.transliteration, text) and
+                    self._validate_sanskrit_context(text) and
+                    not self._is_likely_english_word(clean_word)):
                     
-                words[i] = self._preserve_case_and_punctuation(word, entry.transliteration)
-                corrections_applied.append(f"{clean_word} -> {entry.transliteration} (fuzzy: {score})")
+                    words[i] = self._preserve_case_and_punctuation(word, entry.transliteration)
+                    corrections_applied.append(f"{clean_word} -> {entry.transliteration} (fuzzy: {score})")
         
         return ' '.join(words), corrections_applied
 
     def _fuzzy_match_lexicon(self, word: str) -> Optional[Tuple[LexiconEntry, int]]:
         """Find best fuzzy match in lexicons."""
+        # ULTRA-CONSERVATIVE ANTI-HALLUCINATION SAFEGUARDS
+        if len(word) < 6:  # Increased from 4 to 6 - skip shorter words
+            return None
+        
+        # Skip if word looks like English
+        if self._is_likely_english_word(word):
+            return None
+        
         all_terms = list(self.corrections.keys()) + list(self.proper_nouns.keys()) + list(self.phrases.keys())
         
         if not all_terms:
@@ -733,8 +1056,27 @@ class SanskritPostProcessor:
         
         match = process.extractOne(word, all_terms, scorer=fuzz.ratio)
         
-        if match and match[1] >= self.fuzzy_threshold:
+        # Use EXTREMELY high fuzzy threshold (99 instead of 97) to prevent ALL false matches
+        conservative_threshold = max(99, self.fuzzy_threshold)  # Increased from 97 to 99 - nearly exact match only
+        
+        if match and match[1] >= conservative_threshold:
             matched_term = match[0]
+            
+            # Additional validation: check length similarity (MUCH stricter)
+            length_ratio = min(len(word), len(matched_term)) / max(len(word), len(matched_term))
+            if length_ratio < 0.95:  # Increased from 0.85 to 0.95 for ULTRA-strict matching
+                return None
+            
+            # Additional check: ensure VERY similar character composition
+            word_chars = set(word.lower())
+            matched_chars = set(matched_term.lower())
+            char_overlap = len(word_chars.intersection(matched_chars)) / len(word_chars.union(matched_chars))
+            if char_overlap < 0.85:  # Increased to 85% character overlap required
+                return None
+            
+            # FINAL SAFETY: Prevent any corrections to words shorter than 7 characters
+            if len(word) < 7:
+                return None
             
             # Find the entry
             for lexicon in [self.corrections, self.proper_nouns, self.phrases]:
@@ -908,6 +1250,158 @@ class SanskritPostProcessor:
             stats['story_2_1_error'] = str(e)
         
         return stats
+
+    def _apply_context_aware_capitalization(self, current_text: str, previous_text: str) -> str:
+        """
+        Apply context-aware capitalization based on previous segment ending.
+        
+        CRITICAL FIX for Epic 2 Perfection Plan:
+        - If previous segment ends with sentence-ending punctuation (. ! ?) → keep capitalization
+        - If previous segment ends with continuation punctuation (, ; :) → make lowercase
+        - Preserve proper noun capitalization for Sanskrit terms
+        
+        Args:
+            current_text: Text of current segment
+            previous_text: Text of previous segment
+            
+        Returns:
+            Text with appropriate capitalization
+        """
+        if not current_text or not previous_text:
+            return current_text
+        
+        # Define sentence-ending punctuation
+        sentence_endings = {'.', '!', '?'}
+        continuation_punctuation = {',', ';', ':', '—', '-'}
+        
+        # Check how previous segment ends
+        previous_last_char = previous_text.rstrip()[-1] if previous_text.rstrip() else ''
+        
+        # If previous segment ends with sentence-ending punctuation, keep current capitalization
+        if previous_last_char in sentence_endings:
+            return current_text
+        
+        # If previous segment ends with continuation punctuation or no punctuation,
+        # make first word lowercase (unless it's a proper noun)
+        if previous_last_char in continuation_punctuation or previous_last_char.isalpha():
+            words = current_text.split()
+            if words:
+                first_word = words[0]
+                
+                # Check if first word is a proper noun that should stay capitalized
+                if self._should_preserve_capitalization(first_word):
+                    return current_text
+                
+                # Make first word lowercase while preserving rest
+                words[0] = first_word[0].lower() + first_word[1:] if len(first_word) > 1 else first_word.lower()
+                return ' '.join(words)
+        
+        return current_text
+    
+    def _should_preserve_capitalization(self, word: str) -> bool:
+        """
+        Check if a word should preserve its capitalization (proper nouns, Sanskrit terms).
+        
+        Args:
+            word: Word to check
+            
+        Returns:
+            True if capitalization should be preserved
+        """
+        # Remove punctuation for checking
+        clean_word = re.sub(r'[^\w\u0100-\u017F\u1E00-\u1EFF]', '', word).lower()
+        
+        # Check if it's a known Sanskrit/Hindi term that should be capitalized
+        if hasattr(self, 'corrections') and clean_word in self.corrections:
+            entry = self.corrections[clean_word]
+            return entry.is_proper_noun
+        
+        # Check with lexicon manager if available
+        if hasattr(self, 'lexicon_manager') and self.lexicon_manager:
+            try:
+                all_entries = self.lexicon_manager.get_all_entries()
+                if clean_word in all_entries:
+                    return all_entries[clean_word].is_proper_noun
+            except:
+                pass
+        
+        # Sanskrit terms with diacritical marks should generally preserve capitalization
+        if any(ord(c) > 127 for c in word):
+            return True
+            
+        # Words that are typically proper nouns in spiritual context
+        spiritual_proper_nouns = {
+            'krishna', 'rama', 'sita', 'arjuna', 'hanuman', 'vishnu', 'shiva', 
+            'brahma', 'gita', 'vedanta', 'yoga', 'om', 'aum', 'lord', 'divine',
+            'bhagavad', 'ramayana', 'mahabharata'
+        }
+        
+        return clean_word in spiritual_proper_nouns
+
+    def _apply_qa_validation(self, segments: List[SRTSegment], metrics: ProcessingMetrics) -> List[SRTSegment]:
+        """
+        Apply QA validation rules to processed segments as final quality check.
+        
+        CRITICAL FIX for Epic 2 Perfection Plan:
+        Integrates qa_quality_validation_rules.py directly into main pipeline
+        
+        Args:
+            segments: List of processed SRT segments
+            metrics: Processing metrics to update
+            
+        Returns:
+            List of segments with QA corrections applied
+        """
+        # Import QA validation classes
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+        
+        try:
+            from qa_quality_validation_rules import SRTQualityValidator
+            
+            validator = SRTQualityValidator()
+            qa_corrected_segments = []
+            qa_corrections_applied = 0
+            
+            for segment in segments:
+                original_text = segment.text
+                
+                # Apply QA corrections to individual segment text
+                corrected_text = validator.apply_corrections(segment.text)
+                
+                if corrected_text != original_text:
+                    qa_corrections_applied += 1
+                    # Create new segment with corrected text
+                    import copy
+                    corrected_segment = copy.deepcopy(segment)
+                    corrected_segment.text = corrected_text
+                    qa_corrected_segments.append(corrected_segment)
+                    
+                    # Log the QA correction
+                    segment_id = getattr(segment, 'id', getattr(segment, 'index', 'unknown'))
+                    self.logger.debug(f"QA correction applied to segment {segment_id}: '{original_text}' -> '{corrected_text}'")
+                else:
+                    qa_corrected_segments.append(segment)
+            
+            # Update metrics
+            metrics.qa_corrections_applied = qa_corrections_applied
+            if hasattr(metrics, 'qa_validation_time'):
+                pass  # Already set by timer
+            else:
+                metrics.qa_validation_time = 0
+            
+            self.logger.info(f"QA validation completed: {qa_corrections_applied} corrections applied")
+            
+            return qa_corrected_segments
+            
+        except ImportError as e:
+            self.logger.warning(f"QA validation module not found: {e}. Skipping QA validation.")
+            return segments
+        except Exception as e:
+            self.logger.error(f"Error during QA validation: {e}")
+            # Return original segments if QA validation fails
+            return segments
 
     def get_sanskrit_hindi_processing_report(self) -> Dict[str, Any]:
         """
