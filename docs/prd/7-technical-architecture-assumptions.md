@@ -19,7 +19,7 @@
 ### 7.3 Service Architecture
 **Architecture Type**: MVP Monolith with Progressive Complexity
 
-The core of the MVP will be a **Monolith** service housing:
+The core of the MVP will be a **Monolith** service housing:cont
 - Post-processing logic and algorithms
 - Lexicon management systems
 - Hybrid language identification
@@ -43,4 +43,4 @@ The core of the MVP will be a **Monolith** service housing:
 - **Timestamp Integrity**: Absolute preservation of original SRT timing data
 
 ---
-
+

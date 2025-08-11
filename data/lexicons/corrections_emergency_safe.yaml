@@ -1,0 +1,76 @@
+# Emergency Safe Sanskrit/Hindi Corrections Lexicon
+# This file contains ONLY obvious, high-confidence corrections with NO ambiguous entries
+# Problematic entries like 'krishna/krsna' have been removed to prevent hallucination
+
+entries:
+  - original_term: "bhagavad gita"
+    variations: ["bhagavat gita", "bhagvad geeta", "bhagwad gita"]
+    transliteration: "Bhagavad Gītā"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "arjuna"
+    variations: ["arjun", "arjuuna"]
+    transliteration: "Arjuna"
+    is_proper_noun: true
+    category: "character"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "dharma"
+    variations: ["dhrma", "dharama"]
+    transliteration: "dharma"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "yoga"
+    variations: ["yog", "yogaa"]
+    transliteration: "yoga"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "vedanta"
+    variations: ["vedant", "vedaanta"]
+    transliteration: "Vedānta"
+    is_proper_noun: true
+    category: "philosophy"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "upanishad"
+    variations: ["upanishads", "upanishaads"]
+    transliteration: "Upaniṣad"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "meditation"
+    variations: ["mediation", "meditiation"]
+    transliteration: "meditation"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "English"
+
+  - original_term: "pranayama"
+    variations: ["pranayam", "pranayaama"]
+    transliteration: "prāṇāyāma"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "samadhi"
+    variations: ["samadhi", "samaadhi"]
+    transliteration: "samādhi"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"

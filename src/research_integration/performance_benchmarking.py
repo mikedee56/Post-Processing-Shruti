@@ -13,9 +13,9 @@ import json
 import statistics
 from enum import Enum
 
-from src.utils.logger_config import get_logger
-from src.utils.srt_parser import SRTParser, SRTSegment
-from src.post_processors.sanskrit_post_processor import SanskritPostProcessor
+from ..utils.logger_config import get_logger
+from ..utils.srt_parser import SRTParser, SRTSegment
+from ..post_processors.sanskrit_post_processor import SanskritPostProcessor
 
 logger = get_logger(__name__)
 

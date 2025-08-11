@@ -50,8 +50,7 @@
 5.  The script handles and corrects conversational nuances such as partial or rescinded phrases, ensuring grammatical correctness where possible.
 
 ### Epic 2: Sanskrit & Hindi Identification & Correction
-
-**Epic Goal**: Develop and integrate hybrid language modeling, implement the IAST transliteration standard, and enable verse and scripture identification to ensure the academic integrity of the transcripts.
+2
 
 #### Story 2.1: Lexicon-Based Correction System
 **As a** post-processing script,
@@ -157,4 +156,4 @@
 4.  The system provides a mechanism to track and report on automated QA metrics and editor-specific corrections.
 
 ---
-
+

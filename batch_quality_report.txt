@@ -1,0 +1,2725 @@
+BATCH SUMMARY:
+- Files Processed: 15
+- Total Issues Found: 2426
+- Average Issues per File: 161.7
+
+BATCH QUALITY VALIDATION REPORT
+==================================================
+
+FILE: HighlightsTulsiRamayana102816HQ#28_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 46
+- Critical: 0
+- Major: 42
+- Minor: 4
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (42):
+Line 15: Missing space after period
+Line 79: Missing space after period
+Line 107: Missing space after period
+Line 139: Missing space after period
+Line 151: Missing space after period
+Line 235: Missing space after period
+Line 287: Missing space after period
+Line 291: Missing space after period
+Line 303: Missing space after period
+Line 319: Missing space after period
+Line 387: Missing space after period
+Line 407: Missing space after period
+Line 443: Missing space after period
+Line 447: Missing space after period
+Line 483: Missing space after period
+Line 535: Missing space after period
+Line 571: Missing space after period
+Line 579: Missing space after period
+Line 679: Missing space after period
+Line 743: Missing space after period
+Line 751: Missing space after period
+Line 763: Missing space after period
+Line 819: Missing space after period
+Line 851: Missing space after period
+Line 907: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1027: Missing space after period
+Line 1131: Missing space after period
+Line 1147: Missing space after period
+Line 1187: Missing space after period
+Line 1191: Missing space after period
+Line 1191: Missing space after question mark
+Line 1203: Missing space after period
+Line 1467: Missing space after period
+Line 1479: Missing space after period
+Line 1511: Missing space after period
+Line 1511: Missing space after question mark
+Line 1527: Missing space after period
+Line 1535: Missing space after period
+Line 1539: Missing space after period
+Line 1555: Missing space after period
+
+MINOR ISSUES (4):
+Line 95: Ordinal number formatting
+Line 103: Ordinal number formatting
+Line 695: Ordinal number formatting
+Line 703: Ordinal number formatting
+
+
+FILE: HighlightsTulsiRamayana110416HQ#29_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 100
+- Critical: 0
+- Major: 88
+- Minor: 12
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (88):
+Line 15: Missing space after period
+Line 51: Missing space after period
+Line 79: Missing space after period
+Line 119: Missing space after period
+Line 203: Missing space after period
+Line 307: Missing space after period
+Line 315: Missing space after question mark
+Line 331: Missing space after period
+Line 339: Missing space after period
+Line 355: Missing space after period
+Line 371: Missing space after question mark
+Line 387: Missing space after period
+Line 395: Missing space after period
+Line 419: Missing space after question mark
+Line 427: Missing space after period
+Line 443: Missing space after period
+Line 463: Missing space after period
+Line 471: Missing space after period
+Line 523: Missing space after period
+Line 535: Missing space after period
+Line 539: Missing space after period
+Line 567: Missing space after period
+Line 579: Missing space after period
+Line 583: Missing space after period
+Line 587: Missing space after period
+Line 623: Missing space after period
+Line 631: Missing space after period
+Line 655: Missing space after period
+Line 739: Missing space after period
+Line 767: Missing space after period
+Line 767: Missing space after period
+Line 771: Missing space after period
+Line 783: Missing space after period
+Line 787: Missing space after period
+Line 839: Missing space after period
+Line 847: Missing space after period
+Line 855: Missing space after period
+Line 863: Missing space after period
+Line 903: Missing space after period
+Line 959: Missing space after period
+Line 971: Missing space after period
+Line 975: Missing space after period
+Line 987: Missing space after question mark
+Line 991: Missing space after question mark
+Line 995: Missing space after question mark
+Line 999: Missing space after question mark
+Line 1019: Missing space after period
+Line 1043: Missing space after period
+Line 1059: Missing space after period
+Line 1075: Missing space after period
+Line 1083: Missing space after period
+Line 1087: Missing space after period
+Line 1095: Missing space after period
+Line 1123: Missing space after period
+Line 1147: Missing space after period
+Line 1151: Missing space after question mark
+Line 1175: Missing space after question mark
+Line 1191: Missing space after period
+Line 1211: Missing space after period
+Line 1219: Missing space after period
+Line 1263: Missing space after period
+Line 1287: Missing space after period
+Line 1299: Missing space after period
+Line 1303: Missing space after period
+Line 1359: Missing space after period
+Line 1363: Missing space after period
+Line 1371: Missing space after period
+Line 1395: Missing space after period
+Line 1399: Missing space after period
+Line 1443: Missing space after period
+Line 1467: Missing space after period
+Line 1471: Missing space after period
+Line 1475: Missing space after period
+Line 1479: Missing space after period
+Line 1483: Missing space after period
+Line 1507: Missing space after period
+Line 1543: Missing space after period
+Line 1627: Missing space after period
+Line 1647: Missing space after period
+Line 1679: Missing space after period
+Line 1715: Missing space after period
+Line 1719: Missing space after period
+Line 1731: Missing space after period
+Line 1747: Missing space after period
+Line 1763: Missing space after period
+Line 1791: Missing space after period
+Line 1811: Missing space after period
+Line 1815: Missing space after period
+
+MINOR ISSUES (12):
+Line 39: Ordinal number formatting
+Line 135: Ordinal number formatting
+Line 195: Ordinal number formatting
+Line 235: Ordinal number formatting
+Line 295: Ordinal number formatting
+Line 631: Ordinal number formatting
+Line 759: Ordinal number formatting
+Line 771: Ordinal number formatting
+Line 1107: Ordinal number formatting
+Line 1191: Ordinal number formatting
+Line 1203: Ordinal number formatting
+Line 1323: Number should be word in formal text
+
+
+FILE: Ramayana_2016-27 102116_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 63
+- Critical: 0
+- Major: 61
+- Minor: 2
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (61):
+Line 15: Missing space after period
+Line 131: Missing space after period
+Line 211: Missing space after period
+Line 267: Missing space after period
+Line 291: Missing space after period
+Line 347: Missing space after period
+Line 355: Missing space after period
+Line 399: Missing space after period
+Line 411: Missing space after period
+Line 439: Missing space after period
+Line 455: Missing space after period
+Line 491: Missing space after period
+Line 503: Missing space after period
+Line 535: Missing space after period
+Line 539: Missing space after period
+Line 551: Missing space after period
+Line 667: Missing space after period
+Line 679: Missing space after period
+Line 691: Missing space after period
+Line 699: Missing space after period
+Line 703: Missing space after period
+Line 707: Missing space after period
+Line 719: Missing space after period
+Line 723: Missing space after period
+Line 779: Missing space after period
+Line 783: Missing space after period
+Line 807: Missing space after period
+Line 811: Missing space after period
+Line 847: Missing space after period
+Line 855: Missing space after period
+Line 875: Missing space after period
+Line 919: Missing space after period
+Line 955: Missing space after period
+Line 1023: Missing space after period
+Line 1087: Missing space after period
+Line 1127: Missing space after period
+Line 1139: Missing space after period
+Line 1239: Missing space after period
+Line 1263: Missing space after period
+Line 1267: Missing space after period
+Line 1335: Missing space after period
+Line 1347: Missing space after period
+Line 1347: Missing space after period
+Line 1383: Missing space after period
+Line 1399: Missing space after period
+Line 1423: Missing space after period
+Line 1427: Missing space after period
+Line 1463: Missing space after period
+Line 1467: Missing space after period
+Line 1471: Missing space after period
+Line 1507: Missing space after period
+Line 1515: Missing space after period
+Line 1539: Missing space after period
+Line 1567: Missing space after period
+Line 1611: Missing space after period
+Line 1675: Missing space after period
+Line 1723: Missing space after period
+Line 1731: Missing space after period
+Line 1735: Missing space after period
+Line 1763: Missing space after period
+Line 1767: Missing space after period
+
+MINOR ISSUES (2):
+Line 687: Ordinal number formatting
+Line 707: Ordinal number formatting
+
+
+FILE: SrimadBhagavadGita112913_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 149
+- Critical: 1
+- Major: 142
+- Minor: 6
+
+CRITICAL ISSUES (1):
+Line 943: Number should be word
+  Original: You are facing a situation that no 1 can cure.It is outdated.
+  Fixed: You are facing a situation that no one can cure.It is outdated.
+
+
+MAJOR ISSUES (142):
+Line 23: Missing space after period
+Line 27: Missing space after question mark
+Line 31: Missing space after question mark
+Line 39: Missing space after period
+Line 63: Missing space after period
+Line 67: Missing space after period
+Line 71: Missing space after period
+Line 91: Missing space after period
+Line 95: Missing space after period
+Line 99: Missing space after period
+Line 103: Missing space after period
+Line 115: Missing space after period
+Line 123: Missing space after period
+Line 155: Missing space after period
+Line 163: Missing space after period
+Line 171: Missing space after period
+Line 175: Missing space after period
+Line 183: Missing space after period
+Line 191: Missing space after period
+Line 199: Missing space after period
+Line 203: Missing space after period
+Line 211: Missing space after period
+Line 215: Missing space after period
+Line 223: Missing space after period
+Line 231: Missing space after period
+Line 235: Missing space after period
+Line 239: Missing space after period
+Line 271: Missing space after period
+Line 275: Missing space after question mark
+Line 279: Missing space after period
+Line 283: Missing space after period
+Line 287: Missing space after period
+Line 295: Missing space after period
+Line 311: Missing space after period
+Line 315: Missing space after period
+Line 323: Missing space after period
+Line 327: Missing space after period
+Line 339: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 363: Missing space after period
+Line 375: Missing space after period
+Line 383: Missing space after period
+Line 391: Missing space after period
+Line 395: Missing space after period
+Line 403: Missing space after question mark
+Line 407: Missing space after period
+Line 423: Missing space after period
+Line 435: Missing space after period
+Line 443: Missing space after period
+Line 455: Missing space after period
+Line 463: Missing space after period
+Line 471: Missing space after period
+Line 479: Missing space after period
+Line 491: Missing space after period
+Line 495: Missing space after period
+Line 503: Missing space after period
+Line 507: Missing space after period
+Line 511: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 535: Missing space after period
+Line 551: Missing space after period
+Line 555: Missing space after period
+Line 567: Missing space after period
+Line 575: Missing space after period
+Line 579: Missing space after period
+Line 583: Missing space after period
+Line 591: Missing space after period
+Line 595: Missing space after period
+Line 603: Missing space after period
+Line 611: Missing space after period
+Line 619: Missing space after period
+Line 623: Missing space after period
+Line 643: Missing space after period
+Line 655: Missing space after period
+Line 663: Missing space after period
+Line 671: Missing space after period
+Line 675: Missing space after period
+Line 675: Missing space after period
+Line 683: Missing space after period
+Line 695: Missing space after period
+Line 699: Missing space after period
+Line 711: Missing space after period
+Line 723: Missing space after period
+Line 731: Missing space after period
+Line 739: Missing space after period
+Line 743: Missing space after period
+Line 747: Missing space after period
+Line 759: Missing space after period
+Line 763: Missing space after period
+Line 763: Missing space after period
+Line 763: Missing space after question mark
+Line 767: Missing space after period
+Line 771: Missing space after period
+Line 775: Missing space after period
+Line 779: Missing space after period
+Line 787: Missing space after period
+Line 795: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 827: Missing space after period
+Line 831: Missing space after period
+Line 847: Missing space after period
+Line 851: Missing space after period
+Line 855: Missing space after period
+Line 871: Missing space after period
+Line 879: Missing space after period
+Line 883: Missing space after period
+Line 895: Missing space after period
+Line 911: Missing space after period
+Line 919: Missing space after period
+Line 927: Missing space after period
+Line 931: Missing space after period
+Line 939: Missing space after period
+Line 943: Missing space after period
+Line 947: Missing space after period
+Line 951: Missing space after period
+Line 959: Missing space after period
+Line 967: Missing space after period
+Line 971: Missing space after period
+Line 979: Missing space after question mark
+Line 983: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after period
+Line 999: Missing space after period
+Line 1007: Missing space after period
+Line 1011: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1031: Missing space after period
+Line 1039: Missing space after period
+Line 1071: Missing space after period
+Line 1087: Missing space after period
+Line 1091: Missing space after period
+Line 1095: Missing space after period
+Line 1099: Missing space after period
+Line 1103: Missing space after period
+Line 1111: Missing space after period
+Line 1119: Missing space after period
+Line 1123: Missing space after period
+
+MINOR ISSUES (6):
+Line 23: Number should be word in formal text
+Line 43: Number should be word in formal text
+Line 623: Ordinal number formatting
+Line 731: Ordinal number formatting
+Line 867: Ordinal number formatting
+Line 1063: Ordinal number formatting
+
+
+FILE: SrimadBhagavadGita122013#17_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 217
+- Critical: 0
+- Major: 207
+- Minor: 10
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (207):
+Line 23: Missing space after period
+Line 31: Missing space after period
+Line 35: Missing space after period
+Line 35: Missing space after period
+Line 39: Missing space after period
+Line 47: Missing space after period
+Line 47: Missing space after period
+Line 59: Missing space after period
+Line 59: Missing space after period
+Line 59: Missing space after period
+Line 79: Missing space after period
+Line 83: Missing space after period
+Line 83: Missing space after period
+Line 91: Missing space after period
+Line 95: Missing space after period
+Line 103: Missing space after period
+Line 103: Missing space after period
+Line 111: Missing space after period
+Line 115: Missing space after period
+Line 131: Missing space after period
+Line 139: Missing space after period
+Line 151: Missing space after period
+Line 155: Missing space after period
+Line 159: Missing space after period
+Line 163: Missing space after period
+Line 175: Missing space after period
+Line 179: Missing space after period
+Line 195: Missing space after period
+Line 219: Missing space after period
+Line 223: Missing space after period
+Line 239: Missing space after period
+Line 243: Missing space after period
+Line 251: Missing space after period
+Line 255: Missing space after period
+Line 259: Missing space after period
+Line 267: Missing space after period
+Line 279: Missing space after period
+Line 287: Missing space after period
+Line 291: Missing space after period
+Line 311: Missing space after period
+Line 319: Missing space after period
+Line 327: Missing space after period
+Line 335: Missing space after period
+Line 339: Missing space after period
+Line 339: Missing space after period
+Line 347: Missing space after period
+Line 379: Missing space after period
+Line 379: Missing space after period
+Line 391: Missing space after period
+Line 399: Missing space after period
+Line 403: Missing space after period
+Line 407: Missing space after period
+Line 419: Missing space after period
+Line 435: Missing space after period
+Line 435: Missing space after question mark
+Line 447: Missing space after period
+Line 447: Missing space after period
+Line 451: Missing space after period
+Line 451: Missing space after period
+Line 455: Missing space after period
+Line 459: Missing space after period
+Line 463: Missing space after period
+Line 483: Missing space after period
+Line 483: Missing space after period
+Line 487: Missing space after period
+Line 491: Missing space after period
+Line 495: Missing space after period
+Line 495: Missing space after period
+Line 495: Missing space after period
+Line 499: Missing space after period
+Line 499: Missing space after period
+Line 503: Missing space after period
+Line 511: Missing space after period
+Line 511: Missing space after period
+Line 515: Missing space after period
+Line 519: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 523: Missing space after period
+Line 527: Missing space after period
+Line 535: Missing space after period
+Line 543: Missing space after period
+Line 563: Missing space after period
+Line 571: Missing space after period
+Line 587: Missing space after period
+Line 599: Missing space after period
+Line 599: Missing space after period
+Line 603: Missing space after period
+Line 607: Missing space after period
+Line 611: Missing space after period
+Line 619: Missing space after period
+Line 631: Missing space after period
+Line 639: Missing space after period
+Line 639: Missing space after period
+Line 643: Missing space after period
+Line 643: Missing space after question mark
+Line 647: Missing space after period
+Line 651: Missing space after period
+Line 651: Missing space after period
+Line 655: Missing space after period
+Line 655: Missing space after question mark
+Line 663: Missing space after period
+Line 663: Missing space after period
+Line 667: Missing space after period
+Line 675: Missing space after period
+Line 679: Missing space after period
+Line 683: Missing space after period
+Line 687: Missing space after period
+Line 691: Missing space after period
+Line 691: Missing space after period
+Line 695: Missing space after period
+Line 695: Missing space after question mark
+Line 699: Missing space after period
+Line 703: Missing space after period
+Line 703: Missing space after period
+Line 715: Missing space after period
+Line 719: Missing space after period
+Line 735: Missing space after period
+Line 735: Missing space after period
+Line 747: Missing space after period
+Line 751: Missing space after period
+Line 755: Missing space after period
+Line 759: Missing space after period
+Line 763: Missing space after period
+Line 763: Missing space after period
+Line 763: Missing space after period
+Line 771: Missing space after period
+Line 775: Missing space after period
+Line 775: Missing space after period
+Line 779: Missing space after period
+Line 779: Missing space after period
+Line 791: Missing space after period
+Line 795: Missing space after period
+Line 803: Missing space after period
+Line 807: Missing space after period
+Line 811: Missing space after period
+Line 827: Missing space after period
+Line 839: Missing space after period
+Line 843: Missing space after period
+Line 847: Missing space after period
+Line 851: Missing space after period
+Line 859: Missing space after period
+Line 859: Missing space after period
+Line 863: Missing space after period
+Line 867: Missing space after period
+Line 867: Missing space after period
+Line 867: Missing space after period
+Line 875: Missing space after period
+Line 875: Missing space after period
+Line 879: Missing space after period
+Line 883: Missing space after period
+Line 895: Missing space after period
+Line 903: Missing space after period
+Line 903: Missing space after period
+Line 907: Missing space after period
+Line 911: Missing space after period
+Line 911: Missing space after period
+Line 911: Missing space after period
+Line 915: Missing space after period
+Line 919: Missing space after period
+Line 927: Missing space after period
+Line 927: Missing space after period
+Line 931: Missing space after period
+Line 931: Missing space after period
+Line 935: Missing space after period
+Line 939: Missing space after question mark
+Line 943: Missing space after period
+Line 947: Missing space after period
+Line 951: Missing space after period
+Line 951: Missing space after period
+Line 955: Missing space after period
+Line 959: Missing space after period
+Line 959: Missing space after period
+Line 959: Missing space after question mark
+Line 963: Missing space after period
+Line 967: Missing space after period
+Line 971: Missing space after period
+Line 971: Missing space after period
+Line 975: Missing space after period
+Line 975: Missing space after period
+Line 975: Missing space after period
+Line 979: Missing space after period
+Line 979: Missing space after period
+Line 983: Missing space after period
+Line 983: Missing space after period
+Line 983: Missing space after period
+Line 987: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after period
+Line 1011: Missing space after period
+Line 1011: Missing space after question mark
+Line 1015: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1027: Missing space after period
+Line 1035: Missing space after period
+Line 1039: Missing space after period
+Line 1039: Missing space after period
+Line 1043: Missing space after period
+Line 1047: Missing space after period
+Line 1051: Missing space after period
+Line 1055: Missing space after period
+Line 1071: Missing space after period
+Line 1075: Missing space after period
+Line 1079: Missing space after period
+Line 1083: Missing space after period
+Line 1103: Missing space after period
+
+MINOR ISSUES (10):
+Line 19: Number should be word in formal text
+Line 91: Number should be word in formal text
+Line 263: Number should be word in formal text
+Line 375: Ordinal number formatting
+Line 587: Number should be word in formal text
+Line 807: Ordinal number formatting
+Line 827: Ordinal number formatting
+Line 1055: Ordinal number formatting
+Line 1067: Ordinal number formatting
+Line 1083: Ordinal number formatting
+
+
+FILE: Sunday103011SBS35_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 58
+- Critical: 0
+- Major: 49
+- Minor: 9
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (49):
+Line 7: Missing space after period
+Line 23: Missing space after period
+Line 47: Missing space after period
+Line 91: Missing space after period
+Line 155: Missing space after period
+Line 167: Missing space after period
+Line 171: Missing space after period
+Line 179: Missing space after period
+Line 303: Missing space after period
+Line 363: Missing space after period
+Line 419: Missing space after period
+Line 527: Missing space after question mark
+Line 575: Missing space after period
+Line 711: Missing space after period
+Line 723: Missing space after period
+Line 755: Missing space after period
+Line 771: Missing space after period
+Line 847: Missing space after period
+Line 867: Missing space after period
+Line 903: Missing space after period
+Line 923: Missing space after period
+Line 927: Missing space after period
+Line 935: Missing space after period
+Line 947: Missing space after period
+Line 963: Missing space after period
+Line 967: Missing space after period
+Line 967: Missing space after period
+Line 971: Missing space after period
+Line 975: Missing space after period
+Line 983: Missing space after period
+Line 987: Missing space after question mark
+Line 1027: Missing space after period
+Line 1059: Missing space after period
+Line 1111: Missing space after period
+Line 1115: Missing space after period
+Line 1151: Missing space after period
+Line 1163: Missing space after period
+Line 1183: Missing space after period
+Line 1207: Missing space after period
+Line 1255: Missing space after period
+Line 1319: Missing space after period
+Line 1335: Missing space after period
+Line 1355: Missing space after period
+Line 1379: Missing space after period
+Line 1387: Missing space after period
+Line 1399: Missing space after period
+Line 1459: Missing space after question mark
+Line 1487: Missing space after period
+Line 1495: Missing space after period
+
+MINOR ISSUES (9):
+Line 119: Ordinal number formatting
+Line 123: Ordinal number formatting
+Line 339: Ordinal number formatting
+Line 403: Ordinal number formatting
+Line 407: Ordinal number formatting
+Line 799: Ordinal number formatting
+Line 867: Ordinal number formatting
+Line 871: Ordinal number formatting
+Line 1195: Ordinal number formatting
+
+
+FILE: WhisperX lg v2 dual pass_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 101
+- Critical: 0
+- Major: 98
+- Minor: 3
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (98):
+Line 143: Missing space after period
+Line 179: Missing space after period
+Line 275: Missing space after question mark
+Line 339: Missing space after period
+Line 399: Missing space after period
+Line 399: Missing space after exclamation mark
+Line 407: Missing space after period
+Line 423: Missing space after period
+Line 431: Missing space after period
+Line 451: Missing space after period
+Line 507: Missing space after period
+Line 531: Missing space after period
+Line 635: Missing space after period
+Line 639: Missing space after period
+Line 639: Missing space after period
+Line 675: Missing space after period
+Line 683: Missing space after period
+Line 719: Missing space after period
+Line 747: Missing space after period
+Line 771: Missing space after question mark
+Line 775: Missing space after period
+Line 787: Missing space after period
+Line 815: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 823: Missing space after period
+Line 895: Missing space after period
+Line 903: Missing space after exclamation mark
+Line 927: Missing space after period
+Line 991: Missing space after period
+Line 1007: Missing space after period
+Line 1019: Missing space after period
+Line 1035: Missing space after period
+Line 1043: Missing space after period
+Line 1071: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1139: Missing space after period
+Line 1171: Missing space after period
+Line 1183: Missing space after period
+Line 1183: Missing space after period
+Line 1203: Missing space after period
+Line 1207: Missing space after period
+Line 1207: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1251: Missing space after period
+Line 1291: Missing space after period
+Line 1299: Missing space after period
+Line 1303: Missing space after question mark
+Line 1331: Missing space after period
+Line 1359: Missing space after period
+Line 1363: Missing space after period
+Line 1363: Missing space after period
+Line 1379: Missing space after period
+Line 1379: Missing space after period
+Line 1379: Missing space after period
+Line 1391: Missing space after period
+Line 1455: Missing space after period
+Line 1475: Missing space after period
+Line 1491: Missing space after question mark
+Line 1495: Missing space after question mark
+Line 1523: Missing space after period
+Line 1559: Missing space after period
+Line 1587: Missing space after period
+Line 1651: Missing space after period
+Line 1655: Missing space after period
+Line 1671: Missing space after period
+Line 1671: Missing space after period
+Line 1691: Missing space after period
+Line 1691: Missing space after period
+Line 1715: Missing space after period
+Line 1715: Missing space after period
+Line 1735: Missing space after period
+Line 1755: Missing space after period
+Line 1755: Missing space after period
+Line 1755: Missing space after period
+Line 1787: Missing space after question mark
+Line 1795: Missing space after period
+Line 1811: Missing space after period
+Line 1811: Missing space after period
+Line 1831: Missing space after period
+Line 1831: Missing space after period
+Line 1855: Missing space after period
+Line 1855: Missing space after period
+Line 1863: Missing space after period
+Line 1895: Missing space after question mark
+Line 1907: Missing space after period
+Line 1939: Missing space after period
+Line 1947: Missing space after period
+Line 1947: Missing space after question mark
+Line 1967: Missing space after period
+Line 1967: Missing space after period
+Line 1975: Missing space after period
+
+MINOR ISSUES (3):
+Line 11: Ordinal number formatting
+Line 1043: Ordinal number formatting
+Line 1755: Ordinal number formatting
+
+
+FILE: Whisperx lg v2_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 101
+- Critical: 0
+- Major: 97
+- Minor: 4
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (97):
+Line 143: Missing space after period
+Line 179: Missing space after period
+Line 275: Missing space after question mark
+Line 339: Missing space after period
+Line 399: Missing space after period
+Line 399: Missing space after exclamation mark
+Line 407: Missing space after period
+Line 423: Missing space after period
+Line 431: Missing space after period
+Line 451: Missing space after period
+Line 507: Missing space after period
+Line 531: Missing space after period
+Line 635: Missing space after period
+Line 639: Missing space after period
+Line 639: Missing space after period
+Line 675: Missing space after period
+Line 683: Missing space after period
+Line 719: Missing space after period
+Line 747: Missing space after period
+Line 771: Missing space after question mark
+Line 775: Missing space after period
+Line 787: Missing space after period
+Line 815: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 823: Missing space after period
+Line 895: Missing space after period
+Line 903: Missing space after exclamation mark
+Line 927: Missing space after period
+Line 991: Missing space after period
+Line 1007: Missing space after period
+Line 1019: Missing space after period
+Line 1071: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1075: Missing space after period
+Line 1139: Missing space after period
+Line 1171: Missing space after period
+Line 1183: Missing space after period
+Line 1183: Missing space after period
+Line 1203: Missing space after period
+Line 1207: Missing space after period
+Line 1207: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1251: Missing space after period
+Line 1291: Missing space after period
+Line 1299: Missing space after period
+Line 1303: Missing space after question mark
+Line 1331: Missing space after period
+Line 1359: Missing space after period
+Line 1363: Missing space after period
+Line 1363: Missing space after period
+Line 1379: Missing space after period
+Line 1379: Missing space after period
+Line 1379: Missing space after period
+Line 1391: Missing space after period
+Line 1403: Missing space after period
+Line 1455: Missing space after period
+Line 1475: Missing space after period
+Line 1491: Missing space after question mark
+Line 1495: Missing space after question mark
+Line 1523: Missing space after period
+Line 1559: Missing space after period
+Line 1587: Missing space after period
+Line 1651: Missing space after period
+Line 1655: Missing space after period
+Line 1671: Missing space after period
+Line 1671: Missing space after period
+Line 1691: Missing space after period
+Line 1691: Missing space after period
+Line 1715: Missing space after period
+Line 1715: Missing space after period
+Line 1735: Missing space after period
+Line 1755: Missing space after period
+Line 1755: Missing space after period
+Line 1755: Missing space after period
+Line 1787: Missing space after question mark
+Line 1795: Missing space after period
+Line 1811: Missing space after period
+Line 1811: Missing space after period
+Line 1831: Missing space after period
+Line 1831: Missing space after period
+Line 1855: Missing space after period
+Line 1855: Missing space after period
+Line 1863: Missing space after period
+Line 1895: Missing space after question mark
+Line 1907: Missing space after period
+Line 1939: Missing space after period
+Line 1947: Missing space after period
+Line 1947: Missing space after question mark
+Line 1967: Missing space after period
+Line 1967: Missing space after period
+Line 1975: Missing space after period
+
+MINOR ISSUES (4):
+Line 11: Ordinal number formatting
+Line 1043: Ordinal number formatting
+Line 1367: Ordinal number formatting
+Line 1755: Ordinal number formatting
+
+
+FILE: YV_2018-61_080118_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 190
+- Critical: 1
+- Major: 184
+- Minor: 5
+
+CRITICAL ISSUES (1):
+Line 59: Incorrect capitalization
+  Original: The dreamer himSelf, not as the dream subject.The subject who is lying on the bed.
+  Fixed: The dreamer himself, not as the dream subject.The subject who is lying on the bed.
+
+
+MAJOR ISSUES (184):
+Line 31: Missing space after period
+Line 55: Missing space after period
+Line 59: Missing space after period
+Line 63: Missing space after period
+Line 71: Missing space after period
+Line 75: Missing space after question mark
+Line 83: Missing space after period
+Line 87: Missing space after question mark
+Line 95: Missing space after period
+Line 103: Missing space after period
+Line 107: Missing space after period
+Line 111: Missing space after period
+Line 115: Missing space after period
+Line 123: Missing space after period
+Line 131: Missing space after period
+Line 135: Missing space after period
+Line 143: Missing space after period
+Line 147: Missing space after question mark
+Line 151: Missing space after question mark
+Line 155: Missing space after period
+Line 171: Missing space after period
+Line 179: Missing space after period
+Line 183: Missing space after period
+Line 191: Missing space after period
+Line 191: Missing space after period
+Line 199: Missing space after question mark
+Line 203: Missing space after period
+Line 207: Missing space after period
+Line 219: Missing space after period
+Line 227: Missing space after period
+Line 235: Missing space after period
+Line 243: Missing space after period
+Line 247: Missing space after period
+Line 259: Missing space after period
+Line 267: Missing space after period
+Line 275: Missing space after period
+Line 283: Missing space after period
+Line 291: Missing space after period
+Line 295: Missing space after period
+Line 303: Missing space after period
+Line 307: Missing space after period
+Line 315: Missing space after period
+Line 323: Missing space after period
+Line 331: Missing space after question mark
+Line 339: Missing space after period
+Line 343: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 359: Missing space after period
+Line 371: Missing space after period
+Line 379: Missing space after period
+Line 383: Missing space after question mark
+Line 387: Missing space after period
+Line 399: Missing space after period
+Line 403: Missing space after period
+Line 411: Missing space after period
+Line 423: Missing space after period
+Line 439: Missing space after period
+Line 443: Missing space after question mark
+Line 447: Missing space after period
+Line 467: Missing space after period
+Line 471: Missing space after period
+Line 475: Missing space after period
+Line 487: Missing space after period
+Line 511: Missing space after period
+Line 515: Missing space after period
+Line 527: Missing space after period
+Line 531: Missing space after period
+Line 535: Missing space after period
+Line 543: Missing space after period
+Line 559: Missing space after period
+Line 563: Missing space after period
+Line 567: Missing space after period
+Line 579: Missing space after period
+Line 591: Missing space after period
+Line 599: Missing space after period
+Line 603: Missing space after period
+Line 611: Missing space after period
+Line 615: Missing space after period
+Line 623: Missing space after period
+Line 631: Missing space after period
+Line 643: Missing space after period
+Line 647: Missing space after period
+Line 659: Missing space after period
+Line 667: Missing space after period
+Line 679: Missing space after period
+Line 691: Missing space after period
+Line 695: Missing space after period
+Line 707: Missing space after period
+Line 715: Missing space after period
+Line 731: Missing space after period
+Line 739: Missing space after period
+Line 739: Missing space after question mark
+Line 743: Missing space after period
+Line 755: Missing space after period
+Line 759: Missing space after period
+Line 767: Missing space after period
+Line 779: Missing space after period
+Line 783: Missing space after period
+Line 787: Missing space after period
+Line 795: Missing space after period
+Line 799: Missing space after period
+Line 807: Missing space after period
+Line 811: Missing space after period
+Line 835: Missing space after question mark
+Line 851: Missing space after period
+Line 859: Missing space after period
+Line 867: Missing space after period
+Line 875: Missing space after period
+Line 887: Missing space after period
+Line 895: Missing space after period
+Line 899: Missing space after period
+Line 927: Missing space after period
+Line 935: Missing space after period
+Line 939: Missing space after period
+Line 943: Missing space after period
+Line 947: Missing space after question mark
+Line 963: Missing space after period
+Line 979: Missing space after period
+Line 987: Missing space after period
+Line 991: Missing space after period
+Line 1003: Missing space after period
+Line 1007: Missing space after period
+Line 1011: Missing space after period
+Line 1015: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1027: Missing space after period
+Line 1031: Missing space after period
+Line 1055: Missing space after period
+Line 1067: Missing space after period
+Line 1075: Missing space after period
+Line 1079: Missing space after period
+Line 1099: Missing space after period
+Line 1103: Missing space after period
+Line 1111: Missing space after period
+Line 1123: Missing space after period
+Line 1127: Missing space after period
+Line 1135: Missing space after period
+Line 1163: Missing space after period
+Line 1171: Missing space after period
+Line 1171: Missing space after period
+Line 1179: Missing space after period
+Line 1179: Missing space after period
+Line 1191: Missing space after period
+Line 1199: Missing space after period
+Line 1215: Missing space after period
+Line 1215: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1223: Missing space after period
+Line 1223: Missing space after period
+Line 1243: Missing space after period
+Line 1247: Missing space after period
+Line 1251: Missing space after period
+Line 1255: Missing space after period
+Line 1259: Missing space after question mark
+Line 1267: Missing space after period
+Line 1271: Missing space after period
+Line 1283: Missing space after period
+Line 1287: Missing space after period
+Line 1295: Missing space after period
+Line 1299: Missing space after period
+Line 1311: Missing space after period
+Line 1355: Missing space after period
+Line 1375: Missing space after period
+Line 1379: Missing space after period
+Line 1387: Missing space after period
+Line 1387: Missing space after period
+Line 1391: Missing space after period
+Line 1403: Missing space after period
+Line 1415: Missing space after period
+Line 1419: Missing space after period
+Line 1431: Missing space after period
+Line 1435: Missing space after period
+Line 1443: Missing space after period
+Line 1447: Missing space after period
+Line 1455: Missing space after period
+Line 1475: Missing space after period
+Line 1479: Missing space after period
+Line 1483: Missing space after period
+Line 1487: Missing space after period
+Line 1487: Missing space after period
+Line 1495: Missing space after period
+
+MINOR ISSUES (5):
+Line 39: Ordinal number formatting
+Line 63: Number should be word in formal text
+Line 327: Ordinal number formatting
+Line 331: Ordinal number formatting
+Line 1011: Ordinal number formatting
+
+
+FILE: YV_2018-62_080718_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 245
+- Critical: 0
+- Major: 231
+- Minor: 14
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (231):
+Line 27: Missing space after period
+Line 51: Missing space after question mark
+Line 51: Missing space after question mark
+Line 55: Missing space after period
+Line 55: Missing space after period
+Line 59: Missing space after period
+Line 67: Missing space after period
+Line 71: Missing space after period
+Line 71: Missing space after period
+Line 75: Missing space after period
+Line 87: Missing space after period
+Line 111: Missing space after period
+Line 115: Missing space after period
+Line 119: Missing space after period
+Line 123: Missing space after period
+Line 127: Missing space after period
+Line 139: Missing space after period
+Line 151: Missing space after period
+Line 151: Missing space after period
+Line 155: Missing space after period
+Line 159: Missing space after period
+Line 163: Missing space after period
+Line 167: Missing space after question mark
+Line 175: Missing space after question mark
+Line 179: Missing space after question mark
+Line 183: Missing space after period
+Line 183: Missing space after period
+Line 187: Missing space after period
+Line 191: Missing space after period
+Line 195: Missing space after period
+Line 203: Missing space after period
+Line 207: Missing space after period
+Line 211: Missing space after period
+Line 211: Missing space after period
+Line 215: Missing space after period
+Line 215: Missing space after period
+Line 219: Missing space after period
+Line 227: Missing space after period
+Line 235: Missing space after period
+Line 235: Missing space after period
+Line 239: Missing space after period
+Line 243: Missing space after period
+Line 243: Missing space after question mark
+Line 251: Missing space after question mark
+Line 255: Missing space after period
+Line 259: Missing space after period
+Line 263: Missing space after period
+Line 263: Missing space after period
+Line 271: Missing space after period
+Line 275: Missing space after period
+Line 279: Missing space after period
+Line 279: Missing space after question mark
+Line 287: Missing space after period
+Line 291: Missing space after period
+Line 295: Missing space after period
+Line 299: Missing space after period
+Line 303: Missing space after period
+Line 303: Missing space after period
+Line 311: Missing space after period
+Line 315: Missing space after period
+Line 327: Missing space after period
+Line 339: Missing space after period
+Line 339: Missing space after period
+Line 343: Missing space after period
+Line 347: Missing space after period
+Line 347: Missing space after period
+Line 355: Missing space after period
+Line 359: Missing space after period
+Line 371: Missing space after period
+Line 375: Missing space after period
+Line 383: Missing space after period
+Line 387: Missing space after period
+Line 391: Missing space after period
+Line 391: Missing space after period
+Line 395: Missing space after question mark
+Line 399: Missing space after period
+Line 407: Missing space after period
+Line 411: Missing space after period
+Line 415: Missing space after period
+Line 419: Missing space after question mark
+Line 423: Missing space after period
+Line 427: Missing space after period
+Line 431: Missing space after period
+Line 435: Missing space after period
+Line 443: Missing space after period
+Line 443: Missing space after period
+Line 447: Missing space after period
+Line 455: Missing space after period
+Line 459: Missing space after period
+Line 467: Missing space after period
+Line 471: Missing space after period
+Line 475: Missing space after question mark
+Line 479: Missing space after question mark
+Line 487: Missing space after period
+Line 487: Missing space after period
+Line 491: Missing space after period
+Line 507: Missing space after period
+Line 511: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 531: Missing space after period
+Line 535: Missing space after question mark
+Line 539: Missing space after period
+Line 543: Missing space after period
+Line 543: Missing space after period
+Line 551: Missing space after period
+Line 555: Missing space after question mark
+Line 567: Missing space after period
+Line 571: Missing space after period
+Line 575: Missing space after period
+Line 579: Missing space after period
+Line 579: Missing space after period
+Line 587: Missing space after period
+Line 591: Missing space after period
+Line 591: Missing space after question mark
+Line 595: Missing space after period
+Line 599: Missing space after period
+Line 599: Missing space after period
+Line 603: Missing space after period
+Line 607: Missing space after period
+Line 611: Missing space after period
+Line 611: Missing space after period
+Line 615: Missing space after period
+Line 619: Missing space after period
+Line 627: Missing space after period
+Line 631: Missing space after period
+Line 631: Missing space after period
+Line 635: Missing space after period
+Line 647: Missing space after period
+Line 655: Missing space after period
+Line 659: Missing space after period
+Line 659: Missing space after period
+Line 675: Missing space after period
+Line 683: Missing space after period
+Line 687: Missing space after period
+Line 695: Missing space after period
+Line 699: Missing space after period
+Line 703: Missing space after period
+Line 703: Missing space after period
+Line 707: Missing space after period
+Line 711: Missing space after period
+Line 711: Missing space after period
+Line 715: Missing space after period
+Line 723: Missing space after period
+Line 727: Missing space after period
+Line 731: Missing space after period
+Line 731: Missing space after period
+Line 747: Missing space after period
+Line 751: Missing space after period
+Line 751: Missing space after period
+Line 755: Missing space after period
+Line 759: Missing space after period
+Line 763: Missing space after period
+Line 767: Missing space after period
+Line 775: Missing space after period
+Line 783: Missing space after period
+Line 787: Missing space after period
+Line 787: Missing space after period
+Line 791: Missing space after period
+Line 795: Missing space after period
+Line 799: Missing space after period
+Line 803: Missing space after period
+Line 803: Missing space after period
+Line 807: Missing space after period
+Line 811: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 827: Missing space after period
+Line 831: Missing space after period
+Line 831: Missing space after period
+Line 835: Missing space after period
+Line 843: Missing space after period
+Line 843: Missing space after period
+Line 851: Missing space after period
+Line 851: Missing space after period
+Line 855: Missing space after period
+Line 863: Missing space after period
+Line 863: Missing space after question mark
+Line 867: Missing space after period
+Line 871: Missing space after period
+Line 875: Missing space after period
+Line 879: Missing space after period
+Line 883: Missing space after period
+Line 887: Missing space after period
+Line 891: Missing space after period
+Line 891: Missing space after period
+Line 903: Missing space after period
+Line 919: Missing space after period
+Line 931: Missing space after period
+Line 935: Missing space after period
+Line 939: Missing space after period
+Line 943: Missing space after period
+Line 943: Missing space after period
+Line 955: Missing space after period
+Line 959: Missing space after period
+Line 963: Missing space after period
+Line 967: Missing space after period
+Line 971: Missing space after period
+Line 975: Missing space after period
+Line 979: Missing space after period
+Line 987: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after period
+Line 1003: Missing space after period
+Line 1011: Missing space after period
+Line 1015: Missing space after period
+Line 1019: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1023: Missing space after period
+Line 1039: Missing space after period
+Line 1043: Missing space after period
+Line 1043: Missing space after period
+Line 1047: Missing space after question mark
+Line 1051: Missing space after period
+Line 1055: Missing space after period
+Line 1055: Missing space after period
+Line 1063: Missing space after period
+Line 1067: Missing space after period
+Line 1075: Missing space after period
+Line 1079: Missing space after period
+Line 1083: Missing space after period
+Line 1083: Missing space after period
+Line 1087: Missing space after period
+Line 1095: Missing space after period
+Line 1099: Missing space after period
+Line 1103: Missing space after period
+Line 1107: Missing space after period
+Line 1123: Missing space after period
+Line 1127: Missing space after period
+Line 1131: Missing space after period
+
+MINOR ISSUES (14):
+Line 35: Ordinal number formatting
+Line 63: Ordinal number formatting
+Line 83: Ordinal number formatting
+Line 123: Ordinal number formatting
+Line 131: Ordinal number formatting
+Line 167: Ordinal number formatting
+Line 183: Ordinal number formatting
+Line 355: Ordinal number formatting
+Line 399: Ordinal number formatting
+Line 583: Ordinal number formatting
+Line 855: Ordinal number formatting
+Line 951: Ordinal number formatting
+Line 951: Ordinal number formatting
+Line 963: Ordinal number formatting
+
+
+FILE: YV_2018-63_080818_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 187
+- Critical: 0
+- Major: 180
+- Minor: 7
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (180):
+Line 23: Missing space after period
+Line 51: Missing space after period
+Line 63: Missing space after period
+Line 67: Missing space after period
+Line 71: Missing space after period
+Line 75: Missing space after period
+Line 83: Missing space after period
+Line 87: Missing space after period
+Line 91: Missing space after period
+Line 103: Missing space after period
+Line 107: Missing space after period
+Line 115: Missing space after period
+Line 123: Missing space after period
+Line 127: Missing space after period
+Line 131: Missing space after period
+Line 143: Missing space after period
+Line 147: Missing space after period
+Line 167: Missing space after period
+Line 167: Missing space after period
+Line 171: Missing space after period
+Line 175: Missing space after period
+Line 179: Missing space after period
+Line 183: Missing space after period
+Line 191: Missing space after period
+Line 195: Missing space after period
+Line 203: Missing space after period
+Line 219: Missing space after period
+Line 227: Missing space after period
+Line 235: Missing space after period
+Line 243: Missing space after period
+Line 247: Missing space after period
+Line 279: Missing space after period
+Line 283: Missing space after period
+Line 299: Missing space after period
+Line 303: Missing space after period
+Line 307: Missing space after period
+Line 315: Missing space after period
+Line 327: Missing space after period
+Line 331: Missing space after period
+Line 331: Missing space after period
+Line 339: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 363: Missing space after period
+Line 367: Missing space after period
+Line 371: Missing space after period
+Line 375: Missing space after period
+Line 383: Missing space after period
+Line 391: Missing space after period
+Line 395: Missing space after period
+Line 403: Missing space after question mark
+Line 415: Missing space after period
+Line 419: Missing space after period
+Line 423: Missing space after period
+Line 427: Missing space after period
+Line 443: Missing space after period
+Line 451: Missing space after period
+Line 455: Missing space after period
+Line 463: Missing space after period
+Line 467: Missing space after period
+Line 479: Missing space after period
+Line 495: Missing space after period
+Line 499: Missing space after period
+Line 503: Missing space after period
+Line 511: Missing space after period
+Line 515: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 531: Missing space after period
+Line 539: Missing space after period
+Line 547: Missing space after period
+Line 547: Missing space after period
+Line 559: Missing space after period
+Line 567: Missing space after period
+Line 571: Missing space after period
+Line 579: Missing space after period
+Line 587: Missing space after period
+Line 591: Missing space after period
+Line 595: Missing space after period
+Line 615: Missing space after period
+Line 619: Missing space after period
+Line 631: Missing space after period
+Line 655: Missing space after period
+Line 659: Missing space after period
+Line 671: Missing space after period
+Line 679: Missing space after period
+Line 695: Missing space after period
+Line 699: Missing space after question mark
+Line 703: Missing space after period
+Line 703: Missing space after exclamation mark
+Line 711: Missing space after period
+Line 715: Missing space after question mark
+Line 735: Missing space after period
+Line 747: Missing space after period
+Line 755: Missing space after period
+Line 767: Missing space after period
+Line 787: Missing space after period
+Line 787: Missing space after period
+Line 799: Missing space after period
+Line 811: Missing space after period
+Line 823: Missing space after period
+Line 839: Missing space after period
+Line 839: Missing space after period
+Line 847: Missing space after period
+Line 855: Missing space after period
+Line 867: Missing space after period
+Line 871: Missing space after period
+Line 875: Missing space after period
+Line 883: Missing space after period
+Line 895: Missing space after period
+Line 899: Missing space after period
+Line 927: Missing space after period
+Line 935: Missing space after period
+Line 939: Missing space after period
+Line 943: Missing space after period
+Line 951: Missing space after period
+Line 955: Missing space after period
+Line 955: Missing space after period
+Line 959: Missing space after period
+Line 967: Missing space after period
+Line 983: Missing space after period
+Line 999: Missing space after period
+Line 1003: Missing space after period
+Line 1011: Missing space after period
+Line 1015: Missing space after period
+Line 1023: Missing space after period
+Line 1035: Missing space after period
+Line 1051: Missing space after period
+Line 1055: Missing space after period
+Line 1063: Missing space after period
+Line 1071: Missing space after period
+Line 1071: Missing space after period
+Line 1079: Missing space after period
+Line 1079: Missing space after period
+Line 1095: Missing space after period
+Line 1111: Missing space after period
+Line 1115: Missing space after period
+Line 1119: Missing space after period
+Line 1135: Missing space after period
+Line 1147: Missing space after period
+Line 1151: Missing space after period
+Line 1167: Missing space after question mark
+Line 1171: Missing space after question mark
+Line 1187: Missing space after period
+Line 1195: Missing space after period
+Line 1199: Missing space after period
+Line 1199: Missing space after period
+Line 1203: Missing space after period
+Line 1207: Missing space after period
+Line 1215: Missing space after period
+Line 1227: Missing space after period
+Line 1235: Missing space after question mark
+Line 1267: Missing space after period
+Line 1279: Missing space after period
+Line 1291: Missing space after period
+Line 1303: Missing space after question mark
+Line 1307: Missing space after question mark
+Line 1315: Missing space after period
+Line 1323: Missing space after period
+Line 1327: Missing space after period
+Line 1335: Missing space after period
+Line 1343: Missing space after period
+Line 1351: Missing space after period
+Line 1367: Missing space after period
+Line 1371: Missing space after period
+Line 1379: Missing space after period
+Line 1387: Missing space after period
+Line 1391: Missing space after period
+Line 1395: Missing space after period
+Line 1403: Missing space after period
+Line 1411: Missing space after period
+Line 1415: Missing space after period
+Line 1419: Missing space after period
+Line 1427: Missing space after period
+Line 1431: Missing space after period
+Line 1435: Missing space after period
+Line 1439: Missing space after period
+Line 1447: Missing space after period
+Line 1451: Missing space after period
+
+MINOR ISSUES (7):
+Line 31: Ordinal number formatting
+Line 471: Ordinal number formatting
+Line 719: Ordinal number formatting
+Line 1063: Ordinal number formatting
+Line 1103: Ordinal number formatting
+Line 1231: Ordinal number formatting
+Line 1399: Number should be word in formal text
+
+
+FILE: YV_2018-64_081418_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 196
+- Critical: 0
+- Major: 192
+- Minor: 4
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (192):
+Line 19: Missing space after period
+Line 31: Missing space after period
+Line 47: Missing space after period
+Line 51: Missing space after period
+Line 59: Missing space after period
+Line 63: Missing space after period
+Line 75: Missing space after period
+Line 83: Missing space after period
+Line 91: Missing space after period
+Line 95: Missing space after period
+Line 115: Missing space after period
+Line 119: Missing space after period
+Line 123: Missing space after period
+Line 131: Missing space after period
+Line 135: Missing space after period
+Line 139: Missing space after period
+Line 139: Missing space after period
+Line 143: Missing space after period
+Line 151: Missing space after period
+Line 163: Missing space after period
+Line 163: Missing space after period
+Line 171: Missing space after period
+Line 175: Missing space after period
+Line 179: Missing space after period
+Line 195: Missing space after period
+Line 199: Missing space after period
+Line 207: Missing space after period
+Line 223: Missing space after period
+Line 227: Missing space after period
+Line 231: Missing space after period
+Line 235: Missing space after period
+Line 239: Missing space after period
+Line 243: Missing space after period
+Line 251: Missing space after period
+Line 255: Missing space after period
+Line 263: Missing space after period
+Line 283: Missing space after period
+Line 295: Missing space after period
+Line 307: Missing space after period
+Line 315: Missing space after period
+Line 331: Missing space after period
+Line 335: Missing space after period
+Line 335: Missing space after period
+Line 339: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 363: Missing space after period
+Line 367: Missing space after period
+Line 367: Missing space after period
+Line 371: Missing space after period
+Line 375: Missing space after period
+Line 379: Missing space after period
+Line 383: Missing space after period
+Line 391: Missing space after period
+Line 399: Missing space after period
+Line 411: Missing space after period
+Line 423: Missing space after period
+Line 427: Missing space after period
+Line 431: Missing space after period
+Line 439: Missing space after period
+Line 443: Missing space after period
+Line 451: Missing space after period
+Line 455: Missing space after period
+Line 463: Missing space after period
+Line 467: Missing space after period
+Line 475: Missing space after period
+Line 479: Missing space after period
+Line 491: Missing space after period
+Line 495: Missing space after period
+Line 503: Missing space after period
+Line 507: Missing space after period
+Line 515: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 527: Missing space after period
+Line 531: Missing space after period
+Line 539: Missing space after period
+Line 543: Missing space after period
+Line 547: Missing space after period
+Line 551: Missing space after period
+Line 559: Missing space after period
+Line 567: Missing space after period
+Line 571: Missing space after period
+Line 575: Missing space after period
+Line 575: Missing space after period
+Line 579: Missing space after period
+Line 587: Missing space after period
+Line 591: Missing space after period
+Line 607: Missing space after period
+Line 619: Missing space after period
+Line 631: Missing space after period
+Line 647: Missing space after period
+Line 655: Missing space after period
+Line 671: Missing space after period
+Line 679: Missing space after period
+Line 683: Missing space after period
+Line 691: Missing space after period
+Line 695: Missing space after period
+Line 703: Missing space after period
+Line 707: Missing space after period
+Line 711: Missing space after period
+Line 719: Missing space after question mark
+Line 731: Missing space after period
+Line 735: Missing space after period
+Line 743: Missing space after period
+Line 747: Missing space after period
+Line 755: Missing space after period
+Line 759: Missing space after period
+Line 763: Missing space after period
+Line 771: Missing space after period
+Line 783: Missing space after period
+Line 795: Missing space after period
+Line 807: Missing space after period
+Line 811: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 835: Missing space after period
+Line 855: Missing space after period
+Line 859: Missing space after period
+Line 867: Missing space after period
+Line 875: Missing space after period
+Line 879: Missing space after period
+Line 883: Missing space after period
+Line 891: Missing space after period
+Line 903: Missing space after period
+Line 911: Missing space after period
+Line 919: Missing space after period
+Line 923: Missing space after period
+Line 931: Missing space after period
+Line 935: Missing space after period
+Line 943: Missing space after period
+Line 951: Missing space after period
+Line 955: Missing space after period
+Line 963: Missing space after period
+Line 967: Missing space after period
+Line 975: Missing space after period
+Line 979: Missing space after period
+Line 983: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after period
+Line 1003: Missing space after period
+Line 1007: Missing space after question mark
+Line 1019: Missing space after period
+Line 1027: Missing space after period
+Line 1031: Missing space after period
+Line 1039: Missing space after period
+Line 1043: Missing space after period
+Line 1047: Missing space after period
+Line 1051: Missing space after period
+Line 1055: Missing space after period
+Line 1063: Missing space after period
+Line 1071: Missing space after period
+Line 1075: Missing space after period
+Line 1079: Missing space after period
+Line 1083: Missing space after period
+Line 1087: Missing space after period
+Line 1103: Missing space after period
+Line 1115: Missing space after period
+Line 1123: Missing space after period
+Line 1143: Missing space after period
+Line 1151: Missing space after period
+Line 1159: Missing space after period
+Line 1167: Missing space after period
+Line 1171: Missing space after period
+Line 1179: Missing space after period
+Line 1191: Missing space after period
+Line 1195: Missing space after period
+Line 1215: Missing space after period
+Line 1219: Missing space after period
+Line 1227: Missing space after period
+Line 1243: Missing space after period
+Line 1255: Missing space after period
+Line 1259: Missing space after period
+Line 1271: Missing space after period
+Line 1279: Missing space after period
+Line 1283: Missing space after period
+Line 1287: Missing space after period
+Line 1303: Missing space after period
+Line 1323: Missing space after period
+Line 1327: Missing space after period
+Line 1339: Missing space after period
+Line 1343: Missing space after period
+Line 1351: Missing space after period
+Line 1355: Missing space after period
+Line 1359: Missing space after period
+Line 1367: Missing space after period
+Line 1371: Missing space after period
+Line 1379: Missing space after period
+Line 1387: Missing space after period
+Line 1395: Missing space after period
+Line 1411: Missing space after period
+Line 1419: Missing space after period
+
+MINOR ISSUES (4):
+Line 27: Ordinal number formatting
+Line 507: Ordinal number formatting
+Line 1327: Number should be word in formal text
+Line 1335: Number should be word in formal text
+
+
+FILE: YV_2018-65_081518_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 179
+- Critical: 0
+- Major: 172
+- Minor: 7
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (172):
+Line 27: Missing space after period
+Line 43: Missing space after period
+Line 47: Missing space after period
+Line 51: Missing space after period
+Line 59: Missing space after period
+Line 63: Missing space after period
+Line 71: Missing space after period
+Line 95: Missing space after period
+Line 115: Missing space after period
+Line 119: Missing space after period
+Line 123: Missing space after period
+Line 127: Missing space after period
+Line 131: Missing space after period
+Line 139: Missing space after question mark
+Line 151: Missing space after period
+Line 155: Missing space after period
+Line 159: Missing space after period
+Line 167: Missing space after period
+Line 187: Missing space after period
+Line 195: Missing space after period
+Line 203: Missing space after period
+Line 207: Missing space after period
+Line 215: Missing space after period
+Line 235: Missing space after period
+Line 247: Missing space after period
+Line 255: Missing space after period
+Line 259: Missing space after period
+Line 263: Missing space after period
+Line 267: Missing space after period
+Line 275: Missing space after period
+Line 283: Missing space after period
+Line 291: Missing space after period
+Line 295: Missing space after period
+Line 299: Missing space after period
+Line 303: Missing space after question mark
+Line 307: Missing space after question mark
+Line 311: Missing space after period
+Line 319: Missing space after period
+Line 327: Missing space after period
+Line 335: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 371: Missing space after period
+Line 387: Missing space after period
+Line 395: Missing space after period
+Line 403: Missing space after period
+Line 411: Missing space after period
+Line 419: Missing space after period
+Line 419: Missing space after period
+Line 435: Missing space after period
+Line 451: Missing space after period
+Line 455: Missing space after period
+Line 459: Missing space after period
+Line 459: Missing space after period
+Line 475: Missing space after question mark
+Line 479: Missing space after period
+Line 487: Missing space after period
+Line 491: Missing space after period
+Line 499: Missing space after period
+Line 499: Missing space after period
+Line 507: Missing space after exclamation mark
+Line 511: Missing space after period
+Line 515: Missing space after exclamation mark
+Line 519: Missing space after period
+Line 563: Missing space after period
+Line 567: Missing space after period
+Line 575: Missing space after period
+Line 579: Missing space after period
+Line 587: Missing space after period
+Line 587: Missing space after period
+Line 591: Missing space after period
+Line 603: Missing space after period
+Line 615: Missing space after period
+Line 619: Missing space after period
+Line 627: Missing space after period
+Line 631: Missing space after period
+Line 639: Missing space after period
+Line 639: Missing space after period
+Line 643: Missing space after period
+Line 647: Missing space after period
+Line 655: Missing space after period
+Line 659: Missing space after question mark
+Line 663: Missing space after period
+Line 667: Missing space after period
+Line 671: Missing space after period
+Line 679: Missing space after period
+Line 687: Missing space after period
+Line 691: Missing space after period
+Line 707: Missing space after period
+Line 711: Missing space after period
+Line 719: Missing space after period
+Line 723: Missing space after period
+Line 727: Missing space after period
+Line 735: Missing space after period
+Line 743: Missing space after period
+Line 755: Missing space after period
+Line 763: Missing space after period
+Line 771: Missing space after period
+Line 787: Missing space after period
+Line 795: Missing space after period
+Line 799: Missing space after period
+Line 803: Missing space after period
+Line 807: Missing space after period
+Line 815: Missing space after period
+Line 819: Missing space after period
+Line 831: Missing space after period
+Line 835: Missing space after question mark
+Line 843: Missing space after period
+Line 851: Missing space after period
+Line 863: Missing space after period
+Line 875: Missing space after period
+Line 879: Missing space after period
+Line 887: Missing space after question mark
+Line 903: Missing space after period
+Line 907: Missing space after period
+Line 919: Missing space after period
+Line 923: Missing space after period
+Line 927: Missing space after period
+Line 947: Missing space after period
+Line 959: Missing space after question mark
+Line 963: Missing space after question mark
+Line 971: Missing space after period
+Line 983: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after period
+Line 999: Missing space after period
+Line 1003: Missing space after period
+Line 1003: Missing space after period
+Line 1007: Missing space after period
+Line 1011: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1035: Missing space after period
+Line 1043: Missing space after period
+Line 1047: Missing space after question mark
+Line 1051: Missing space after period
+Line 1059: Missing space after question mark
+Line 1063: Missing space after period
+Line 1071: Missing space after question mark
+Line 1079: Missing space after period
+Line 1083: Missing space after period
+Line 1095: Missing space after period
+Line 1123: Missing space after period
+Line 1135: Missing space after period
+Line 1143: Missing space after period
+Line 1147: Missing space after period
+Line 1171: Missing space after period
+Line 1175: Missing space after question mark
+Line 1191: Missing space after period
+Line 1195: Missing space after period
+Line 1199: Missing space after period
+Line 1203: Missing space after period
+Line 1211: Missing space after period
+Line 1215: Missing space after question mark
+Line 1219: Missing space after period
+Line 1235: Missing space after period
+Line 1239: Missing space after period
+Line 1247: Missing space after period
+Line 1275: Missing space after question mark
+Line 1283: Missing space after period
+Line 1291: Missing space after period
+Line 1291: Missing space after period
+Line 1291: Missing space after period
+Line 1307: Missing space after period
+Line 1311: Missing space after period
+Line 1319: Missing space after period
+Line 1323: Missing space after period
+Line 1331: Missing space after period
+Line 1335: Missing space after period
+Line 1335: Missing space after question mark
+Line 1339: Missing space after period
+
+MINOR ISSUES (7):
+Line 35: Ordinal number formatting
+Line 203: Number should be word in formal text
+Line 383: Ordinal number formatting
+Line 399: Ordinal number formatting
+Line 867: Ordinal number formatting
+Line 951: Ordinal number formatting
+Line 955: Ordinal number formatting
+
+
+FILE: YV_2018-66_082118_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 314
+- Critical: 0
+- Major: 308
+- Minor: 6
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (308):
+Line 27: Missing space after period
+Line 43: Missing space after period
+Line 51: Missing space after period
+Line 55: Missing space after period
+Line 75: Missing space after period
+Line 83: Missing space after period
+Line 83: Missing space after period
+Line 95: Missing space after period
+Line 99: Missing space after period
+Line 115: Missing space after question mark
+Line 119: Missing space after period
+Line 119: Missing space after period
+Line 123: Missing space after period
+Line 127: Missing space after period
+Line 127: Missing space after period
+Line 131: Missing space after period
+Line 131: Missing space after period
+Line 143: Missing space after period
+Line 147: Missing space after period
+Line 151: Missing space after period
+Line 151: Missing space after period
+Line 155: Missing space after period
+Line 159: Missing space after period
+Line 159: Missing space after period
+Line 163: Missing space after period
+Line 163: Missing space after period
+Line 167: Missing space after period
+Line 171: Missing space after period
+Line 175: Missing space after period
+Line 183: Missing space after period
+Line 183: Missing space after period
+Line 191: Missing space after period
+Line 195: Missing space after period
+Line 203: Missing space after period
+Line 207: Missing space after period
+Line 211: Missing space after period
+Line 215: Missing space after period
+Line 219: Missing space after period
+Line 219: Missing space after period
+Line 223: Missing space after period
+Line 231: Missing space after period
+Line 231: Missing space after period
+Line 235: Missing space after question mark
+Line 239: Missing space after period
+Line 239: Missing space after question mark
+Line 243: Missing space after period
+Line 247: Missing space after period
+Line 247: Missing space after period
+Line 247: Missing space after question mark
+Line 251: Missing space after period
+Line 251: Missing space after period
+Line 255: Missing space after period
+Line 255: Missing space after period
+Line 255: Missing space after question mark
+Line 259: Missing space after period
+Line 259: Missing space after period
+Line 259: Missing space after question mark
+Line 259: Missing space after question mark
+Line 263: Missing space after period
+Line 267: Missing space after period
+Line 267: Missing space after period
+Line 267: Missing space after question mark
+Line 271: Missing space after period
+Line 275: Missing space after period
+Line 275: Missing space after question mark
+Line 279: Missing space after period
+Line 283: Missing space after period
+Line 283: Missing space after question mark
+Line 283: Missing space after question mark
+Line 283: Missing space after question mark
+Line 291: Missing space after period
+Line 295: Missing space after period
+Line 299: Missing space after period
+Line 303: Missing space after period
+Line 307: Missing space after period
+Line 311: Missing space after period
+Line 311: Missing space after period
+Line 323: Missing space after period
+Line 327: Missing space after period
+Line 327: Missing space after period
+Line 331: Missing space after period
+Line 331: Missing space after period
+Line 335: Missing space after period
+Line 335: Missing space after period
+Line 339: Missing space after period
+Line 343: Missing space after period
+Line 343: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 355: Missing space after period
+Line 359: Missing space after period
+Line 363: Missing space after period
+Line 367: Missing space after period
+Line 375: Missing space after period
+Line 379: Missing space after period
+Line 379: Missing space after period
+Line 383: Missing space after period
+Line 383: Missing space after period
+Line 387: Missing space after period
+Line 387: Missing space after period
+Line 395: Missing space after period
+Line 395: Missing space after period
+Line 399: Missing space after period
+Line 403: Missing space after period
+Line 407: Missing space after period
+Line 411: Missing space after period
+Line 411: Missing space after period
+Line 411: Missing space after question mark
+Line 411: Missing space after question mark
+Line 415: Missing space after period
+Line 419: Missing space after period
+Line 423: Missing space after period
+Line 427: Missing space after period
+Line 439: Missing space after period
+Line 443: Missing space after period
+Line 447: Missing space after period
+Line 455: Missing space after period
+Line 455: Missing space after period
+Line 459: Missing space after period
+Line 463: Missing space after period
+Line 483: Missing space after period
+Line 491: Missing space after question mark
+Line 495: Missing space after period
+Line 503: Missing space after question mark
+Line 503: Missing space after question mark
+Line 507: Missing space after period
+Line 515: Missing space after period
+Line 523: Missing space after question mark
+Line 527: Missing space after period
+Line 535: Missing space after period
+Line 539: Missing space after period
+Line 543: Missing space after period
+Line 543: Missing space after period
+Line 543: Missing space after question mark
+Line 547: Missing space after period
+Line 547: Missing space after period
+Line 547: Missing space after period
+Line 547: Missing space after period
+Line 551: Missing space after period
+Line 563: Missing space after period
+Line 563: Missing space after period
+Line 567: Missing space after period
+Line 567: Missing space after question mark
+Line 575: Missing space after period
+Line 579: Missing space after period
+Line 583: Missing space after period
+Line 587: Missing space after period
+Line 591: Missing space after period
+Line 591: Missing space after period
+Line 595: Missing space after period
+Line 603: Missing space after period
+Line 603: Missing space after question mark
+Line 607: Missing space after period
+Line 607: Missing space after period
+Line 611: Missing space after period
+Line 611: Missing space after period
+Line 611: Missing space after question mark
+Line 615: Missing space after period
+Line 615: Missing space after period
+Line 619: Missing space after period
+Line 623: Missing space after question mark
+Line 627: Missing space after period
+Line 627: Missing space after period
+Line 631: Missing space after period
+Line 631: Missing space after question mark
+Line 635: Missing space after period
+Line 639: Missing space after period
+Line 639: Missing space after period
+Line 643: Missing space after period
+Line 647: Missing space after period
+Line 659: Missing space after period
+Line 659: Missing space after period
+Line 671: Missing space after question mark
+Line 679: Missing space after period
+Line 679: Missing space after period
+Line 679: Missing space after period
+Line 679: Missing space after question mark
+Line 683: Missing space after period
+Line 683: Missing space after period
+Line 687: Missing space after period
+Line 687: Missing space after question mark
+Line 691: Missing space after period
+Line 695: Missing space after period
+Line 699: Missing space after period
+Line 699: Missing space after period
+Line 707: Missing space after period
+Line 707: Missing space after period
+Line 707: Missing space after period
+Line 711: Missing space after period
+Line 711: Missing space after period
+Line 719: Missing space after period
+Line 719: Missing space after period
+Line 727: Missing space after period
+Line 731: Missing space after period
+Line 735: Missing space after period
+Line 739: Missing space after period
+Line 747: Missing space after period
+Line 751: Missing space after question mark
+Line 755: Missing space after period
+Line 755: Missing space after period
+Line 755: Missing space after period
+Line 759: Missing space after period
+Line 763: Missing space after period
+Line 771: Missing space after period
+Line 779: Missing space after period
+Line 783: Missing space after period
+Line 783: Missing space after period
+Line 791: Missing space after period
+Line 799: Missing space after period
+Line 811: Missing space after period
+Line 823: Missing space after period
+Line 835: Missing space after period
+Line 839: Missing space after period
+Line 859: Missing space after question mark
+Line 867: Missing space after period
+Line 875: Missing space after period
+Line 879: Missing space after period
+Line 887: Missing space after period
+Line 895: Missing space after period
+Line 895: Missing space after period
+Line 903: Missing space after period
+Line 907: Missing space after period
+Line 919: Missing space after question mark
+Line 931: Missing space after period
+Line 947: Missing space after period
+Line 947: Missing space after period
+Line 955: Missing space after period
+Line 963: Missing space after period
+Line 967: Missing space after period
+Line 987: Missing space after period
+Line 987: Missing space after period
+Line 991: Missing space after question mark
+Line 991: Missing space after question mark
+Line 991: Missing space after question mark
+Line 995: Missing space after period
+Line 995: Missing space after period
+Line 999: Missing space after period
+Line 1007: Missing space after period
+Line 1007: Missing space after question mark
+Line 1011: Missing space after period
+Line 1015: Missing space after period
+Line 1019: Missing space after period
+Line 1019: Missing space after period
+Line 1023: Missing space after period
+Line 1027: Missing space after period
+Line 1027: Missing space after period
+Line 1027: Missing space after question mark
+Line 1031: Missing space after period
+Line 1031: Missing space after period
+Line 1035: Missing space after period
+Line 1035: Missing space after period
+Line 1051: Missing space after period
+Line 1055: Missing space after period
+Line 1055: Missing space after period
+Line 1059: Missing space after period
+Line 1059: Missing space after period
+Line 1067: Missing space after period
+Line 1067: Missing space after period
+Line 1067: Missing space after period
+Line 1067: Missing space after question mark
+Line 1087: Missing space after period
+Line 1091: Missing space after period
+Line 1111: Missing space after period
+Line 1111: Missing space after period
+Line 1115: Missing space after period
+Line 1115: Missing space after period
+Line 1115: Missing space after period
+Line 1119: Missing space after period
+Line 1119: Missing space after period
+Line 1123: Missing space after period
+Line 1127: Missing space after period
+Line 1139: Missing space after period
+Line 1151: Missing space after period
+Line 1159: Missing space after period
+Line 1163: Missing space after period
+Line 1163: Missing space after period
+Line 1171: Missing space after period
+Line 1175: Missing space after period
+Line 1179: Missing space after period
+Line 1179: Missing space after question mark
+Line 1183: Missing space after period
+Line 1187: Missing space after period
+Line 1195: Missing space after period
+Line 1203: Missing space after period
+Line 1207: Missing space after period
+Line 1207: Missing space after period
+Line 1227: Missing space after period
+Line 1231: Missing space after question mark
+Line 1235: Missing space after period
+Line 1243: Missing space after period
+Line 1255: Missing space after period
+Line 1259: Missing space after period
+Line 1259: Missing space after period
+Line 1259: Missing space after period
+Line 1263: Missing space after period
+Line 1275: Missing space after period
+Line 1279: Missing space after period
+Line 1283: Missing space after period
+Line 1287: Missing space after period
+Line 1291: Missing space after period
+Line 1311: Missing space after period
+Line 1351: Missing space after period
+Line 1359: Missing space after question mark
+Line 1371: Missing space after period
+Line 1375: Missing space after period
+Line 1383: Missing space after period
+Line 1383: Missing space after period
+
+MINOR ISSUES (6):
+Line 35: Ordinal number formatting
+Line 135: Ordinal number formatting
+Line 143: Ordinal number formatting
+Line 219: Ordinal number formatting
+Line 287: Ordinal number formatting
+Line 459: Ordinal number formatting
+
+
+FILE: YV_2018-67_082218_emergency_safe.srt
+----------------------------------------
+
+QA QUALITY REPORT
+=================
+
+SUMMARY:
+- Total Issues: 280
+- Critical: 0
+- Major: 267
+- Minor: 13
+
+CRITICAL ISSUES (0):
+
+MAJOR ISSUES (267):
+Line 27: Missing space after period
+Line 47: Missing space after period
+Line 55: Missing space after period
+Line 63: Missing space after period
+Line 67: Missing space after period
+Line 67: Missing space after period
+Line 71: Missing space after period
+Line 71: Missing space after period
+Line 79: Missing space after period
+Line 87: Missing space after period
+Line 87: Missing space after period
+Line 91: Missing space after period
+Line 91: Missing space after period
+Line 95: Missing space after period
+Line 95: Missing space after period
+Line 99: Missing space after period
+Line 103: Missing space after period
+Line 107: Missing space after period
+Line 107: Missing space after period
+Line 111: Missing space after period
+Line 115: Missing space after period
+Line 119: Missing space after period
+Line 123: Missing space after period
+Line 123: Missing space after period
+Line 123: Missing space after period
+Line 131: Missing space after period
+Line 139: Missing space after period
+Line 147: Missing space after period
+Line 151: Missing space after period
+Line 155: Missing space after period
+Line 159: Missing space after period
+Line 159: Missing space after period
+Line 163: Missing space after period
+Line 171: Missing space after period
+Line 171: Missing space after period
+Line 171: Missing space after period
+Line 175: Missing space after question mark
+Line 179: Missing space after period
+Line 183: Missing space after period
+Line 183: Missing space after period
+Line 187: Missing space after period
+Line 195: Missing space after period
+Line 199: Missing space after period
+Line 203: Missing space after period
+Line 203: Missing space after period
+Line 207: Missing space after period
+Line 215: Missing space after period
+Line 219: Missing space after period
+Line 227: Missing space after period
+Line 231: Missing space after period
+Line 235: Missing space after period
+Line 239: Missing space after period
+Line 239: Missing space after period
+Line 243: Missing space after period
+Line 251: Missing space after period
+Line 275: Missing space after period
+Line 275: Missing space after period
+Line 279: Missing space after period
+Line 283: Missing space after period
+Line 287: Missing space after period
+Line 291: Missing space after period
+Line 295: Missing space after period
+Line 307: Missing space after period
+Line 307: Missing space after question mark
+Line 315: Missing space after period
+Line 319: Missing space after period
+Line 319: Missing space after period
+Line 323: Missing space after period
+Line 327: Missing space after period
+Line 331: Missing space after period
+Line 335: Missing space after period
+Line 339: Missing space after period
+Line 339: Missing space after period
+Line 343: Missing space after period
+Line 347: Missing space after period
+Line 347: Missing space after period
+Line 351: Missing space after period
+Line 355: Missing space after period
+Line 355: Missing space after period
+Line 359: Missing space after period
+Line 359: Missing space after period
+Line 363: Missing space after period
+Line 367: Missing space after period
+Line 367: Missing space after period
+Line 375: Missing space after period
+Line 379: Missing space after period
+Line 379: Missing space after period
+Line 383: Missing space after period
+Line 383: Missing space after period
+Line 387: Missing space after period
+Line 391: Missing space after period
+Line 395: Missing space after period
+Line 403: Missing space after period
+Line 407: Missing space after period
+Line 411: Missing space after period
+Line 419: Missing space after period
+Line 419: Missing space after period
+Line 427: Missing space after period
+Line 431: Missing space after period
+Line 443: Missing space after period
+Line 451: Missing space after period
+Line 455: Missing space after period
+Line 483: Missing space after question mark
+Line 495: Missing space after period
+Line 519: Missing space after period
+Line 523: Missing space after period
+Line 531: Missing space after period
+Line 535: Missing space after period
+Line 539: Missing space after period
+Line 543: Missing space after period
+Line 547: Missing space after period
+Line 551: Missing space after period
+Line 551: Missing space after period
+Line 555: Missing space after period
+Line 559: Missing space after period
+Line 579: Missing space after period
+Line 591: Missing space after period
+Line 611: Missing space after period
+Line 623: Missing space after period
+Line 627: Missing space after period
+Line 631: Missing space after period
+Line 635: Missing space after period
+Line 643: Missing space after period
+Line 647: Missing space after period
+Line 655: Missing space after period
+Line 659: Missing space after period
+Line 667: Missing space after period
+Line 675: Missing space after period
+Line 679: Missing space after period
+Line 679: Missing space after period
+Line 683: Missing space after period
+Line 687: Missing space after question mark
+Line 687: Missing space after question mark
+Line 687: Missing space after question mark
+Line 691: Missing space after period
+Line 695: Missing space after period
+Line 699: Missing space after period
+Line 715: Missing space after period
+Line 719: Missing space after period
+Line 723: Missing space after period
+Line 739: Missing space after period
+Line 747: Missing space after period
+Line 755: Missing space after period
+Line 755: Missing space after period
+Line 775: Missing space after period
+Line 787: Missing space after question mark
+Line 787: Missing space after question mark
+Line 791: Missing space after period
+Line 795: Missing space after period
+Line 803: Missing space after period
+Line 807: Missing space after question mark
+Line 811: Missing space after period
+Line 819: Missing space after period
+Line 855: Missing space after period
+Line 859: Missing space after period
+Line 859: Missing space after period
+Line 863: Missing space after period
+Line 867: Missing space after period
+Line 883: Missing space after period
+Line 887: Missing space after period
+Line 895: Missing space after period
+Line 899: Missing space after period
+Line 899: Missing space after period
+Line 903: Missing space after period
+Line 907: Missing space after period
+Line 907: Missing space after period
+Line 911: Missing space after period
+Line 915: Missing space after period
+Line 915: Missing space after period
+Line 923: Missing space after period
+Line 927: Missing space after period
+Line 931: Missing space after period
+Line 935: Missing space after period
+Line 939: Missing space after period
+Line 947: Missing space after period
+Line 951: Missing space after period
+Line 951: Missing space after period
+Line 955: Missing space after period
+Line 959: Missing space after period
+Line 967: Missing space after period
+Line 967: Missing space after period
+Line 971: Missing space after question mark
+Line 971: Missing space after question mark
+Line 971: Missing space after question mark
+Line 979: Missing space after period
+Line 991: Missing space after period
+Line 995: Missing space after question mark
+Line 995: Missing space after question mark
+Line 1003: Missing space after period
+Line 1023: Missing space after period
+Line 1027: Missing space after period
+Line 1027: Missing space after period
+Line 1027: Missing space after question mark
+Line 1031: Missing space after period
+Line 1031: Missing space after period
+Line 1035: Missing space after period
+Line 1039: Missing space after period
+Line 1055: Missing space after period
+Line 1059: Missing space after period
+Line 1063: Missing space after period
+Line 1067: Missing space after question mark
+Line 1067: Missing space after question mark
+Line 1071: Missing space after period
+Line 1087: Missing space after period
+Line 1095: Missing space after period
+Line 1103: Missing space after period
+Line 1111: Missing space after period
+Line 1115: Missing space after period
+Line 1123: Missing space after question mark
+Line 1127: Missing space after period
+Line 1127: Missing space after question mark
+Line 1131: Missing space after question mark
+Line 1135: Missing space after period
+Line 1135: Missing space after question mark
+Line 1139: Missing space after period
+Line 1147: Missing space after question mark
+Line 1151: Missing space after question mark
+Line 1159: Missing space after period
+Line 1163: Missing space after question mark
+Line 1167: Missing space after period
+Line 1195: Missing space after question mark
+Line 1199: Missing space after period
+Line 1203: Missing space after period
+Line 1203: Missing space after period
+Line 1207: Missing space after period
+Line 1207: Missing space after question mark
+Line 1211: Missing space after period
+Line 1219: Missing space after period
+Line 1219: Missing space after period
+Line 1227: Missing space after period
+Line 1231: Missing space after period
+Line 1235: Missing space after period
+Line 1247: Missing space after period
+Line 1251: Missing space after period
+Line 1255: Missing space after period
+Line 1259: Missing space after period
+Line 1259: Missing space after period
+Line 1267: Missing space after period
+Line 1267: Missing space after period
+Line 1271: Missing space after period
+Line 1283: Missing space after period
+Line 1287: Missing space after period
+Line 1287: Missing space after period
+Line 1291: Missing space after period
+Line 1295: Missing space after period
+Line 1299: Missing space after period
+Line 1299: Missing space after period
+Line 1303: Missing space after period
+Line 1303: Missing space after period
+Line 1307: Missing space after period
+Line 1311: Missing space after period
+Line 1315: Missing space after period
+Line 1323: Missing space after period
+Line 1323: Missing space after period
+Line 1327: Missing space after period
+Line 1331: Missing space after period
+Line 1335: Missing space after period
+Line 1335: Missing space after period
+Line 1339: Missing space after period
+Line 1339: Missing space after period
+Line 1343: Missing space after period
+Line 1343: Missing space after period
+Line 1347: Missing space after period
+Line 1351: Missing space after period
+Line 1355: Missing space after period
+Line 1359: Missing space after period
+Line 1359: Missing space after period
+
+MINOR ISSUES (13):
+Line 35: Ordinal number formatting
+Line 55: Ordinal number formatting
+Line 219: Ordinal number formatting
+Line 451: Number should be word in formal text
+Line 455: Number should be word in formal text
+Line 459: Number should be word in formal text
+Line 527: Ordinal number formatting
+Line 851: Ordinal number formatting
+Line 935: Ordinal number formatting
+Line 967: Ordinal number formatting
+Line 979: Ordinal number formatting
+Line 1167: Number should be word in formal text
+Line 1195: Ordinal number formatting
+
+

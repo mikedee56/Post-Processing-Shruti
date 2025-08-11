@@ -1,0 +1,26 @@
+{
+  "file_path": "data\\raw_srts\\transcript_edited_2025-05-25T20-06-57.srt",
+  "processing_time": 0.0,
+  "total_segments": 0,
+  "segments_modified": 0,
+  "corrections_applied": {},
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [
+    "Error processing SRT file data\\raw_srts\\transcript_edited_2025-05-25T20-06-57.srt: Error parsing SRT file: No valid SRT segments found"
+  ],
+  "warnings_encountered": [],
+  "original_word_count": 0,
+  "processed_word_count": 0,
+  "original_char_count": 0,
+  "processed_char_count": 0,
+  "confidence_scores": [],
+  "average_confidence": 0.0,
+  "flagged_segments": 0,
+  "parsing_time": 0.0,
+  "normalization_time": 0.0,
+  "correction_time": 0.0,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-08T16:02:04.836140+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

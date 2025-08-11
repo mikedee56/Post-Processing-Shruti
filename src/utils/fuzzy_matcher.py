@@ -49,14 +49,14 @@ class FuzzyMatch:
 @dataclass
 class MatchingConfig:
     """Configuration for fuzzy matching parameters."""
-    min_confidence: float = 0.75
-    levenshtein_threshold: float = 0.80
-    phonetic_threshold: float = 0.85
-    partial_threshold: float = 0.70
-    token_threshold: float = 0.75
-    max_edit_distance: int = 3
+    min_confidence: float = 0.88  # Increased from 0.75 - more conservative
+    levenshtein_threshold: float = 0.88  # Increased from 0.80 - more conservative
+    phonetic_threshold: float = 0.90  # Increased from 0.85 - more conservative
+    partial_threshold: float = 0.85  # Increased from 0.70 - more conservative
+    token_threshold: float = 0.88  # Increased from 0.75 - more conservative
+    max_edit_distance: int = 2  # Decreased from 3 - less aggressive
     enable_phonetic_matching: bool = True
-    enable_compound_matching: bool = True
+    enable_compound_matching: bool = True  # Will be controlled by improved logic
 
 
 class FuzzyMatcher:
@@ -275,28 +275,119 @@ class FuzzyMatcher:
         """Find partial and token-based matches."""
         matches = []
         
+        # ULTRA-CONSERVATIVE ANTI-HALLUCINATION SAFEGUARDS
+        # Skip very short words that are likely English - INCREASED THRESHOLD
+        if len(word) <= 7:  # Increased from 5 to 7 - MUCH more conservative
+            return matches
+        
+        # Comprehensive English protected words - identical to sanskrit_post_processor.py
+        english_protected_words = {
+            # Function words
+            'who', 'what', 'when', 'where', 'why', 'how', 'and', 'the', 'is', 'are', 'was', 'were', 
+            'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 
+            'should', 'may', 'might', 'can', 'must', 'shall', 'ought',
+            
+            # Pronouns
+            'i', 'me', 'my', 'mine', 'myself', 'you', 'your', 'yours', 'yourself', 'he', 'him', 
+            'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'we', 'us', 
+            'our', 'ours', 'ourselves', 'they', 'them', 'their', 'theirs', 'themselves',
+            
+            # Determiners and articles
+            'this', 'that', 'these', 'those', 'a', 'an', 'some', 'any', 'all', 'every', 'each',
+            
+            # Prepositions
+            'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 
+            'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'under', 
+            'over', 'across', 'beside', 'behind', 'beyond', 'within', 'without', 'against',
+            
+            # Conjunctions  
+            'but', 'or', 'nor', 'so', 'yet', 'because', 'since', 'unless', 'while', 'although', 
+            'though', 'if', 'when', 'where', 'whether',
+            
+            # Common adverbs
+            'very', 'quite', 'rather', 'too', 'more', 'most', 'less', 'least', 'much', 'many', 
+            'few', 'little', 'enough', 'only', 'just', 'even', 'also', 'already', 'still', 'yet', 
+            'again', 'once', 'twice', 'here', 'there', 'now', 'then', 'today', 'tomorrow', 'yesterday',
+            
+            # Common verbs that could be mismatched
+            'see', 'look', 'hear', 'listen', 'feel', 'think', 'know', 'understand', 'remember', 
+            'forget', 'learn', 'teach', 'tell', 'say', 'speak', 'talk', 'ask', 'answer', 'call',
+            'come', 'go', 'bring', 'take', 'get', 'give', 'put', 'make', 'let', 'help',
+            
+            # Spiritual/religious context words that should remain English
+            'chapter', 'verse', 'entitled', 'text', 'scripture', 'book', 'page', 'line',
+            'meditation', 'practice', 'teaching', 'lesson', 'study', 'read', 'recite',
+            'prayer', 'worship', 'devotion', 'faith', 'belief', 'truth', 'wisdom',
+            
+            # Numbers and time
+            'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+            'first', 'second', 'third', 'fourth', 'fifth', 'last', 'next', 'previous',
+            'hour', 'minute', 'second', 'day', 'week', 'month', 'year', 'time',
+            
+            # Common adjectives
+            'good', 'bad', 'big', 'small', 'great', 'little', 'long', 'short', 'high', 'low',
+            'new', 'old', 'young', 'ancient', 'modern', 'early', 'late', 'fast', 'slow',
+            'hot', 'cold', 'warm', 'cool', 'light', 'dark', 'bright', 'clear', 'clean', 'dirty'
+        }
+        
+        # ABSOLUTE PROTECTION: Skip ALL protected English words - NO EXCEPTIONS EVER
+        if word.lower() in english_protected_words:
+            return matches
+            
+        # ABSOLUTE PROTECTION: Skip ANY word that contains protected substrings
+        word_lower = word.lower()
+        if any(protected in word_lower for protected in ['is', 'as', 'and', 'the', 'who', 'one', 'two', 'three', 'was', 'are', 'has', 'had']):
+            return matches
+        
+        # Skip words that look like English based on patterns
+        if self._is_likely_english_word(word):
+            return matches
+        
+        # Use EXTREMELY conservative thresholds - PREVENT ALL HALLUCINATION
+        conservative_thresholds = {
+            MatchType.PARTIAL: max(0.98, self.config.partial_threshold),  # Increased to 98% - nearly exact
+            MatchType.TOKEN_SORT: max(0.98, self.config.token_threshold),  # Increased to 98% - nearly exact
+            MatchType.TOKEN_SET: max(0.98, self.config.token_threshold)    # Increased to 98% - nearly exact
+        }
+        
         # Use fuzzywuzzy for various matching strategies
         strategies = [
-            (fuzz.partial_ratio, MatchType.PARTIAL, self.config.partial_threshold),
-            (fuzz.token_sort_ratio, MatchType.TOKEN_SORT, self.config.token_threshold),
-            (fuzz.token_set_ratio, MatchType.TOKEN_SET, self.config.token_threshold)
+            (fuzz.partial_ratio, MatchType.PARTIAL, conservative_thresholds[MatchType.PARTIAL]),
+            (fuzz.token_sort_ratio, MatchType.TOKEN_SORT, conservative_thresholds[MatchType.TOKEN_SORT]),
+            (fuzz.token_set_ratio, MatchType.TOKEN_SET, conservative_thresholds[MatchType.TOKEN_SET])
         ]
         
         for strategy_func, match_type, threshold in strategies:
-            # Get top matches using fuzzywuzzy
-            fuzzy_matches = process.extract(word, self.term_list, scorer=strategy_func, limit=5)
+            # Get top matches using fuzzywuzzy - limit to 2 to avoid noise
+            fuzzy_matches = process.extract(word, self.term_list, scorer=strategy_func, limit=2)
             
             for matched_term, score in fuzzy_matches:
                 confidence = score / 100.0  # Convert to 0-1 range
                 
                 if confidence >= threshold:
+                    # ULTRA-STRICT validation: ensure VERY similar length
+                    length_ratio = min(len(word), len(matched_term)) / max(len(word), len(matched_term))
+                    if length_ratio < 0.9:  # Increased from 0.6 to 0.9 - must be very similar length
+                        continue
+                        
+                    # ADDITIONAL SAFETY: Character composition similarity
+                    word_chars = set(word.lower())
+                    term_chars = set(matched_term.lower())
+                    char_overlap = len(word_chars.intersection(term_chars)) / len(word_chars.union(term_chars))
+                    if char_overlap < 0.85:  # At least 85% character overlap required
+                        continue
+                    
                     entry = self.search_terms[matched_term]
+                    
+                    # Apply conservative confidence penalty
+                    adjusted_confidence = confidence * 0.9  # 10% penalty for partial matches
+                    
                     match = FuzzyMatch(
                         original_word=word,
                         matched_term=matched_term,
                         corrected_term=entry['original_term'],
                         transliteration=entry['transliteration'],
-                        confidence=confidence,
+                        confidence=adjusted_confidence,
                         match_type=match_type,
                         is_proper_noun=entry['is_proper_noun'],
                         category=entry['category'],
@@ -310,27 +401,50 @@ class FuzzyMatcher:
         """Find matches for compound words by breaking them down."""
         matches = []
         
+        # ULTRA-CONSERVATIVE ANTI-HALLUCINATION SAFEGUARDS  
+        # DISABLE COMPOUND MATCHING COMPLETELY - too dangerous for hallucination
+        return matches  # Completely disable compound matching to prevent false positives
+        
+        # Skip words that look like English
+        if self._is_likely_english_word(word):
+            return matches
+        
         # Try to find Sanskrit/Hindi components in the word
         for term in self.search_terms:
-            if len(term) >= 3 and term in word:  # Minimum component length
+            # Require minimum 5 character terms for compound matching to avoid short false positives
+            if len(term) >= 5 and term in word:
                 # Calculate confidence based on component coverage
                 coverage = len(term) / len(word)
-                if coverage >= 0.4:  # At least 40% coverage
+                
+                # Require much higher coverage (75% minimum) to prevent false matches
+                if coverage >= 0.75:
                     entry = self.search_terms[term]
-                    confidence = coverage * 0.85  # Reduce confidence for partial matches
                     
-                    match = FuzzyMatch(
-                        original_word=word,
-                        matched_term=term,
-                        corrected_term=entry['original_term'],
-                        transliteration=entry['transliteration'],
-                        confidence=confidence,
-                        match_type=MatchType.PARTIAL,
-                        is_proper_noun=entry['is_proper_noun'],
-                        category=entry['category'],
-                        source_lexicon=entry['source_authority']
+                    # Additional validation: term must be at word boundary or start/end
+                    word_start_idx = word.find(term)
+                    is_valid_boundary = (
+                        word_start_idx == 0 or  # At start
+                        word_start_idx + len(term) == len(word) or  # At end
+                        not word[word_start_idx - 1].isalpha() or  # After non-letter
+                        not word[word_start_idx + len(term)].isalpha()  # Before non-letter
                     )
-                    matches.append(match)
+                    
+                    if is_valid_boundary:
+                        # Much more conservative confidence calculation
+                        confidence = coverage * 0.65  # Further reduced for safety
+                        
+                        match = FuzzyMatch(
+                            original_word=word,
+                            matched_term=term,
+                            corrected_term=entry['original_term'],
+                            transliteration=entry['transliteration'],
+                            confidence=confidence,
+                            match_type=MatchType.PARTIAL,
+                            is_proper_noun=entry['is_proper_noun'],
+                            category=entry['category'],
+                            source_lexicon=entry['source_authority']
+                        )
+                        matches.append(match)
         
         return matches
 
@@ -351,6 +465,47 @@ class FuzzyMatcher:
                 variants.add(variant)
         
         return variants
+
+    def _is_likely_english_word(self, word: str) -> bool:
+        """
+        Determine if a word is likely English based on letter patterns and structure.
+        """
+        word_lower = word.lower()
+        
+        # Very short words are often English function words
+        if len(word_lower) <= 3:
+            return True
+        
+        # Common English word endings
+        english_endings = {
+            'ed', 'ing', 'ly', 'er', 'est', 'tion', 'sion', 'ment', 'ness', 
+            'able', 'ible', 'ful', 'less', 'ward', 'wise', 'like', 'ship'
+        }
+        
+        # Check if word ends with common English suffixes
+        for ending in english_endings:
+            if word_lower.endswith(ending):
+                return True
+        
+        # Common English prefixes
+        english_prefixes = {
+            'un', 're', 'pre', 'dis', 'mis', 'over', 'under', 'out', 'up', 'in', 'im'
+        }
+        
+        # Check if word starts with common English prefixes
+        for prefix in english_prefixes:
+            if word_lower.startswith(prefix):
+                return True
+        
+        # English-specific letter patterns
+        if word_lower.count('th') > 0 or word_lower.count('ck') > 0 or word_lower.count('qu') > 0:
+            return True
+        
+        # Double letters more common in English
+        if any(word_lower.count(letter) > 1 for letter in 'llssttffpp'):
+            return True
+        
+        return False
 
     def _calculate_phonetic_confidence(self, original: str, variant: str) -> float:
         """Calculate confidence for phonetic matches."""

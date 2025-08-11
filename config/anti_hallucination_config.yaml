@@ -1,0 +1,452 @@
+# Ultra-Conservative Anti-Hallucination Configuration
+# This configuration prevents Sanskrit term hallucination by applying very strict thresholds
+
+system_name: "Epic 2.4 ASR Post-Processing - Anti-Hallucination Mode"
+version: "2.4.ULTRA_CONSERVATIVE"
+last_updated: "2025-01-08"
+
+# Core Protection Settings
+protection:
+  enabled: true
+  mode: "ultra_conservative"  # Options: conservative, ultra_conservative, disabled
+  
+# Word Length Thresholds (increased for safety)
+length_thresholds:
+  min_word_length_for_correction: 5      # Increased from 4
+  min_word_length_for_fuzzy: 6           # Increased from 4  
+  min_word_length_for_compound: 7        # Increased from 6
+
+# Fuzzy Matching Thresholds (much more strict)
+fuzzy_matching:
+  # Main thresholds
+  min_confidence: 0.95                   # Increased from 0.88
+  levenshtein_threshold: 0.95           # Increased from 0.88
+  phonetic_threshold: 0.97              # Increased from 0.90
+  
+  # Legacy fuzzy threshold  
+  fuzzy_threshold: 97                   # Increased from 90
+  
+  # Partial matching (very strict)
+  partial_threshold: 0.92               # Increased from 0.85
+  token_sort_threshold: 0.95            # Increased from 0.88
+  token_set_threshold: 0.95             # Increased from 0.88
+  
+  # Edit distance (more restrictive)
+  max_edit_distance: 2                  # Decreased from 3
+  
+  # Length similarity (stricter)
+  min_length_ratio: 0.85                # Increased from 0.7
+  
+  # Character overlap requirement
+  min_char_overlap: 0.7                 # New - require 70% character overlap
+
+# Correction Application (very conservative)
+correction_application:
+  min_confidence: 0.95                  # Increased from 0.88
+  critical_confidence: 0.98             # Increased from 0.95
+  max_corrections_per_segment: 3        # Decreased from 5
+  
+  # Multi-word replacement thresholds (almost disabled)
+  multiword_replacement_threshold: 99   # Increased from 98
+  single_word_replacement_threshold: 95 # Increased from 90
+
+# Context Validation (enhanced)
+context_validation:
+  enabled: true
+  require_sanskrit_context: true        # Must have Sanskrit indicators
+  min_sanskrit_indicators: 2            # Need at least 2 Sanskrit words or diacritics
+  
+  # Enhanced English word detection
+  english_pattern_detection: true
+  english_ending_detection: true
+  english_prefix_detection: true
+
+# Protected English Words (comprehensive list)
+# These words will NEVER be converted to Sanskrit terms
+english_protected_words:
+  # Core function words
+  function_words:
+    - who
+    - what  
+    - when
+    - where
+    - why
+    - how
+    - and
+    - the
+    - is
+    - are
+    - was
+    - were
+    - been
+    - being
+    - have
+    - has
+    - had
+    - do
+    - does
+    - did
+    - will
+    - would
+    - could
+    - should
+    - may
+    - might
+    - can
+    - must
+    - shall
+    - ought
+
+  # Pronouns
+  pronouns:
+    - i
+    - me
+    - my
+    - mine
+    - myself
+    - you
+    - your
+    - yours
+    - yourself
+    - he
+    - him
+    - his
+    - himself
+    - she
+    - her
+    - hers
+    - herself
+    - it
+    - its
+    - itself
+    - we
+    - us
+    - our
+    - ours
+    - ourselves
+    - they
+    - them
+    - their
+    - theirs
+    - themselves
+
+  # Articles and determiners  
+  determiners:
+    - this
+    - that
+    - these
+    - those
+    - a
+    - an
+    - some
+    - any
+    - all
+    - every
+    - each
+
+  # Prepositions
+  prepositions:
+    - in
+    - on
+    - at
+    - to
+    - for
+    - of
+    - with
+    - by
+    - from
+    - up
+    - about
+    - into
+    - through
+    - during
+    - before
+    - after
+    - above
+    - below
+    - between
+    - among
+    - under
+    - over
+    - across
+    - beside
+    - behind
+    - beyond
+    - within
+    - without
+    - against
+
+  # Conjunctions
+  conjunctions:
+    - but
+    - or
+    - nor
+    - so
+    - yet
+    - because
+    - since
+    - unless
+    - while
+    - although
+    - though
+    - if
+    - when
+    - where
+    - whether
+
+  # Common adverbs
+  adverbs:
+    - very
+    - quite
+    - rather
+    - too
+    - more
+    - most
+    - less
+    - least
+    - much
+    - many
+    - few
+    - little
+    - enough
+    - only
+    - just
+    - even
+    - also
+    - already
+    - still
+    - yet
+    - again
+    - once
+    - twice
+    - here
+    - there
+    - now
+    - then
+    - today
+    - tomorrow
+    - yesterday
+
+  # Common verbs
+  verbs:
+    - see
+    - look
+    - hear
+    - listen
+    - feel
+    - think
+    - know
+    - understand
+    - remember
+    - forget
+    - learn
+    - teach
+    - tell
+    - say
+    - speak
+    - talk
+    - ask
+    - answer
+    - call
+    - come
+    - go
+    - bring
+    - take
+    - get
+    - give
+    - put
+    - make
+    - let
+    - help
+
+  # Spiritual/religious context (English)
+  spiritual_english:
+    - chapter
+    - verse
+    - entitled
+    - text
+    - scripture
+    - book
+    - page
+    - line
+    - meditation
+    - practice
+    - teaching
+    - lesson
+    - study
+    - read
+    - recite
+    - prayer
+    - worship
+    - devotion
+    - faith
+    - belief
+    - truth
+    - wisdom
+
+  # Numbers and time
+  numbers_time:
+    - one
+    - two
+    - three
+    - four
+    - five
+    - six
+    - seven
+    - eight
+    - nine
+    - ten
+    - first
+    - second
+    - third
+    - fourth
+    - fifth
+    - last
+    - next
+    - previous
+    - hour
+    - minute
+    - second
+    - day
+    - week
+    - month
+    - year
+    - time
+
+  # Common adjectives
+  adjectives:
+    - good
+    - bad
+    - big
+    - small
+    - great
+    - little
+    - long
+    - short
+    - high
+    - low
+    - new
+    - old
+    - young
+    - ancient
+    - modern
+    - early
+    - late
+    - fast
+    - slow
+    - hot
+    - cold
+    - warm
+    - cool
+    - light
+    - dark
+    - bright
+    - clear
+    - clean
+    - dirty
+
+# Sanskrit Context Indicators
+# These words/patterns indicate Sanskrit context is appropriate
+sanskrit_context_indicators:
+  words:
+    - yoga
+    - vedanta
+    - upanishad
+    - gita
+    - bhagavad
+    - scripture
+    - verse
+    - meditation
+    - dharma
+    - karma
+    - moksha
+    - samadhi
+    - pranayama
+    - mantra
+    - hindu
+    - sanskrit
+    - vedic
+    - spiritual
+    - divine
+    - god
+    - lord
+    - deity
+    - temple
+    - ashram
+    - guru
+    - swami
+    - yogi
+    - sadhu
+    - consciousness
+    - enlightenment
+    - liberation
+    - realization
+    - transcendence
+  
+  # Sanskrit diacritical marks
+  diacritics: "ṛṣṇāīūṅṭḍṇḷśṃḥ"
+
+# English Pattern Detection Rules
+english_patterns:
+  # Common endings that indicate English words
+  endings:
+    - ed
+    - ing
+    - ly
+    - er
+    - est
+    - tion
+    - sion
+    - ment
+    - ness
+    - able
+    - ible
+    - ful
+    - less
+    - ward
+    - wise
+    - like
+    - ship
+  
+  # Common prefixes that indicate English words
+  prefixes:
+    - un
+    - re
+    - pre
+    - dis
+    - mis
+    - over
+    - under
+    - out
+    - up
+    - in
+    - im
+  
+  # Letter patterns typical of English
+  letter_patterns:
+    - th
+    - ck
+    - qu
+    - ll
+    - ss
+    - tt
+    - ff
+    - pp
+
+# Logging and Monitoring
+logging:
+  log_protected_words: true            # Log when protected words are encountered
+  log_skipped_corrections: true        # Log corrections that were skipped
+  log_context_validation: true         # Log context validation results
+  
+# Performance Settings
+performance:
+  max_fuzzy_candidates: 2             # Decreased from 5 - limit candidates to reduce noise
+  enable_caching: true
+  cache_protected_words: true
+
+# Emergency Settings
+emergency:
+  disable_all_corrections: false      # Emergency kill switch
+  disable_fuzzy_matching: false       # Disable only fuzzy matching
+  disable_compound_matching: true     # Disable compound word matching (high risk)

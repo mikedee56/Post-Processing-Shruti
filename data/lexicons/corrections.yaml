@@ -10,14 +10,6 @@ entries:
     confidence: 1.0
     source_authority: "IAST"
 
-  - original_term: "krishna"
-    variations: ["krsna", "krshna", "krisna"]
-    transliteration: "Kṛṣṇa"
-    is_proper_noun: true
-    category: "deity"
-    confidence: 1.0
-    source_authority: "IAST"
-
   - original_term: "arjuna"
     variations: ["arjun", "arjuuna"]
     transliteration: "Arjuna"
@@ -47,14 +39,6 @@ entries:
     transliteration: "Vedānta"
     is_proper_noun: true
     category: "philosophy"
-    confidence: 1.0
-    source_authority: "IAST"
-
-  - original_term: "atman"
-    variations: ["atma", "aatman"]
-    transliteration: "ātman"
-    is_proper_noun: false
-    category: "concept"
     confidence: 1.0
     source_authority: "IAST"
 

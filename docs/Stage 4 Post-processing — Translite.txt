@@ -1,0 +1,16 @@
+Stage 4: Post-processing — Transliteration and Diacritic Generation
+The final stage of the pipeline transforms the raw transcribed text into the required scholarly format.
+
+Goal: Convert the Devanagari script output for Hindi and Sanskrit into the IAST (International Alphabet of Sanskrit Transliteration) Roman script, ensuring all diacritical marks are correctly rendered.
+
+Tool: aksharamukha Python library.   
+
+Rationale: aksharamukha is a powerful and comprehensive library designed specifically for script conversion. It supports 121 scripts and 21 romanization formats, making it an ideal tool for this task. Crucially, it goes beyond simple one-to-one character mapping and implements language-specific orthographic conventions, such as rules for gemination, nasalization, and vowel length. This linguistic awareness is essential for producing high-fidelity transliterations. The library explicitly supports Devanagari as a source script and IAST as a target format.   
+
+Implementation: After the ASR and alignment pass, the pipeline will iterate through the structured transcript data. For each segment where the language ID is 'hi' or 'sa', the Devanagari text will be passed to the aksharamukha.transliterate.process() function.
+
+Example Call: transliterate.process('Devanagari', 'IAST', 'धर्म भारत की').   
+
+The function also accepts pre_options to handle language-specific rules. For instance, the RemoveSchwaHindi option can be used to correctly apply the schwa deletion rule common in spoken Hindi, which is critical for generating a phonetically accurate IAST output.   
+
+Text from segments identified as English will pass through this stage without modification. The final output will be a clean, unified transcript that adheres to the IAST standard for all Indic language content.

@@ -190,9 +190,35 @@ class CorrectionApplier:
         """Filter candidates based on confidence and validity."""
         filtered = []
         
+        # CRITICAL ANTI-HALLUCINATION SAFEGUARDS - PROTECTION LIST
+        protected_words = {
+            'who', 'what', 'when', 'where', 'why', 'how', 'and', 'the', 'is', 'are', 'was', 'were',
+            'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+            'should', 'may', 'might', 'can', 'must', 'shall', 'ought', 'i', 'me', 'my', 'mine',
+            'you', 'your', 'yours', 'he', 'him', 'his', 'she', 'her', 'hers', 'it', 'its',
+            'we', 'us', 'our', 'ours', 'they', 'them', 'their', 'theirs', 'this', 'that',
+            'these', 'those', 'a', 'an', 'some', 'any', 'all', 'every', 'each', 'in', 'on',
+            'at', 'to', 'for', 'of', 'with', 'by', 'from', 'up', 'about', 'into', 'through',
+            'during', 'before', 'after', 'above', 'below', 'between', 'among', 'under', 'over',
+            'but', 'or', 'nor', 'so', 'yet', 'because', 'since', 'unless', 'while', 'although',
+            'though', 'if', 'when', 'where', 'whether', 'one', 'two', 'three', 'four', 'five',
+            'chapter', 'verse', 'entitled', 'text', 'scripture', 'book', 'as'
+        }
+        
         for candidate in candidates:
-            # Basic confidence check
-            if candidate.confidence < self.min_confidence:
+            # ABSOLUTE PROTECTION: Never touch protected English words
+            original_word = candidate.original_text.lower().strip()
+            if original_word in protected_words:
+                self.logger.debug(f"Skipping protected word: {original_word}")
+                continue
+                
+            # ABSOLUTE PROTECTION: Skip very short words (length <= 6)
+            if len(original_word) <= 6:
+                self.logger.debug(f"Skipping short word: {original_word}")
+                continue
+            
+            # ULTRA-STRICT confidence check - increased threshold
+            if candidate.confidence < max(0.95, self.min_confidence):  # Minimum 95% confidence
                 continue
             
             # Validate position and length

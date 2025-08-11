@@ -1,0 +1,43 @@
+{
+  "file_path": "data\\test_samples\\basic_test.srt",
+  "processing_time": 1.2492961883544922,
+  "total_segments": 5,
+  "segments_modified": 5,
+  "corrections_applied": {
+    "sanskrit_hindi_compound_word": 10,
+    "removed_filler_words": 4,
+    "converted_numbers": 2,
+    "fixed_capitalization": 2,
+    "sanskrit_hindi_direct_replacement": 6,
+    "legacy_lexicon_correction": 14,
+    "conversational_rescinded": 2,
+    "handled_conversational_nuances": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.396) in segment",
+    "High semantic drift (0.380) in segment",
+    "High semantic drift (0.431) in segment"
+  ],
+  "original_word_count": 57,
+  "processed_word_count": 53,
+  "original_char_count": 331,
+  "processed_char_count": 301,
+  "confidence_scores": [
+    0.5013534566699123,
+    0.583125,
+    0.4930188679245283,
+    0.37229249011857707,
+    0.18434343434343434
+  ],
+  "average_confidence": 0.4268266498112904,
+  "flagged_segments": 5,
+  "parsing_time": 0.0,
+  "normalization_time": 0.011132955551147461,
+  "correction_time": 1.2308180332183838,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-08T15:25:21.417016+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

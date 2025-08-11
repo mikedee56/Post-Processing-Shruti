@@ -14,7 +14,7 @@ from enum import Enum
 import statistics
 import hashlib
 
-from src.utils.logger_config import get_logger
+from ..utils.logger_config import get_logger
 from .performance_benchmarking import BenchmarkReport, PerformanceBenchmarking
 from .research_validation_metrics import AcademicValidationReport, ResearchValidationMetrics
 from .lexicon_acquisition import AcquisitionReport, LexiconAcquisition
