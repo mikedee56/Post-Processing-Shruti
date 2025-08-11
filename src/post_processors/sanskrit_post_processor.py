@@ -39,6 +39,11 @@ from utils.iast_transliterator import IASTTransliterator
 # Import Story 2.6 Academic Polish components
 from post_processors.academic_polish_processor import AcademicPolishProcessor
 
+# Import Story 3.1 NER components
+from ner_module.yoga_vedanta_ner import YogaVedantaNER
+from ner_module.capitalization_engine import CapitalizationEngine
+from ner_module.ner_model_manager import NERModelManager, SuggestionSource
+
 
 @dataclass
 class TranscriptSegment:
@@ -83,13 +88,15 @@ class SanskritPostProcessor:
     and processing scriptural verses.
     """
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Optional[Path] = None, enable_ner: bool = True):
         """
         Initialize the Sanskrit Post-Processor.
         
         Args:
             config_path: Path to configuration file (optional)
+            enable_ner: Enable NER processing for proper noun capitalization (default: True)
         """
+        self.enable_ner = enable_ner
         self.config = self._load_config(config_path)
         self.logger = get_logger(__name__, self.config.get('logging', {}))
         
@@ -167,6 +174,35 @@ class SanskritPostProcessor:
         self.academic_polish_processor = AcademicPolishProcessor()
         self.enable_academic_polish = self.config.get('enable_academic_polish', False)
         
+        # Initialize Story 3.1 NER components
+        self.enable_ner = self.config.get('enable_ner', True)
+        if self.enable_ner:
+            training_data_dir = Path(self.config.get('ner_training_data_dir', 'data/ner_training'))
+            
+            # Initialize NER model with integrated lexicon manager
+            self.ner_model = YogaVedantaNER(
+                training_data_dir=training_data_dir,
+                lexicon_manager=self.lexicon_manager
+            )
+            
+            # Initialize capitalization engine
+            self.capitalization_engine = CapitalizationEngine(
+                ner_model=self.ner_model,
+                lexicon_manager=self.lexicon_manager
+            )
+            
+            # Initialize model manager for expandable NER
+            self.ner_model_manager = NERModelManager(
+                models_dir=training_data_dir / "trained_models",
+                lexicon_manager=self.lexicon_manager
+            )
+            
+            self.logger.info("Story 3.1 NER components initialized successfully")
+        else:
+            self.ner_model = None
+            self.capitalization_engine = None
+            self.ner_model_manager = None
+        
         # Legacy lexicons for backward compatibility
         self.corrections: Dict[str, LexiconEntry] = {}
         self.proper_nouns: Dict[str, LexiconEntry] = {}
@@ -175,6 +211,21 @@ class SanskritPostProcessor:
         
         # Load legacy lexicons from external files
         self._load_lexicons()
+        
+        # Initialize Story 3.1 NER components (if enabled)
+        if self.enable_ner:
+            self.ner_model = YogaVedantaNER(
+                lexicon_manager=self.lexicon_manager,
+                enable_byt5_sanskrit=self.config.get('enable_byt5_sanskrit', False)
+            )
+            self.capitalization_engine = CapitalizationEngine(self.ner_model)
+            self.ner_model_manager = NERModelManager()
+            self.logger.info("Story 3.1 NER components initialized")
+        else:
+            self.ner_model = None
+            self.capitalization_engine = None
+            self.ner_model_manager = None
+            self.logger.info("NER processing disabled")
         
         # Fuzzy matching threshold (legacy)
         self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
@@ -245,7 +296,15 @@ class SanskritPostProcessor:
                 'max_semantic_drift': 0.3,
                 'max_timestamp_deviation': 0.001,
                 'min_quality_score': 0.7
-            }
+            },
+            
+            # Story 3.1: Named Entity Recognition configuration
+            'enable_ner': True,
+            'ner_training_data_dir': 'data/ner_training',
+            'ner_confidence_threshold': 0.8,
+            'ner_suggestion_threshold': 3,
+            'enable_auto_capitalization': True,
+            'enable_ner_suggestions': True
         }
 
     def _load_lexicons(self):
@@ -485,8 +544,46 @@ class SanskritPostProcessor:
             self.metrics_collector.update_correction_count(metrics, "legacy_lexicon_correction")
             all_corrections_applied.append("legacy_lexicon_correction")
         
-        # Step 5: Apply proper noun capitalization (existing approach)
-        processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
+        # Step 5: Apply Story 3.1 NER processing (if enabled)
+        if self.enable_ner:
+            self.metrics_collector.start_timer('ner_processing')
+            
+            try:
+                # Identify named entities in the text
+                ner_result = self.ner_model.identify_entities(processed_segment.text)
+                
+                # Apply intelligent capitalization based on NER results
+                capitalization_result = self.capitalization_engine.capitalize_text(processed_segment.text)
+                processed_segment.text = capitalization_result.capitalized_text
+                
+                # Track NER metrics
+                self.metrics_collector.update_correction_count(metrics, "ner_entities_identified", len(ner_result.entities))
+                self.metrics_collector.update_correction_count(metrics, "ner_capitalizations", len(capitalization_result.changes_made))
+                
+                # Add low confidence entities as suggestions to model manager
+                for entity in ner_result.entities:
+                    if entity.confidence < 0.8:  # Low confidence threshold
+                        self.ner_model_manager.add_proper_noun_suggestion(
+                            text=entity.text,
+                            category=entity.category,
+                            source=SuggestionSource.AUTO_DISCOVERY,
+                            context=processed_segment.text[:200]  # First 200 chars for context
+                        )
+                
+                all_corrections_applied.append("ner_processing")
+                
+                self.logger.debug(f"NER processing completed: {len(ner_result.entities)} entities identified, "
+                                f"{len(capitalization_result.changes_made)} capitalizations applied")
+                                
+            except Exception as e:
+                self.logger.error(f"Error during NER processing: {e}")
+                metrics.errors_encountered.append(f"NER processing error: {e}")
+            
+            self.metrics_collector.end_timer('ner_processing')
+        
+        # Step 6: Apply proper noun capitalization (fallback/legacy approach)
+        if not self.enable_ner:
+            processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
         
         # Step 6: Quality validation and semantic drift check
         if original_text != processed_segment.text:
@@ -1413,21 +1510,21 @@ class SanskritPostProcessor:
         try:
             report = {
                 'system_info': {
-                    'story_version': '2.1',
+                    'story_version': '3.1' if self.enable_ner else '2.1',
                     'components': [
                         'SanskritHindiIdentifier',
                         'LexiconManager', 
                         'FuzzyMatcher',
                         'IASTTransliterator',
                         'CorrectionApplier'
-                    ],
+                    ] + (['YogaVedantaNER', 'CapitalizationEngine', 'NERModelManager'] if self.enable_ner else []),
                     'capabilities': [
                         'Sanskrit/Hindi word identification',
                         'Fuzzy matching with Levenshtein distance',
                         'IAST transliteration enforcement', 
                         'High-confidence correction application',
                         'Externalized lexicon management'
-                    ]
+                    ] + (['Named entity recognition', 'Intelligent proper noun capitalization', 'Expandable NER model management'] if self.enable_ner else [])
                 },
                 'lexicon_summary': self.lexicon_manager.get_lexicon_statistics(),
                 'configuration': {
@@ -1435,7 +1532,8 @@ class SanskritPostProcessor:
                     'correction_min_confidence': self.config.get('correction_min_confidence'),
                     'iast_strict_mode': self.config.get('iast_strict_mode'),
                     'enable_phonetic_matching': self.config.get('enable_phonetic_matching'),
-                    'max_corrections_per_segment': self.config.get('max_corrections_per_segment')
+                    'max_corrections_per_segment': self.config.get('max_corrections_per_segment'),
+                    'enable_ner': self.enable_ner
                 },
                 'validation_results': {}
             }
@@ -1446,6 +1544,19 @@ class SanskritPostProcessor:
             if sample_entry:
                 validation_issues = self.word_identifier.validate_lexicon_integrity()
                 report['validation_results'] = validation_issues
+            
+            # Add NER-specific statistics if enabled
+            if self.enable_ner:
+                report['ner_system'] = {
+                    'model_statistics': self.ner_model.get_model_statistics(),
+                    'capitalization_statistics': self.capitalization_engine.get_capitalization_statistics(),
+                    'model_management': self.ner_model_manager.get_model_statistics(),
+                    'suggestions_summary': {
+                        'total_suggestions': len(self.ner_model_manager.suggestions),
+                        'pending_review': len(self.ner_model_manager.get_suggestions_for_review()),
+                        'suggestion_threshold': self.ner_model_manager.suggestion_threshold
+                    }
+                }
             
             return report
             

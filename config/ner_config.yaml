@@ -1,0 +1,180 @@
+# Yoga Vedanta Named Entity Recognition Configuration
+# Configuration file for NER model and capitalization settings
+
+version: "1.0"
+description: "Configuration for Yoga Vedanta NER system"
+
+# NER Model Configuration
+ner_model:
+  version: "1.0.0"
+  training_data_dir: "data/ner_training"
+  models_dir: "data/ner_training/trained_models"
+  enable_caching: true
+  
+  # Confidence thresholds
+  confidence:
+    minimum_entity_confidence: 0.5
+    high_confidence_threshold: 0.85
+    medium_confidence_threshold: 0.70
+    auto_approval_threshold: 0.9
+    
+  # Processing options
+  processing:
+    enable_context_analysis: true
+    enable_pattern_matching: true
+    enable_lexicon_integration: true
+    max_entities_per_text: 50
+    overlap_resolution_strategy: "highest_confidence"
+
+# Entity Classification Configuration
+entity_classification:
+  # Category-specific settings
+  categories:
+    SCRIPTURE:
+      confidence_threshold: 0.8
+      capitalization_rule: "title_case"
+      validation_required: false
+      
+    DEITY:
+      confidence_threshold: 0.9
+      capitalization_rule: "proper_case"
+      validation_required: false
+      
+    CHARACTER:
+      confidence_threshold: 0.85
+      capitalization_rule: "proper_case"
+      validation_required: false
+      
+    TEACHER:
+      confidence_threshold: 0.85
+      capitalization_rule: "proper_case"
+      validation_required: true
+      
+    PLACE:
+      confidence_threshold: 0.8
+      capitalization_rule: "proper_case"
+      validation_required: false
+      
+    PHILOSOPHY:
+      confidence_threshold: 0.75
+      capitalization_rule: "proper_case"
+      validation_required: false
+
+# Capitalization Engine Configuration
+capitalization:
+  # Rule application settings
+  rules:
+    enable_special_patterns: true
+    enable_context_rules: true
+    preserve_sentence_case: true
+    handle_acronyms: true
+    
+  # Special case patterns
+  special_patterns:
+    multi_word_scriptures: true
+    honorific_prefixes: true
+    compound_philosophy_terms: true
+    
+  # Validation settings
+  validation:
+    enable_validation: true
+    check_sentence_structure: true
+    check_length_changes: true
+    max_length_difference: 10
+
+# Model Management Configuration
+model_management:
+  # Versioning
+  versioning:
+    enable_auto_versioning: true
+    version_format: "semantic"  # semantic (1.2.3) or timestamp
+    backup_old_versions: true
+    max_versions_to_keep: 10
+    
+  # Training and retraining
+  training:
+    enable_incremental_training: true
+    min_examples_for_training: 10
+    validation_split: 0.2
+    training_epochs: 5
+    early_stopping: true
+    
+  # Suggestions system
+  suggestions:
+    enable_auto_suggestions: true
+    suggestion_threshold: 3
+    auto_discovery: true
+    context_examples_count: 5
+    max_suggestions_per_session: 100
+
+# Integration Settings
+integration:
+  # Lexicon integration
+  lexicon:
+    primary_lexicon_file: "proper_nouns.yaml"
+    enable_multi_lexicon: true
+    auto_sync_approved_suggestions: true
+    backup_before_changes: true
+    
+  # Post-processor integration  
+  post_processor:
+    enable_ner_integration: true
+    apply_capitalization: true
+    confidence_boost_for_known_entities: 0.1
+    preserve_original_confidence: false
+
+# Performance Settings
+performance:
+  # Caching
+  caching:
+    enable_entity_cache: true
+    cache_size: 1000
+    cache_ttl: 3600  # seconds
+    
+  # Processing limits
+  limits:
+    max_text_length: 10000
+    max_processing_time: 30  # seconds
+    enable_timeout: true
+    
+  # Optimization
+  optimization:
+    enable_parallel_processing: false
+    batch_size: 100
+    enable_gpu_acceleration: false
+
+# Logging and Monitoring
+logging:
+  level: "INFO"
+  enable_performance_logging: true
+  enable_suggestion_logging: true
+  enable_training_logging: true
+  log_entity_discoveries: true
+  
+  # Log files
+  files:
+    main_log: "logs/ner_system.log"
+    performance_log: "logs/ner_performance.log"
+    suggestions_log: "logs/ner_suggestions.log"
+
+# Quality Assurance
+quality_assurance:
+  # Validation checks
+  validation:
+    enable_entity_validation: true
+    check_category_consistency: true
+    check_transliteration_quality: true
+    validate_capitalization: true
+    
+  # Metrics tracking
+  metrics:
+    track_precision_recall: true
+    track_processing_time: true
+    track_suggestion_accuracy: true
+    generate_quality_reports: true
+    
+  # Alerts
+  alerts:
+    low_confidence_threshold: 0.6
+    high_error_rate_threshold: 0.1
+    enable_email_alerts: false

@@ -1,0 +1,203 @@
+# Yoga Vedanta Proper Nouns Training Dataset
+# Domain-specific training data for NER model training
+# Categories: persons, places, texts, concepts, deities, teachers
+
+version: "1.0"
+description: "Training dataset for Yoga Vedanta Named Entity Recognition"
+source_authority: "Academic Research Collection"
+last_updated: "2025-08-10"
+
+# Training examples with entity labels
+training_examples:
+  - text: "In the Bhagavad Gita, Krishna teaches Arjuna about dharma and yoga."
+    entities:
+      - text: "Bhagavad Gita"
+        start: 7
+        end: 19
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+      - text: "Krishna"
+        start: 21
+        end: 28
+        label: "DEITY"
+        category: "persons"
+        confidence: 1.0
+      - text: "Arjuna"
+        start: 37
+        end: 43
+        label: "CHARACTER"
+        category: "persons"
+        confidence: 1.0
+
+  - text: "Patanjali's Yoga Sutras describe the eight limbs of yoga."
+    entities:
+      - text: "Patanjali"
+        start: 0
+        end: 9
+        label: "TEACHER"
+        category: "persons"
+        confidence: 1.0
+      - text: "Yoga Sutras"
+        start: 12
+        end: 23
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+
+  - text: "The Upanishads and Vedas are foundational texts of Vedanta."
+    entities:
+      - text: "Upanishads"
+        start: 4
+        end: 14
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+      - text: "Vedas"
+        start: 19
+        end: 24
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+      - text: "Vedanta"
+        start: 52
+        end: 59
+        label: "PHILOSOPHY"
+        category: "concepts"
+        confidence: 1.0
+
+  - text: "Swami Vivekananda brought Vedanta teachings to the West."
+    entities:
+      - text: "Swami Vivekananda"
+        start: 0
+        end: 17
+        label: "TEACHER"
+        category: "persons"
+        confidence: 1.0
+      - text: "Vedanta"
+        start: 26
+        end: 33
+        label: "PHILOSOPHY"
+        category: "concepts"
+        confidence: 1.0
+
+  - text: "In Rishikesh and Varanasi, pilgrims study ancient scriptures."
+    entities:
+      - text: "Rishikesh"
+        start: 3
+        end: 12
+        label: "PLACE"
+        category: "places"
+        confidence: 1.0
+      - text: "Varanasi"
+        start: 17
+        end: 25
+        label: "PLACE"
+        category: "places"
+        confidence: 1.0
+
+  - text: "The Mahabharata and Ramayana are epic narratives of dharma."
+    entities:
+      - text: "Mahabharata"
+        start: 4
+        end: 15
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+      - text: "Ramayana"
+        start: 20
+        end: 28
+        label: "SCRIPTURE"
+        category: "texts"
+        confidence: 1.0
+
+  - text: "Shiva and Vishnu are principal deities in Hindu tradition."
+    entities:
+      - text: "Shiva"
+        start: 0
+        end: 5
+        label: "DEITY"
+        category: "persons"
+        confidence: 1.0
+      - text: "Vishnu"
+        start: 10
+        end: 16
+        label: "DEITY"
+        category: "persons"
+        confidence: 1.0
+
+  - text: "The Himalayas are considered sacred in yogic tradition."
+    entities:
+      - text: "Himalayas"
+        start: 4
+        end: 13
+        label: "PLACE"
+        category: "places"
+        confidence: 1.0
+
+  - text: "Shankaracharya established the Advaita Vedanta philosophy."
+    entities:
+      - text: "Shankaracharya"
+        start: 0
+        end: 14
+        label: "TEACHER"
+        category: "persons"
+        confidence: 1.0
+      - text: "Advaita Vedanta"
+        start: 31
+        end: 46
+        label: "PHILOSOPHY"
+        category: "concepts"
+        confidence: 1.0
+
+  - text: "Rama and Sita exemplify dharmic principles in the epic."
+    entities:
+      - text: "Rama"
+        start: 0
+        end: 4
+        label: "CHARACTER"
+        category: "persons"
+        confidence: 1.0
+      - text: "Sita"
+        start: 9
+        end: 13
+        label: "CHARACTER"
+        category: "persons"
+        confidence: 1.0
+
+# Entity categories and their descriptions
+entity_categories:
+  SCRIPTURE:
+    description: "Sacred texts, books, and scriptural works"
+    examples: ["Bhagavad Gita", "Upanishads", "Vedas", "Yoga Sutras"]
+    
+  DEITY:
+    description: "Divine beings and deities"
+    examples: ["Krishna", "Shiva", "Vishnu", "Ganesha"]
+    
+  CHARACTER:
+    description: "Mythological and historical characters"
+    examples: ["Arjuna", "Rama", "Sita", "Hanuman"]
+    
+  TEACHER:
+    description: "Spiritual teachers, gurus, and philosophers"
+    examples: ["Patanjali", "Shankaracharya", "Swami Vivekananda"]
+    
+  PLACE:
+    description: "Sacred places, cities, and geographical locations"
+    examples: ["Rishikesh", "Varanasi", "Himalayas", "Vrindavan"]
+    
+  PHILOSOPHY:
+    description: "Philosophical concepts and systems"
+    examples: ["Vedanta", "Advaita", "Sankhya", "Yoga"]
+
+# Common variations and misspellings for training
+common_variations:
+  "Krishna": ["Krsna", "Krishn", "Krishnaa"]
+  "Bhagavad Gita": ["Bhagvad Gita", "Bhagawad Gita", "Bagavad Geeta"]
+  "Patanjali": ["Patanjaly", "Patanjalee", "Pantanjali"]
+  "Upanishads": ["Upanishad", "Upanisads", "Upanishadas"]
+  "Vedanta": ["Vedaanta", "Vedant", "Vedantaa"]
+  "Mahabharata": ["Mahabharat", "Mahaabharata", "Mahabharatha"]
+  "Ramayana": ["Ramayan", "Raamayana", "Ramayanna"]
+  "Rishikesh": ["Rishikesh", "Rishikes", "Hrishikesh"]

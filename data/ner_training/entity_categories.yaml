@@ -1,0 +1,173 @@
+# Entity Categories Configuration for Yoga Vedanta NER
+# Defines the classification system for different types of proper nouns
+
+version: "1.0"
+description: "Entity category definitions for Yoga Vedanta Named Entity Recognition"
+source_authority: "Academic Classification System"
+
+# Main entity categories with detailed specifications
+categories:
+  SCRIPTURE:
+    id: 0
+    name: "Scripture"
+    description: "Sacred texts, books, and scriptural works in Yoga Vedanta tradition"
+    capitalization_rule: "title_case"
+    confidence_threshold: 0.8
+    examples:
+      - "Bhagavad Gita"
+      - "Upanishads"
+      - "Vedas"
+      - "Yoga Sutras"
+      - "Brahma Sutras"
+      - "Mahabharata"
+      - "Ramayana"
+    patterns:
+      - "(?i)\\b(bhagavad|bhagwad|bhagvad)\\s+(gita|geeta)\\b"
+      - "(?i)\\b(upanishad|upanisad)s?\\b"
+      - "(?i)\\b(yoga|yog)\\s+(sutra|sutras)\\b"
+
+  DEITY:
+    id: 1
+    name: "Deity"
+    description: "Divine beings, deities, and divine manifestations"
+    capitalization_rule: "proper_case"
+    confidence_threshold: 0.9
+    examples:
+      - "Krishna"
+      - "Shiva"
+      - "Vishnu"
+      - "Ganesha"
+      - "Brahma"
+      - "Lakshmi"
+      - "Saraswati"
+    patterns:
+      - "(?i)\\b(krishna|krsna|krishn)\\b"
+      - "(?i)\\b(shiva|siva|shiv)\\b"
+      - "(?i)\\b(vishnu|visnu)\\b"
+
+  CHARACTER:
+    id: 2
+    name: "Character"
+    description: "Mythological and epic characters, heroes, and legendary figures"
+    capitalization_rule: "proper_case"
+    confidence_threshold: 0.85
+    examples:
+      - "Arjuna"
+      - "Rama"
+      - "Sita"
+      - "Hanuman"
+      - "Yudhishthira"
+      - "Bhima"
+      - "Lakshmana"
+    patterns:
+      - "(?i)\\b(arjuna|arjun)\\b"
+      - "(?i)\\b(rama|ram)\\b"
+      - "(?i)\\b(sita|seeta)\\b"
+
+  TEACHER:
+    id: 3
+    name: "Teacher"
+    description: "Spiritual teachers, gurus, philosophers, and sages"
+    capitalization_rule: "proper_case"
+    confidence_threshold: 0.85
+    examples:
+      - "Patanjali"
+      - "Shankaracharya"
+      - "Swami Vivekananda"
+      - "Ramana Maharshi"
+      - "Guru Nanak"
+      - "Kabir"
+      - "Vyasa"
+    patterns:
+      - "(?i)\\b(patanjali|patanjaly)\\b"
+      - "(?i)\\b(shankar|shankara)(charya|acharya)?\\b"
+      - "(?i)\\b(swami|swamy)\\s+\\w+\\b"
+
+  PLACE:
+    id: 4
+    name: "Place"
+    description: "Sacred places, pilgrimage sites, cities, and geographical locations"
+    capitalization_rule: "proper_case"
+    confidence_threshold: 0.8
+    examples:
+      - "Rishikesh"
+      - "Varanasi"
+      - "Vrindavan"
+      - "Haridwar"
+      - "Himalayas"
+      - "Kashi"
+      - "Mathura"
+    patterns:
+      - "(?i)\\b(rishikesh|rishikes|hrishikesh)\\b"
+      - "(?i)\\b(varanasi|banaras|kashi)\\b"
+      - "(?i)\\b(vrindavan|brindavan)\\b"
+
+  PHILOSOPHY:
+    id: 5
+    name: "Philosophy"
+    description: "Philosophical concepts, systems, and schools of thought"
+    capitalization_rule: "proper_case"
+    confidence_threshold: 0.75
+    examples:
+      - "Vedanta"
+      - "Advaita"
+      - "Sankhya"
+      - "Yoga"
+      - "Bhakti"
+      - "Karma"
+      - "Jnana"
+    patterns:
+      - "(?i)\\b(vedanta|vedant)\\b"
+      - "(?i)\\b(advaita|adwait)\\b"
+      - "(?i)\\b(sankhya|samkhya)\\b"
+
+# Capitalization rules
+capitalization_rules:
+  proper_case:
+    description: "Capitalize first letter only"
+    example: "Krishna"
+    
+  title_case:
+    description: "Capitalize all major words"
+    example: "Bhagavad Gita"
+    
+  all_caps:
+    description: "All letters capitalized (rare usage)"
+    example: "OM"
+
+# Context clues for disambiguation
+context_clues:
+  scripture_contexts:
+    - "chapter"
+    - "verse"
+    - "text"
+    - "book"
+    - "scripture"
+    - "teaches"
+    - "written"
+    
+  deity_contexts:
+    - "worship"
+    - "devotion"
+    - "pray"
+    - "divine"
+    - "god"
+    - "lord"
+    
+  place_contexts:
+    - "visit"
+    - "pilgrimage"
+    - "sacred"
+    - "holy"
+    - "temple"
+    - "city"
+    - "mountain"
+
+# Confidence scoring parameters
+confidence_parameters:
+  exact_match_bonus: 0.3
+  context_match_bonus: 0.2
+  pattern_match_bonus: 0.15
+  lexicon_match_bonus: 0.25
+  minimum_confidence: 0.5
+  maximum_confidence: 1.0
