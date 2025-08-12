@@ -1,0 +1,137 @@
+# MCP Integration Configuration for Advanced Text Normalizer
+# This configuration enables context-aware number processing with MCP servers
+
+mcp_servers:
+  # Primary MCP server endpoints (Phase 1 - will be configured when servers are available)
+  spacy_server:
+    endpoint: "mcp://localhost:3001/spacy"
+    capabilities: ["linguistic_analysis", "context_detection", "pos_tagging"]
+    timeout_ms: 2000
+    retry_attempts: 3
+    
+  nlp_server:
+    endpoint: "mcp://localhost:3002/nlp"
+    capabilities: ["context_classification", "pattern_recognition", "semantic_analysis"]
+    timeout_ms: 1500
+    retry_attempts: 2
+    
+  transformers_server:
+    endpoint: "mcp://localhost:3003/transformers" 
+    capabilities: ["deep_context_understanding", "semantic_similarity"]
+    timeout_ms: 3000
+    retry_attempts: 1
+
+# Advanced Text Normalizer Configuration
+advanced_text_normalizer:
+  # MCP Processing Settings
+  enable_mcp_processing: true
+  enable_fallback: true
+  mcp_fallback_threshold: 0.7
+  
+  # Context Classification Settings
+  idiomatic_expressions:
+    preserve_patterns:
+      - "one by one"
+      - "two by two"
+      - "step by step"
+      - "day by day" 
+      - "one after another"
+      - "one at a time"
+      - "two at a time"
+      - "hand in hand"
+      - "side by side"
+    confidence_threshold: 0.85
+    
+  mathematical_contexts:
+    convert_patterns:
+      - "plus"
+      - "minus" 
+      - "times"
+      - "divided by"
+      - "equals"
+      - "add"
+      - "subtract"
+      - "multiply"
+      - "divide"
+    confidence_threshold: 0.80
+    
+  scriptural_contexts:
+    smart_conversion_patterns:
+      - "chapter"
+      - "verse"
+      - "psalm"
+      - "book"
+      - "section"
+    confidence_threshold: 0.85
+    
+  temporal_contexts:
+    year_conversion_patterns:
+      - "year"
+      - "in nineteen"
+      - "in twenty"
+      - "two thousand"
+      - "born in"
+      - "died in"
+      - "happened in"
+    confidence_threshold: 0.80
+
+# Performance and Quality Settings
+performance:
+  max_processing_time_ms: 2000
+  enable_performance_monitoring: true
+  log_processing_stats: true
+  
+quality:
+  semantic_drift_threshold: 0.3
+  min_confidence_score: 0.7
+  preserve_meaningful_discourse: true
+  
+# Fallback Configuration
+fallback:
+  enable_graceful_degradation: true
+  log_fallback_usage: true
+  fallback_performance_tracking: true
+
+# Development and Testing
+development:
+  enable_debug_logging: true
+  save_processing_examples: true
+  validate_improvements: true
+  
+  # Test cases for validation
+  test_cases:
+    idiomatic_preservation:
+      - input: "And one by one, he killed six of their children."
+        expected_output: "And one by one, he killed six of their children."
+        should_preserve: "one by one"
+        
+    scriptural_conversion:
+      - input: "We study chapter two verse twenty five."
+        expected_output: "We study chapter 2 verse 25."
+        should_convert: ["two", "twenty five"]
+        
+    temporal_conversion:
+      - input: "In the year two thousand five, we started."
+        expected_output: "In the year 2005, we started."
+        should_convert: ["two thousand five"]
+        
+    mathematical_conversion:
+      - input: "Two plus two equals four."
+        expected_output: "2 plus 2 equals 4."
+        should_convert: ["Two", "two", "four"]
+
+# Integration Settings
+integration:
+  # Existing system compatibility
+  maintain_backward_compatibility: true
+  preserve_existing_api: true
+  
+  # Processing pipeline integration
+  integrate_with_conversational_patterns: true
+  integrate_with_filler_word_removal: true
+  integrate_with_capitalization: true
+  
+  # Quality assurance integration
+  enable_semantic_drift_monitoring: true
+  enable_quality_score_calculation: true
+  enable_change_tracking: true
