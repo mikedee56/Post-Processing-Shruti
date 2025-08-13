@@ -80,6 +80,47 @@ class AcademicPolishProcessor:
             (r'\bguru\b(?=\s+[A-Z])', 'Guru', 'Capitalize in formal title context'),
             (r'\bswami\b(?=\s+[A-Z])', 'Swami', 'Capitalize in formal title context'),
             (r'\bācārya\b(?=\s+[A-Z])', 'Ācārya', 'Capitalize in formal title context'),
+            
+            # ENHANCED: Additional spiritual terminology based on QA findings
+            (r'gita', 'Gita', 'Capitalize when referring to Bhagavad Gita'),
+            (r'purana', 'Purana', 'Capitalize sacred text category'),
+            (r'smriti', 'Smriti', 'Capitalize scripture category'),
+            (r'sruti', 'Sruti', 'Capitalize scripture category'),
+            
+            # ENHANCED: Yoga systems and spiritual practices  
+            (r'rajayoga', 'Raja Yoga', 'Capitalize yoga system'),
+            (r'hatha yoga', 'Hatha Yoga', 'Capitalize yoga system'),
+            (r'kundalini yoga', 'Kundalini Yoga', 'Capitalize yoga system'),
+            
+            # ENHANCED: Philosophical schools and teachers
+            (r'shankaracharya', 'Shankaracharya', 'Capitalize spiritual teacher'),
+            (r'patanjali', 'Patanjali', 'Capitalize sage/author'),
+            (r'valmiki', 'Valmiki', 'Capitalize sage/author'),
+            (r'vyasa', 'Vyasa', 'Capitalize sage/author'),
+        ]
+        
+        # Filler word removal patterns - CRITICAL MISSING FUNCTIONALITY
+        self.filler_word_patterns = [
+            # Common filler words at start of sentences/segments
+            (r'^\s*(?:um|uh|er|ah|eh),?\s*', '', 'Remove filler word at start'),
+            (r'^\s*(?:you know|like|well|so),?\s*', '', 'Remove filler phrase at start'),
+            
+            # Mid-sentence filler words with surrounding punctuation
+            (r',\s*(?:um|uh|er|ah|eh),?\s*', ', ', 'Remove mid-sentence filler word'),
+            (r',\s*(?:you know|like|I mean),?\s*', ', ', 'Remove mid-sentence filler phrase'),
+            
+            # Filler words before punctuation
+            (r'\s+(?:um|uh|er|ah|eh)\s*([,.;:])', r'\1', 'Remove filler before punctuation'),
+            
+            # Repeated words/stuttering
+            (r'\b(\w+)\s+\1\b', r'\1', 'Remove word repetition'),
+            
+            # False starts and corrections
+            (r'\b(?:I mean|let me rephrase|actually|rather),?\s*', '', 'Remove correction phrases'),
+            (r'\b(?:what I meant was|let me correct that),?\s*', '', 'Remove correction phrases'),
+            
+            # Hesitation patterns
+            (r'\s*(?:and and|the the|of of|in in)\s*', ' ', 'Remove hesitation repetitions'),
         ]
         
         # Format consistency patterns
@@ -128,6 +169,21 @@ class AcademicPolishProcessor:
             
             line = original_line
             line_issues = []
+            
+            # Apply filler word removal first (highest priority for academic polish)
+            for pattern, replacement, description in self.filler_word_patterns:
+                if re.search(pattern, line, re.IGNORECASE):
+                    new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
+                    if new_line != line:
+                        line_issues.append(PolishIssue(
+                            line_number=line_num,
+                            issue_type='filler_word_removal',
+                            description=description,
+                            original_text=line,
+                            suggested_fix=new_line,
+                            priority='critical'  # Filler removal is critical for academic standards
+                        ))
+                        line = new_line
             
             # Apply capitalization fixes
             for pattern, replacement, description in self.capitalization_patterns:
@@ -339,6 +395,7 @@ class AcademicPolishProcessor:
         minor_issues = [i for i in issues if i.priority == 'minor']
         
         # Categorize by type
+        filler_removal = [i for i in issues if i.issue_type == 'filler_word_removal']
         capitalization = [i for i in issues if i.issue_type == 'capitalization']
         sanskrit_std = [i for i in issues if i.issue_type == 'sanskrit_standardization']
         format_consistency = [i for i in issues if i.issue_type == 'format_consistency']
@@ -358,6 +415,7 @@ SUMMARY:
 - Minor: {len(minor_issues)}
 
 ENHANCEMENT CATEGORIES:
+- Filler Word Removal: {len(filler_removal)}
 - Academic Capitalization: {len(capitalization)}
 - Sanskrit Term Standardization: {len(sanskrit_std)}
 - Format Consistency: {len(format_consistency)}
