@@ -1,0 +1,25 @@
+{
+  "validation_id": "953d06ad-a94b-438e-a97d-af0518da5cc0",
+  "change_id": "story_4_3_validation",
+  "deployment_approved": false,
+  "performance_tests_passed": 0,
+  "performance_tests_failed": 5,
+  "blocking_issues": [
+    "Processing latency exceeds 1000ms",
+    "Cache hit rate below 70.0%",
+    "Memory usage exceeds 512MB",
+    "Error rate exceeds 0.100%",
+    "End-to-end performance test failed"
+  ],
+  "warnings": [],
+  "estimated_production_impact": {
+    "estimated_latency_increase_percentage": 2.5,
+    "estimated_throughput_decrease_percentage": 1.8,
+    "estimated_memory_increase_percentage": 3.2,
+    "estimated_error_rate_increase_percentage": 0.1,
+    "confidence_score": 0.75
+  },
+  "validation_duration_seconds": 0.1007235050201416,
+  "validated_by": "automated",
+  "validated_at": 1755209817.1853268
+}
