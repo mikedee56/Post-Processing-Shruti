@@ -198,4 +198,4 @@ Thumbs.db
 config/secrets.yaml
 config/api_keys.json
 .env.local
-.env.production
+.env.productionserena/

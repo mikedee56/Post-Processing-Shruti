@@ -1,9 +1,8 @@
 {
-  "hooks": {
-    "qa-eval-pass": {
-      "command": ".git/hooks/post-qa-eval",
-      "description": "Auto-commit and push after successful QA evaluation",
-      "trigger": "after-qa-eval-pass"
-    }
+  "user-prompt-submit-hook": {
+    "command": "python3 .claude/claude-input-hook.py",
+    "description": "Gentle notification when Claude Code is ready for input",
+    "enabled": true,
+    "timeout": 5
   }
 }

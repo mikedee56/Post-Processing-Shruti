@@ -240,9 +240,20 @@
       "Bash(git rm:*)",
       "Bash(for:*)",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__onboarding",
+      "mcp__serena__write_memory",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__insert_after_symbol",
+      "Bash(\"/c/Windows/py.exe\" -3.10 -m pytest tests/test_story_4_1_quality_assurance.py -v)",
+      "Bash(PYTHONPATH=/mnt/d/Post-Processing-Shruti/src python3 -m pytest tests/test_story_4_1_quality_assurance.py -v)",
+      "Bash(touch:*)",
+      "Bash(PYTHONPATH=/mnt/d/Post-Processing-Shruti/src python3 validate_story_4_1.py)",
+      "Bash(git reset:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   },
   "mcpServers": {
     "serena": {
