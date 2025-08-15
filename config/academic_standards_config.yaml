@@ -1,0 +1,439 @@
+# Academic Standards Configuration for Scripture Intelligence Enhancement
+# Story 4.5: Scripture Intelligence Enhancement Configuration
+
+# Academic Standards and Citation Configuration
+academic_standards:
+  # Publication target standards
+  publication_standards:
+    basic_academic:
+      minimum_quality_score: 0.60
+      required_sections: ["title", "content"]
+      citation_requirements: "basic"
+      
+    peer_review:
+      minimum_quality_score: 0.85
+      required_sections: ["title", "abstract", "content", "citations", "bibliography"]
+      citation_requirements: "rigorous"
+      transliteration_standard: "iast"
+      
+    journal_submission:
+      minimum_quality_score: 0.90
+      required_sections: ["title", "abstract", "keywords", "content", "methodology", "citations", "bibliography"]
+      citation_requirements: "publication_grade"
+      transliteration_standard: "iast"
+      require_consultant_review: true
+      
+    book_publication:
+      minimum_quality_score: 0.95
+      required_sections: ["title", "abstract", "keywords", "content", "methodology", "citations", "bibliography", "index"]
+      citation_requirements: "exemplary"
+      transliteration_standard: "iast"
+      require_consultant_review: true
+      require_peer_review: true
+
+# Citation Standards Configuration
+citation_standards:
+  # Default citation style
+  default_style: "indological_standard"
+  
+  # Supported citation styles
+  styles:
+    indological_standard:
+      verse_format: "{abbreviation} {chapter}.{verse}"
+      full_format: "{source_title} {chapter}.{verse}"
+      with_text_format: "{abbreviation} {chapter}.{verse}: {transliterated_text}"
+      bibliography_format: "{author}. {source_title}. {edition}."
+      
+    mla:
+      verse_format: "({abbreviation} {chapter}.{verse})"
+      full_format: "{author}. {source_title}. {chapter}.{verse}."
+      with_text_format: '"{transliterated_text}" ({abbreviation} {chapter}.{verse})'
+      bibliography_format: "{author}. {source_title}. {publisher}, {year}."
+      
+    apa:
+      verse_format: "({abbreviation} {chapter}.{verse})"
+      full_format: "{author} ({year}). {source_title}. {chapter}.{verse}."
+      with_text_format: '"{transliterated_text}" ({abbreviation} {chapter}.{verse})'
+      bibliography_format: "{author} ({year}). {source_title}. {publisher}."
+
+  # Standard source abbreviations
+  source_abbreviations:
+    bhagavad_gita:
+      standard: "BG"
+      scholarly: "Bhag."
+      full: "Bhagavad Gītā"
+      devanagari: "भगवद्गीता"
+      traditional_author: "Vyāsa"
+      
+    yoga_sutras:
+      standard: "YS"
+      scholarly: "Yoga."
+      full: "Yoga Sūtras"
+      devanagari: "योग सूत्र"
+      traditional_author: "Patañjali"
+      
+    mundaka_upanishad:
+      standard: "MuU"
+      scholarly: "Muṇḍ."
+      full: "Muṇḍaka Upaniṣad"
+      devanagari: "मुण्डक उपनिषद्"
+      traditional_author: "Unknown"
+      
+    katha_upanishad:
+      standard: "KaU"
+      scholarly: "Kaṭh."
+      full: "Kaṭha Upaniṣad"
+      devanagari: "कठ उपनिषद्"
+      traditional_author: "Unknown"
+
+# Transliteration Standards Configuration
+transliteration_standards:
+  # Default transliteration standard
+  default_standard: "iast"
+  
+  # IAST (International Alphabet of Sanskrit Transliteration) configuration
+  iast:
+    strict_mode: true
+    require_diacriticals: true
+    allow_mixed_standards: false
+    quality_threshold: 0.85
+    
+    # IAST character mappings and validation
+    vowels:
+      basic: ["a", "i", "u", "e", "o"]
+      long: ["ā", "ī", "ū", "ē", "ō"]
+      vocalic: ["ṛ", "ṝ", "ḷ", "ḹ"]
+      
+    consonants:
+      stops: ["k", "g", "ṅ", "c", "j", "ñ", "ṭ", "ḍ", "ṇ", "t", "d", "n", "p", "b", "m"]
+      continuants: ["y", "r", "l", "v"]
+      sibilants: ["ś", "ṣ", "s"]
+      
+    special_marks:
+      anusvara: "ṃ"
+      visarga: "ḥ"
+      
+  # Alternative standards for reference
+  harvard_kyoto:
+    vowels_long: ["A", "I", "U", "E", "O"]
+    vocalic: ["R", "RR", "L", "LL"]
+    special: ["M", "H"]
+    
+  simplified:
+    remove_diacriticals: true
+    ascii_only: true
+
+# Advanced Verse Matching Configuration
+advanced_verse_matching:
+  # Contextual matching modes
+  modes:
+    standard:
+      confidence_threshold: 0.70
+      enable_fallback: true
+      
+    academic:
+      confidence_threshold: 0.85
+      enable_cross_reference_validation: true
+      enable_canonical_consistency_check: true
+      
+    research_grade:
+      confidence_threshold: 0.90
+      enable_cross_reference_validation: true
+      enable_canonical_consistency_check: true
+      enable_academic_citation_validation: true
+      
+    publication_ready:
+      confidence_threshold: 0.95
+      enable_cross_reference_validation: true
+      enable_canonical_consistency_check: true
+      enable_academic_citation_validation: true
+      require_consultant_validation: true
+
+  # Contextual analysis configuration
+  contextual_analysis:
+    scriptural_context:
+      enable: true
+      patterns:
+        bhagavad_gita:
+          - "\\b(?:chapter|adhyaya)\\s+(\\d+|[a-z]+)\\s+(?:verse|shloka)\\s+(\\d+|[a-z]+)\\b"
+          - "\\bgita\\s+(\\d+)\\.(\\d+)\\b"
+          - "\\b(?:bg|bh?g)\\s*(\\d+)\\.(\\d+)\\b"
+        upanishads:
+          - "\\b(\\w+)\\s+upanishad\\b"
+          - "\\bmundaka\\s+(\\d+)\\.(\\d+)\\.(\\d+)\\b"
+          - "\\bkatha\\s+(\\d+)\\.(\\d+)\\.(\\d+)\\b"
+        yoga_sutras:
+          - "\\b(?:yoga\\s+)?sutra\\s+(\\d+)\\.(\\d+)\\b"
+          - "\\bpatanjali\\s+(\\d+)\\.(\\d+)\\b"
+          - "\\bys\\s+(\\d+)\\.(\\d+)\\b"
+          
+    philosophical_context:
+      enable: true
+      traditions:
+        advaita_vedanta: ["brahman", "atman", "maya", "moksha", "jnana", "viveka"]
+        karma_yoga: ["karma", "action", "duty", "dharma", "nishkama", "yajna"]
+        bhakti_yoga: ["bhakti", "devotion", "prema", "surrender", "ishvara"]
+        raja_yoga: ["meditation", "samadhi", "dharana", "dhyana", "pranayama"]
+        
+    linguistic_context:
+      enable: true
+      patterns:
+        sanskrit_compounds: "\\b\\w+[aeiou][mn]?\\w*\\b"
+        transliteration_markers: "[āīūṛḷēōṃḥṅñṭḍṇśṣ]"
+        verse_markers: "[।॥]"
+        technical_terms: "\\b(?:yoga|dharma|karma|moksha|samsara|nirvana)\\b"
+
+# Publication Quality Standards
+publication_quality:
+  # Quality assessment metrics
+  validation_metrics:
+    accuracy:
+      weight: 1.5
+      threshold_basic: 0.60
+      threshold_academic: 0.80
+      threshold_publication: 0.90
+      
+    consistency:
+      weight: 1.3
+      threshold_basic: 0.65
+      threshold_academic: 0.80
+      threshold_publication: 0.90
+      
+    completeness:
+      weight: 1.2
+      threshold_basic: 0.60
+      threshold_academic: 0.75
+      threshold_publication: 0.85
+      
+    scholarly_rigor:
+      weight: 1.4
+      threshold_basic: 0.55
+      threshold_academic: 0.80
+      threshold_publication: 0.90
+      
+    citation_quality:
+      weight: 1.5
+      threshold_basic: 0.60
+      threshold_academic: 0.85
+      threshold_publication: 0.95
+      
+    transliteration_standards:
+      weight: 1.4
+      threshold_basic: 0.65
+      threshold_academic: 0.85
+      threshold_publication: 0.95
+      
+    academic_formatting:
+      weight: 1.2
+      threshold_basic: 0.60
+      threshold_academic: 0.80
+      threshold_publication: 0.90
+
+  # Quality assurance levels
+  quality_assurance_levels:
+    draft:
+      minimum_score: 0.50
+      validation_required: false
+      
+    internal_review:
+      minimum_score: 0.70
+      validation_required: true
+      require_peer_review: false
+      
+    consultant_review:
+      minimum_score: 0.80
+      validation_required: true
+      require_consultant_approval: true
+      
+    peer_review:
+      minimum_score: 0.85
+      validation_required: true
+      require_consultant_approval: true
+      require_peer_review: true
+      
+    publication_ready:
+      minimum_score: 0.90
+      validation_required: true
+      require_consultant_approval: true
+      require_peer_review: true
+      require_final_validation: true
+
+# Consultant Review Workflow Configuration
+consultant_workflow:
+  # Workflow settings
+  enable_consultant_integration: true
+  require_human_verification: true
+  include_review_comments: true
+  
+  # Review priorities
+  priority_levels:
+    high:
+      quality_threshold: 0.90
+      response_time_hours: 24
+      
+    standard:
+      quality_threshold: 0.75
+      response_time_hours: 72
+      
+    low:
+      quality_threshold: 0.60
+      response_time_hours: 168  # 1 week
+  
+  # Review focus areas
+  focus_areas:
+    - "Citation accuracy and formatting"
+    - "Transliteration standards compliance"
+    - "Academic rigor assessment"
+    - "Publication readiness evaluation"
+    - "Scholarly integrity verification"
+    - "Methodological soundness review"
+  
+  # Consultant feedback integration
+  feedback_integration:
+    approval_threshold: 0.85
+    revision_threshold: 0.70
+    rejection_threshold: 0.50
+    
+    feedback_categories:
+      - "accuracy_verification"
+      - "academic_standards_compliance"
+      - "publication_readiness"
+      - "scholarly_rigor"
+      - "methodological_soundness"
+
+# Integration Configuration
+integration:
+  # Story 2.3 compatibility
+  story_2_3_compatibility:
+    maintain_existing_api: true
+    preserve_scripture_processor: true
+    extend_canonical_manager: true
+    
+  # Story 2.1 compatibility  
+  story_2_1_compatibility:
+    maintain_sanskrit_hindi_system: true
+    preserve_lexicon_manager: true
+    extend_iast_formatting: true
+    
+  # Story 2.3 integration  
+  story_2_3_integration:
+    enhance_scripture_processing: true
+    preserve_canonical_text_manager: true
+    extend_verse_selection: true
+    maintain_existing_api: true
+    
+  # Backward compatibility
+  backward_compatibility:
+    preserve_existing_workflows: true
+    maintain_api_contracts: true
+    support_legacy_configurations: true
+    ensure_seamless_upgrades: true
+    
+  # API preservation
+  preserve_existing_api:
+    scripture_processor_methods: true
+    sanskrit_hindi_identifier_methods: true
+    lexicon_manager_interface: true
+    result_data_structures: true
+    
+  # MCP integration (Stories 4.1-4.2)
+  mcp_integration:
+    enable_mcp_enhancement: true
+    parallel_development_support: true
+    convergence_point_story_4_4: true
+
+# Performance Configuration
+performance:
+  # Processing optimization
+  optimization:
+    enable_caching: true
+    cache_timeout_hours: 24
+    max_concurrent_validations: 5
+    
+  # Resource management
+  resource_limits:
+    max_content_length: 50000  # characters
+    max_citations_per_document: 200
+    max_processing_time_seconds: 300  # 5 minutes
+    
+  # Quality vs. speed tradeoffs
+  quality_speed_balance:
+    fast_mode:
+      reduced_validation_rules: true
+      skip_non_critical_checks: true
+      
+    balanced_mode:
+      full_validation: true
+      moderate_performance: true
+      
+    thorough_mode:
+      comprehensive_validation: true
+      maximum_quality_assurance: true
+
+# Output Formats Configuration
+output_formats:
+  # Supported output formats
+  formats:
+    markdown:
+      enable: true
+      include_metadata: true
+      include_validation_report: true
+      
+    latex:
+      enable: false  # Disabled for initial implementation
+      template: "academic_article"
+      
+    word_compatible:
+      enable: true
+      format: "docx_compatible_markdown"
+      
+    json:
+      enable: true
+      include_full_metadata: true
+      include_validation_details: true
+      
+    html:
+      enable: false  # For future implementation
+      
+  # Bibliography generation
+  bibliography:
+    auto_generate: true
+    style: "indological_standard"
+    include_full_citations: true
+    group_by_source: true
+    
+  # Appendices generation
+  appendices:
+    auto_generate: false
+    include_validation_report: true
+    include_methodology_notes: true
+    include_consultant_reviews: false  # Privacy consideration
+
+# Logging and Monitoring Configuration
+logging:
+  # Validation logging
+  log_level: "INFO"
+  log_validation_results: true
+  log_performance_metrics: true
+  
+  # Academic process logging
+  log_citation_generation: true
+  log_quality_assessments: true
+  log_consultant_interactions: false  # Privacy consideration
+  
+  # Error handling
+  detailed_error_logging: true
+  capture_validation_failures: true
+  performance_issue_alerts: true
+
+# Security and Privacy Configuration
+security:
+  # Data protection
+  protect_consultant_communications: true
+  anonymize_validation_logs: true
+  secure_citation_database: true
+  
+  # Access control
+  restrict_high_quality_features: false
+  require_authentication_for_consultant: true
+  audit_academic_modifications: true

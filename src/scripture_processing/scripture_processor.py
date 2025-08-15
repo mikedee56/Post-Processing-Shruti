@@ -63,6 +63,12 @@ class ScriptureProcessor:
         self.enable_hybrid_matching = self.config.get('enable_hybrid_matching', False)
         self.hybrid_engine = None
         
+        # Story 4.5 - Academic enhancement configuration
+        self.enable_academic_enhancement = self.config.get('enable_academic_enhancement', False)
+        self.academic_citation_manager = None
+        self.publication_formatter = None
+        self.academic_validator = None
+        
         # Initialize components
         self.canonical_manager = CanonicalTextManager(
             scripture_dir=scripture_dir,
@@ -125,6 +131,34 @@ class ScriptureProcessor:
             except Exception as e:
                 self.logger.error(f"Failed to initialize hybrid matching engine: {e}")
                 self.enable_hybrid_matching = False
+        
+        # Initialize academic enhancement components if enabled (Story 4.5)
+        if self.enable_academic_enhancement:
+            try:
+                from .academic_citation_manager import AcademicCitationManager
+                from .publication_formatter import PublicationFormatter  
+                from ..utils.academic_validator import AcademicValidator
+                
+                # Initialize academic components
+                self.academic_citation_manager = AcademicCitationManager(
+                    config=self.config.get('academic_citation', {})
+                )
+                
+                self.publication_formatter = PublicationFormatter(
+                    canonical_manager=self.canonical_manager,
+                    citation_manager=self.academic_citation_manager,
+                    config=self.config.get('publication_formatter', {})
+                )
+                
+                self.academic_validator = AcademicValidator(
+                    config=self.config.get('academic_validator', {})
+                )
+                
+                self.logger.info("Academic enhancement components initialized (Story 4.5)")
+                
+            except Exception as e:
+                self.logger.error(f"Failed to initialize academic enhancement components: {e}")
+                self.enable_academic_enhancement = False
         
         self.logger.info("Scripture processor initialized with all components")
     
