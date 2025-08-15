@@ -1,0 +1,273 @@
+# Production Configuration for MCP Pipeline Excellence System
+# Story 4.4: Integration and Hardening - Production Environment Settings
+
+# System Configuration
+system:
+  story_version: "4.4"
+  environment: "production"
+  debug_mode: false
+  log_level: "INFO"
+  
+# Processing Configuration
+processing:
+  # Performance targets
+  max_processing_time_per_segment: 1.0  # seconds
+  throughput_target: 10.0  # segments per second
+  
+  # Resource limits
+  max_memory_usage_mb: 1024
+  max_cpu_usage_percent: 80
+  max_concurrent_files: 10
+  
+  # Quality targets
+  sanskrit_accuracy_improvement_target: 15.0  # percent
+  uptime_requirement: 99.9  # percent
+  
+  # Processing options
+  enable_mcp_processing: true
+  enable_sanskrit_enhancement: true
+  enable_ner_processing: true
+  enable_academic_polish: true
+  enable_quality_validation: true
+
+# MCP Configuration
+mcp:
+  enabled: true
+  timeout_seconds: 30
+  retry_attempts: 3
+  context_aware_processing: true
+  fallback_to_traditional: true
+  
+  # Performance settings
+  max_concurrent_requests: 5
+  request_timeout: 10
+  
+  # Context processing
+  enable_scriptural_context: true
+  enable_mathematical_context: true
+  enable_temporal_context: true
+  enable_idiomatic_preservation: true
+
+# Sanskrit Enhancement Configuration
+sanskrit_enhancement:
+  enabled: true
+  
+  # Lexicon settings
+  enhanced_lexicon_enabled: true
+  fuzzy_matching_enabled: true
+  phonetic_matching_enabled: true
+  
+  # Accuracy validation
+  accuracy_validation_enabled: true
+  accuracy_threshold: 0.85
+  
+  # Research metrics
+  research_metrics_enabled: true
+  metrics_collection_level: "detailed"
+
+# NER Configuration
+ner:
+  enabled: true
+  
+  # Capitalization settings
+  capitalization_enabled: true
+  context_aware_capitalization: true
+  
+  # Model settings
+  model_confidence_threshold: 0.75
+  enable_proper_noun_detection: true
+  enable_scripture_detection: true
+
+# Academic Polish Configuration
+academic_polish:
+  enabled: true
+  
+  # Polish options
+  enable_capitalization_fixes: true
+  enable_punctuation_improvements: true
+  enable_sentence_structure_enhancement: true
+  enable_academic_terminology_standardization: true
+  
+  # Quality thresholds
+  minimum_quality_score: 0.80
+  academic_compliance_threshold: 0.85
+
+# Quality Assurance Configuration
+quality_assurance:
+  enabled: true
+  
+  # Validation levels
+  enable_syntax_validation: true
+  enable_semantic_validation: true
+  enable_accuracy_validation: true
+  enable_performance_validation: true
+  
+  # Thresholds
+  minimum_confidence_score: 0.70
+  maximum_error_rate: 0.05
+  quality_gate_threshold: 0.80
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Metrics collection
+  collect_performance_metrics: true
+  collect_quality_metrics: true
+  collect_error_metrics: true
+  collect_system_metrics: true
+  
+  # Retention settings
+  metrics_retention_days: 30
+  detailed_logs_retention_days: 7
+  
+  # Alerting thresholds
+  performance_degradation_threshold: 2.0  # 2x normal processing time
+  error_rate_threshold: 0.10  # 10% error rate
+  memory_usage_threshold: 0.90  # 90% memory usage
+  
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "structured"
+  
+  # File logging
+  enable_file_logging: true
+  log_file_path: "logs/production.log"
+  max_log_file_size_mb: 100
+  log_rotation_count: 10
+  
+  # Component logging levels
+  component_levels:
+    sanskrit_processor: "INFO"
+    mcp_client: "INFO"
+    ner_module: "INFO"
+    quality_assurance: "INFO"
+    performance_monitor: "INFO"
+
+# Security Configuration
+security:
+  # Input validation
+  enable_input_validation: true
+  max_file_size_mb: 100
+  allowed_file_extensions: [".srt", ".txt"]
+  
+  # Output security
+  sanitize_output: true
+  prevent_path_traversal: true
+  
+  # System security
+  run_with_limited_privileges: true
+  disable_unsafe_operations: true
+
+# Backup Configuration
+backup:
+  enabled: true
+  
+  # Backup settings
+  backup_frequency: "daily"
+  backup_retention_days: 30
+  backup_location: "backup/"
+  
+  # Backup types
+  enable_data_backup: true
+  enable_config_backup: true
+  enable_metrics_backup: true
+
+# Deployment Configuration
+deployment:
+  # Deployment metadata
+  deployment_id: null  # Set during deployment
+  deployment_timestamp: null  # Set during deployment
+  deployed_by: null  # Set during deployment
+  
+  # Environment validation
+  validate_environment: true
+  require_certification: true
+  
+  # Rollback settings
+  enable_rollback: true
+  rollback_timeout_minutes: 10
+  preserve_rollback_data: true
+  
+  # Zero-downtime deployment
+  enable_blue_green_deployment: false  # For future implementation
+  health_check_enabled: true
+  health_check_timeout_seconds: 30
+
+# Performance Baselines
+performance_baselines:
+  # Processing performance
+  baseline_processing_time_per_segment: 0.5  # seconds
+  baseline_throughput: 15.0  # segments per second
+  baseline_memory_usage_mb: 512
+  baseline_cpu_usage_percent: 40
+  
+  # Quality baselines
+  baseline_sanskrit_accuracy: 85.0  # percent
+  baseline_overall_quality_score: 0.90
+  baseline_error_rate: 0.02  # 2%
+  
+  # System baselines
+  baseline_uptime: 99.95  # percent
+  baseline_response_time: 0.3  # seconds
+  baseline_recovery_time: 60  # seconds
+
+# Integration Settings
+integration:
+  # Story 4.1 - MCP Infrastructure
+  mcp_infrastructure_enabled: true
+  context_aware_processing_enabled: true
+  
+  # Story 4.2 - Sanskrit Enhancement
+  sanskrit_enhancement_enabled: true
+  ml_enhanced_lexicon_enabled: true
+  
+  # Story 4.3 - Production Excellence
+  production_excellence_enabled: true
+  enterprise_monitoring_enabled: true
+  
+  # Existing system compatibility
+  maintain_backward_compatibility: true
+  existing_api_compatibility: true
+
+# Environment Variables (for reference)
+environment_variables:
+  PYTHONPATH: "${PROJECT_ROOT}/src"
+  LOG_LEVEL: "INFO"
+  ENVIRONMENT: "production"
+  MONITORING_ENABLED: "true"
+  
+# Feature Flags
+feature_flags:
+  # Story 4.1 features
+  mcp_transformer_processing: true
+  context_aware_number_conversion: true
+  
+  # Story 4.2 features
+  enhanced_lexicon_management: true
+  ml_sanskrit_accuracy_validation: true
+  research_metrics_collection: true
+  
+  # Story 4.3 features
+  enterprise_monitoring: true
+  sub_second_performance_optimization: true
+  reliability_enhancements: true
+  
+  # Story 4.4 features
+  end_to_end_testing: true
+  production_certification: true
+  emergency_procedures: true
+  
+# Experimental Features (disabled in production)
+experimental:
+  # Future enhancements
+  advanced_ai_processing: false
+  real_time_collaboration: false
+  cloud_native_deployment: false
+  
+# Version Information
+version_info:
+  config_version: "4.4.0"
+  last_updated: "2025-08-14"
+  compatible_system_versions: ["4.1", "4.2", "4.3", "4.4"]
