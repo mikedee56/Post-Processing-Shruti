@@ -82,17 +82,56 @@ This is a **MVP monolith** designed for progressive complexity:
 - `is_proper_noun`/`is_verse` (boolean): Classification flags
 - `canonical_text` (string): Full scriptural text for verses
 
+## Environment Setup (CRITICAL)
+
+**⚠️ REQUIRED: Always activate the virtual environment before testing or development**
+
+The project uses a configured virtual environment with all dependencies pre-installed:
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate  # Linux/Mac
+# OR
+.venv\Scripts\activate.bat  # Windows
+
+# Set Python path for imports
+export PYTHONPATH=/path/to/project/src
+# OR (Windows)
+set PYTHONPATH=D:\Post-Processing-Shruti\src
+
+# Verify environment
+python -c "import fuzzywuzzy, sanskrit_parser, pysrt, yaml; print('Environment ready')"
+```
+
+**Dependencies installed in virtual environment:**
+- Core: `fuzzywuzzy`, `python-Levenshtein`, `pysrt`, `pyyaml`, `structlog`
+- Sanskrit/Hindi: `sanskrit_parser`, `indic-nlp-library`, `inltk`
+- Data processing: `pandas`, `numpy`, `scipy`
+- Academic features: All Story 4.5 dependencies
+
 ## Testing Requirements
 
 Follow a **Full Testing Pyramid** approach:
+- **ALWAYS use virtual environment**: `.venv\Scripts\python.exe` (Windows) or `.venv/bin/python` (Linux/Mac)
 - Unit tests for individual functions
 - Integration tests for the complete pipeline
 - Use golden dataset for accuracy measurements (WER/CER reduction)
 
+### Running Tests
+```bash
+# Activate environment first
+source .venv/bin/activate
+
+# Run Story 4.5 validation
+PYTHONPATH=/path/to/project/src python test_story_4_5_final_validation.py
+
+# Run integration tests
+PYTHONPATH=/path/to/project/src python test_task_4_system_integration.py
+```
+
 ## Important Notes
 
-- **No build/lint commands available** - this is a planning-stage project
-- The existing `sanskrit_post_processor.py` script needs to be integrated
+- **CRITICAL**: All testing must use the virtual environment - dependency issues are environmental, not implementation issues
 - Focus on defensive security - this processes academic content only
 - Maintain academic integrity and IAST transliteration standards
 - All external lexicons should be version-controlled JSON/YAML files

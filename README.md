@@ -28,9 +28,31 @@ A sophisticated post-processing system designed to transform ASR-generated trans
 
 ### Installation
 
+**⚠️ IMPORTANT: This project uses a pre-configured virtual environment**
+
 ```bash
 git clone https://github.com/your-org/post-processing-shruti.git
 cd post-processing-shruti
+
+# Activate the pre-configured virtual environment
+source .venv/bin/activate  # Linux/Mac
+# OR
+.venv\Scripts\activate.bat  # Windows
+
+# Verify installation
+python -c "import fuzzywuzzy, sanskrit_parser, pysrt; print('✅ Environment ready')"
+```
+
+**If virtual environment is missing or corrupted:**
+```bash
+# Create new virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# OR
+python -m venv .venv
+.venv\Scripts\activate.bat  # Windows
+
+# Install all dependencies
 pip install -r requirements.txt
 ```
 
