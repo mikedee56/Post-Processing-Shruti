@@ -20,7 +20,7 @@ import json
 from .academic_citation_manager import AcademicCitationManager, AcademicCitation, CitationStyle
 from .advanced_verse_matcher import AdvancedVerseMatcher, ContextualMatchingResult
 from .canonical_text_manager import CanonicalTextManager, VerseCandidate
-from ..utils.logger_config import get_logger
+from utils.logger_config import get_logger
 
 
 class PublicationStandard(Enum):
@@ -53,7 +53,7 @@ class ConsultantReview:
     review_id: str = ""
     document_id: str = ""
     consultant_name: str = ""
-    review_date: datetime = field(default_factory=datetime.now)
+    review_date: datetime.datetime = field(default_factory=datetime.datetime.now)
     
     # Review status
     status: str = "pending"  # pending, in_progress, completed, approved, rejected
@@ -103,7 +103,7 @@ class AcademicCompliance:
     priority_fixes: List[str] = field(default_factory=list)
     
     # Validation metadata
-    validation_date: datetime = field(default_factory=datetime.now)
+    validation_date: datetime.datetime = field(default_factory=datetime.datetime.now)
     validator_version: str = "4.5.0"
 
 
@@ -1793,6 +1793,9 @@ excellence and publication readiness.
         title = document.title if hasattr(document, 'title') else 'Untitled'
         content_text = document.content if hasattr(document, 'content') else ""
         
+        # Process content text for HTML (move replacement outside f-string)
+        html_content = content_text.replace('\n', '<br>')
+        
         html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -1807,7 +1810,7 @@ excellence and publication readiness.
 <body>
     <h1>{title}</h1>
     <div class="content">
-        {content_text.replace('\n', '<br>')}
+        {html_content}
     </div>
 </body>
 </html>"""

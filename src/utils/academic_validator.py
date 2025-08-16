@@ -17,7 +17,7 @@ import re
 import datetime
 import json
 
-from ..utils.logger_config import get_logger
+from utils.logger_config import get_logger
 
 
 class AcademicStandard(Enum):

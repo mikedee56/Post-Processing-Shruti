@@ -21,7 +21,7 @@ from .hybrid_matching_engine import (
     MatchingStage, SourceProvenance
 )
 from .canonical_text_manager import CanonicalTextManager, VerseCandidate
-from ..utils.logger_config import get_logger
+from utils.logger_config import get_logger
 
 
 class ContextualMatchingMode(Enum):
