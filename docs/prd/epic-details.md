@@ -116,7 +116,7 @@
 **so that** I can provide accurate corrections based on my expertise.
 
 **Acceptance Criteria**
-1.  The system provides a mechanism for a general proofreader (GP) to easily flag issues for a Subject Matter Expert (SME) review, with a line and a comment/question, in a Google Docs-style workflow.
+1.  The system provides a mechanism for a general proofreader (GP) to easily flag issues for a Subject Matter Expert (SME) review, with a line and a comment/question, in a Google Docs-style wofirstrkflow.
 2.  The system implements a rating system that matches the editor's level of expertise with the difficulty or complexity of the scripture involved in a particular transcript.
 3.  The system provides a feedback loop to incorporate human corrections from the review process back into tche post-processing script and external lexicons.
 

@@ -1,0 +1,78 @@
+{
+  "test_suite": "real_content_pipeline",
+  "timestamp": 1755321839.9439518,
+  "total_tests": 3,
+  "successful_tests": 3,
+  "total_processing_time": 4.287739276885986,
+  "results": [
+    {
+      "test_name": "yoga_lecture_1",
+      "processing_time": 1.4001774787902832,
+      "input_segments": 5,
+      "output_segments": 5,
+      "quality_improvements": {
+        "filler_words_removed": 1.0,
+        "numbers_converted": 1.0,
+        "sanskrit_terms_corrected": 0.0,
+        "capitalization_improved": 2.0
+      },
+      "accuracy_metrics": {
+        "segments_modified": 5,
+        "average_confidence": 0.6386440840930571,
+        "processing_time": 1.399176836013794
+      },
+      "integration_points_tested": [
+        "sanskrit_post_processor"
+      ],
+      "error_count": 0,
+      "warnings": [],
+      "success": true
+    },
+    {
+      "test_name": "yoga_lecture_2",
+      "processing_time": 1.1882679462432861,
+      "input_segments": 5,
+      "output_segments": 5,
+      "quality_improvements": {
+        "filler_words_removed": 1.0,
+        "numbers_converted": 1.0,
+        "sanskrit_terms_corrected": 0.0,
+        "capitalization_improved": 2.0
+      },
+      "accuracy_metrics": {
+        "segments_modified": 4,
+        "average_confidence": 0.6662436209908307,
+        "processing_time": 1.1872656345367432
+      },
+      "integration_points_tested": [
+        "sanskrit_post_processor"
+      ],
+      "error_count": 0,
+      "warnings": [],
+      "success": true
+    },
+    {
+      "test_name": "yoga_lecture_3",
+      "processing_time": 1.699293851852417,
+      "input_segments": 5,
+      "output_segments": 5,
+      "quality_improvements": {
+        "filler_words_removed": 0.0,
+        "numbers_converted": 0.0,
+        "sanskrit_terms_corrected": 0.0,
+        "capitalization_improved": 0.0
+      },
+      "accuracy_metrics": {
+        "segments_modified": 3,
+        "average_confidence": 0.7164444444444444,
+        "processing_time": 1.699293851852417
+      },
+      "integration_points_tested": [
+        "sanskrit_post_processor"
+      ],
+      "error_count": 0,
+      "warnings": [],
+      "success": true
+    }
+  ]
+}

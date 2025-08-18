@@ -1,0 +1,39 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp_aacgcqg.srt",
+  "processing_time": 1.549407720565796,
+  "total_segments": 4,
+  "segments_modified": 4,
+  "corrections_applied": {
+    "ner_entities_identified": 9,
+    "ner_capitalizations": 5,
+    "mcp_context_aware_number_processing": 3,
+    "removed_filler_words": 2,
+    "fixed_capitalization": 2,
+    "ner_processing": 4,
+    "sanskrit_hindi_direct_replacement": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.356) in segment"
+  ],
+  "original_word_count": 55,
+  "processed_word_count": 49,
+  "original_char_count": 323,
+  "processed_char_count": 277,
+  "confidence_scores": [
+    0.5354761904761904,
+    0.6718390804597701,
+    0.7373626373626373,
+    0.5825307125307124
+  ],
+  "average_confidence": 0.6318021552073276,
+  "flagged_segments": 4,
+  "parsing_time": 0.0,
+  "normalization_time": 0.022115707397460938,
+  "correction_time": 1.5194473266601562,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-17T04:35:54.398486+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

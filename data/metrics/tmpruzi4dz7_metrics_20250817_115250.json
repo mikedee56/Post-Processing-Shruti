@@ -1,0 +1,39 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpruzi4dz7.srt",
+  "processing_time": 0.5213840007781982,
+  "total_segments": 3,
+  "segments_modified": 3,
+  "corrections_applied": {
+    "ner_entities_identified": 6,
+    "ner_capitalizations": 5,
+    "mcp_context_aware_number_processing": 3,
+    "removed_filler_words": 1,
+    "fixed_capitalization": 2,
+    "ner_processing": 3,
+    "sanskrit_hindi_direct_replacement": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.320) in segment",
+    "High semantic drift (0.354) in segment"
+  ],
+  "original_word_count": 39,
+  "processed_word_count": 35,
+  "original_char_count": 234,
+  "processed_char_count": 200,
+  "confidence_scores": [
+    0.528974358974359,
+    0.6357831325301204,
+    0.7066385669125393
+  ],
+  "average_confidence": 0.6237986861390062,
+  "flagged_segments": 3,
+  "parsing_time": 0.0,
+  "normalization_time": 0.003000020980834961,
+  "correction_time": 0.5083801746368408,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-17T15:52:50.096996+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

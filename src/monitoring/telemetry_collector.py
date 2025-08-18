@@ -175,6 +175,51 @@ class TelemetryCollector:
         
         # Update component metrics immediately for real-time access
         self._update_component_metrics(event)
+
+    def record_event(self, event_type: str, data: Dict[str, Any], 
+                    source_component: Optional[str] = None,
+                    tags: Optional[Dict[str, str]] = None,
+                    severity: AlertSeverity = AlertSeverity.INFO):
+        """
+        Simplified event recording API for backward compatibility.
+        
+        This method provides a simplified interface that matches the expected API
+        used throughout the codebase. It delegates to collect_event with sensible defaults.
+        
+        Args:
+            event_type: Type of event being recorded
+            data: Event data dictionary
+            source_component: Source component (auto-detected if not provided)
+            tags: Optional tags for the event
+            severity: Event severity level
+        """
+        # Auto-detect source component from stack trace if not provided
+        if source_component is None:
+            import inspect
+            frame = inspect.currentframe()
+            try:
+                # Get the caller's module name
+                caller_frame = frame.f_back
+                if caller_frame and caller_frame.f_globals:
+                    module_name = caller_frame.f_globals.get('__name__', 'unknown')
+                    # Extract component name from module path
+                    if '.' in module_name:
+                        source_component = module_name.split('.')[-1]
+                    else:
+                        source_component = module_name
+                else:
+                    source_component = 'unknown'
+            finally:
+                del frame
+        
+        # Delegate to the main collect_event method
+        self.collect_event(
+            event_type=event_type,
+            source_component=source_component,
+            data=data,
+            tags=tags,
+            severity=severity
+        )
     
     def collect_processing_telemetry(self, operation_name: str, component: str,
                                    processing_time_ms: float, success: bool,

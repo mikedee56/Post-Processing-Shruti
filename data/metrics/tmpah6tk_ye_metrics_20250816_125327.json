@@ -1,0 +1,39 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpah6tk_ye.srt",
+  "processing_time": 0.3152029514312744,
+  "total_segments": 3,
+  "segments_modified": 3,
+  "corrections_applied": {
+    "sanskrit_hindi_direct_replacement": 2,
+    "ner_entities_identified": 1,
+    "ner_capitalizations": 0,
+    "removed_filler_words": 1,
+    "ner_processing": 3,
+    "mcp_context_aware_number_processing": 2,
+    "fixed_capitalization": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.322) in segment",
+    "High semantic drift (0.324) in segment"
+  ],
+  "original_word_count": 32,
+  "processed_word_count": 28,
+  "original_char_count": 181,
+  "processed_char_count": 151,
+  "confidence_scores": [
+    0.6414285714285715,
+    0.646774193548387,
+    0.6553571428571429
+  ],
+  "average_confidence": 0.6478533026113671,
+  "flagged_segments": 3,
+  "parsing_time": 0.0010013580322265625,
+  "normalization_time": 0.005016803741455078,
+  "correction_time": 0.30419278144836426,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T16:53:27.060953+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

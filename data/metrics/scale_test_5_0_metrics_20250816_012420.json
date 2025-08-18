@@ -1,0 +1,39 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpmyglxgpw\\scale_test_5_0.srt",
+  "processing_time": 0.9251317977905273,
+  "total_segments": 5,
+  "segments_modified": 5,
+  "corrections_applied": {
+    "sanskrit_hindi_direct_replacement": 6,
+    "ner_entities_identified": 4,
+    "ner_capitalizations": 2,
+    "fixed_capitalization": 3,
+    "ner_processing": 5,
+    "legacy_lexicon_correction": 2,
+    "removed_filler_words": 2,
+    "mcp_context_aware_number_processing": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [],
+  "original_word_count": 66,
+  "processed_word_count": 61,
+  "original_char_count": 392,
+  "processed_char_count": 359,
+  "confidence_scores": [
+    0.669130869130869,
+    0.6923076923076923,
+    0.4834146341463414,
+    0.70875,
+    0.6396172248803828
+  ],
+  "average_confidence": 0.6386440840930571,
+  "flagged_segments": 5,
+  "parsing_time": 0.0,
+  "normalization_time": 0.06332278251647949,
+  "correction_time": 0.84981369972229,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T05:24:19.224311+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

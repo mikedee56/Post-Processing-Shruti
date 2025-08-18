@@ -1,0 +1,36 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp786i_mo6\\quality_test.srt",
+  "processing_time": 0.19592952728271484,
+  "total_segments": 2,
+  "segments_modified": 2,
+  "corrections_applied": {
+    "ner_entities_identified": 2,
+    "ner_capitalizations": 2,
+    "mcp_context_aware_number_processing": 1,
+    "removed_filler_words": 2,
+    "fixed_capitalization": 2,
+    "ner_processing": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.474) in segment"
+  ],
+  "original_word_count": 23,
+  "processed_word_count": 18,
+  "original_char_count": 126,
+  "processed_char_count": 99,
+  "confidence_scores": [
+    0.4983898305084746,
+    0.6241791044776118
+  ],
+  "average_confidence": 0.5612844674930432,
+  "flagged_segments": 2,
+  "parsing_time": 0.0019240379333496094,
+  "normalization_time": 0.023010969161987305,
+  "correction_time": 0.1660022735595703,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T05:25:05.101440+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

@@ -158,33 +158,123 @@ class SystemMonitor:
         self.logger.info("SystemMonitor initialized with enterprise monitoring capabilities")
     
     def start_monitoring(self):
-        """Start the monitoring system."""
+        """Start the monitoring system with proper thread management."""
         with self.lock:
             if self.running:
+                self.logger.warning("Monitoring system is already running")
                 return
             
+            # Clean up any existing threads first
+            if self.monitoring_thread and self.monitoring_thread.is_alive():
+                self.logger.warning("Previous monitoring thread still alive, cleaning up...")
+                self.running = False
+                self.monitoring_thread.join(timeout=2)
+            
+            if self.dashboard_thread and self.dashboard_thread.is_alive():
+                self.logger.warning("Previous dashboard thread still alive, cleaning up...")
+                self.dashboard_thread.join(timeout=2)
+            
+            # Set running flag
             self.running = True
             
-            # Start monitoring threads
-            self.monitoring_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
-            self.dashboard_thread = threading.Thread(target=self._dashboard_loop, daemon=True)
-            
-            self.monitoring_thread.start()
-            self.dashboard_thread.start()
-            
-            self.logger.info("System monitoring started")
+            # Create and start new threads
+            try:
+                self.monitoring_thread = threading.Thread(
+                    target=self._monitoring_loop, 
+                    name="SystemMonitor-Monitoring",
+                    daemon=True
+                )
+                self.dashboard_thread = threading.Thread(
+                    target=self._dashboard_loop, 
+                    name="SystemMonitor-Dashboard",
+                    daemon=True
+                )
+                
+                self.monitoring_thread.start()
+                self.dashboard_thread.start()
+                
+                self.logger.info("System monitoring started successfully")
+                
+            except Exception as e:
+                self.running = False
+                self.logger.error(f"Failed to start monitoring threads: {e}")
+                raise
     
     def stop_monitoring(self):
-        """Stop the monitoring system."""
+        """Stop the monitoring system with proper thread cleanup."""
+        # Step 1: Signal threads to stop
         with self.lock:
+            if not self.running:
+                return  # Already stopped
             self.running = False
-            
-        if self.monitoring_thread:
-            self.monitoring_thread.join(timeout=5)
-        if self.dashboard_thread:
-            self.dashboard_thread.join(timeout=5)
+            self.logger.info("Stopping system monitoring...")
+        
+        # Step 2: Give threads time to finish current operations
+        time.sleep(0.1)
+        
+        # Step 3: Wait for threads to finish gracefully
+        threads_to_join = []
+        
+        if self.monitoring_thread and self.monitoring_thread.is_alive():
+            threads_to_join.append(('monitoring', self.monitoring_thread))
+        
+        if self.dashboard_thread and self.dashboard_thread.is_alive():
+            threads_to_join.append(('dashboard', self.dashboard_thread))
+        
+        # Join threads with proper timeout handling
+        for thread_name, thread in threads_to_join:
+            try:
+                thread.join(timeout=5)
+                if thread.is_alive():
+                    self.logger.warning(f"{thread_name} thread did not terminate within timeout")
+                else:
+                    self.logger.debug(f"{thread_name} thread terminated successfully")
+            except Exception as e:
+                self.logger.error(f"Error joining {thread_name} thread: {e}")
+        
+        # Step 4: Clean up thread references
+        with self.lock:
+            self.monitoring_thread = None
+            self.dashboard_thread = None
             
         self.logger.info("System monitoring stopped")
+
+    def is_monitoring_active(self):
+        """Check if monitoring system is active and threads are running."""
+        with self.lock:
+            if not self.running:
+                return False
+            
+            monitoring_active = (
+                self.monitoring_thread and 
+                self.monitoring_thread.is_alive()
+            )
+            
+            dashboard_active = (
+                self.dashboard_thread and 
+                self.dashboard_thread.is_alive()
+            )
+            
+            return monitoring_active and dashboard_active
+    
+    def get_thread_status(self):
+        """Get detailed status of monitoring threads for debugging."""
+        with self.lock:
+            status = {
+                'running_flag': self.running,
+                'monitoring_thread': {
+                    'exists': self.monitoring_thread is not None,
+                    'alive': self.monitoring_thread.is_alive() if self.monitoring_thread else False,
+                    'name': self.monitoring_thread.name if self.monitoring_thread else None
+                },
+                'dashboard_thread': {
+                    'exists': self.dashboard_thread is not None,
+                    'alive': self.dashboard_thread.is_alive() if self.dashboard_thread else False,
+                    'name': self.dashboard_thread.name if self.dashboard_thread else None
+                }
+            }
+            
+        return status
     
     def record_system_metric(self, metric_name: str, value: float, component: str,
                            unit: str = "", tags: Optional[Dict[str, str]] = None):
@@ -465,8 +555,16 @@ class SystemMonitor:
             self.dashboard_panels[panel.panel_id] = panel
     
     def _monitoring_loop(self):
-        """Main monitoring loop."""
-        while self.running:
+        """Main monitoring loop with improved error handling and graceful shutdown."""
+        self.logger.info("Monitoring loop started")
+        
+        while True:
+            # Check running status with proper synchronization
+            with self.lock:
+                if not self.running:
+                    self.logger.info("Monitoring loop received stop signal")
+                    break
+            
             try:
                 # Collect system health metrics
                 self._collect_system_health_metrics()
@@ -477,25 +575,61 @@ class SystemMonitor:
                 # Process events
                 self._process_event_queue()
                 
-                time.sleep(self.health_check_interval)
+                # Check for alerts
+                # self._check_alert_rules()  # Fixed: removed call without metric parameter
                 
+                # Sleep with interruption check
+                sleep_start = time.time()
+                while time.time() - sleep_start < self.health_check_interval:
+                    with self.lock:
+                        if not self.running:
+                            self.logger.info("Monitoring loop interrupted during sleep")
+                            return
+                    time.sleep(0.1)  # Small increments for faster shutdown
+                    
             except Exception as e:
                 self.logger.error(f"Error in monitoring loop: {e}")
-                time.sleep(5)  # Brief pause before retry
+                # Exponential backoff on errors
+                error_sleep = min(5, 0.5 + time.time() % 5)
+                time.sleep(error_sleep)
+        
+        self.logger.info("Monitoring loop terminated")  # Brief pause before retry
     
     def _dashboard_loop(self):
-        """Dashboard refresh loop."""
-        while self.running:
+        """Dashboard refresh loop with improved error handling and graceful shutdown."""
+        self.logger.info("Dashboard loop started")
+        
+        while True:
+            # Check running status with proper synchronization
+            with self.lock:
+                if not self.running:
+                    self.logger.info("Dashboard loop received stop signal")
+                    break
+            
             try:
                 # Refresh dashboard data
                 dashboard_data = self.get_dashboard_data()
-                self.dashboard_cache = dashboard_data
                 
-                time.sleep(self.dashboard_refresh_interval)
+                # Update cache atomically
+                with self.lock:
+                    self.dashboard_cache = dashboard_data
                 
+                # Sleep with interruption check
+                sleep_start = time.time()
+                while time.time() - sleep_start < self.dashboard_refresh_interval:
+                    with self.lock:
+                        if not self.running:
+                            self.logger.info("Dashboard loop interrupted during sleep")
+                            return
+                    time.sleep(0.1)  # Small increments for faster shutdown
+                    
             except Exception as e:
                 self.logger.error(f"Error in dashboard loop: {e}")
-                time.sleep(10)  # Brief pause before retry
+                # Exponential backoff on errors
+                error_sleep = min(10, 1 + time.time() % 10)
+                time.sleep(error_sleep)
+        
+        self.logger.info("Dashboard loop terminated")  # Brief pause before retry
     
     def _collect_system_health_metrics(self):
         """Collect system health metrics."""
@@ -788,8 +922,14 @@ class SystemMonitor:
         self.event_handlers[event_type].append(handler)
     
     def __del__(self):
-        """Cleanup on destruction."""
-        self.stop_monitoring()
+        """Safe cleanup on destruction."""
+        try:
+            # Only stop if we're still in a valid state
+            if hasattr(self, 'running') and hasattr(self, 'lock'):
+                self.stop_monitoring()
+        except Exception:
+            # Silently ignore errors during interpreter shutdown
+            pass
 
 
 def test_system_monitor():

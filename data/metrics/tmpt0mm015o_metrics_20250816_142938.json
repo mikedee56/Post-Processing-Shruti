@@ -1,0 +1,42 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpt0mm015o.srt",
+  "processing_time": 0.6993343830108643,
+  "total_segments": 5,
+  "segments_modified": 5,
+  "corrections_applied": {
+    "sanskrit_hindi_direct_replacement": 8,
+    "ner_entities_identified": 3,
+    "ner_capitalizations": 1,
+    "removed_filler_words": 3,
+    "fixed_capitalization": 3,
+    "ner_processing": 5,
+    "mcp_context_aware_number_processing": 2,
+    "legacy_lexicon_correction": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.386) in segment",
+    "High semantic drift (0.367) in segment"
+  ],
+  "original_word_count": 59,
+  "processed_word_count": 52,
+  "original_char_count": 358,
+  "processed_char_count": 303,
+  "confidence_scores": [
+    0.5848221343873518,
+    0.6263888888888888,
+    0.5828358208955224,
+    0.5598601398601398,
+    0.638560606060606
+  ],
+  "average_confidence": 0.5984935180185018,
+  "flagged_segments": 5,
+  "parsing_time": 0.0,
+  "normalization_time": 0.01700305938720703,
+  "correction_time": 0.6743180751800537,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T18:29:37.578382+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

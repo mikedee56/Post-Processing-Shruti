@@ -1,0 +1,32 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpfh5uhy1v\\accuracy_test.srt",
+  "processing_time": 0.18279385566711426,
+  "total_segments": 2,
+  "segments_modified": 1,
+  "corrections_applied": {
+    "ner_entities_identified": 2,
+    "ner_capitalizations": 2,
+    "fixed_capitalization": 1,
+    "ner_processing": 2
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [],
+  "original_word_count": 18,
+  "processed_word_count": 18,
+  "original_char_count": 98,
+  "processed_char_count": 100,
+  "confidence_scores": [
+    0.6988662131519273,
+    0.7611111111111111
+  ],
+  "average_confidence": 0.7299886621315193,
+  "flagged_segments": 2,
+  "parsing_time": 0.0,
+  "normalization_time": 0.026025772094726562,
+  "correction_time": 0.15176916122436523,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T05:25:04.459362+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

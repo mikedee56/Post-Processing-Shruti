@@ -1,0 +1,31 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmpvdfi13_6\\compatibility_test.srt",
+  "processing_time": 0.018993854522705078,
+  "total_segments": 1,
+  "segments_modified": 1,
+  "corrections_applied": {
+    "ner_entities_identified": 0,
+    "ner_capitalizations": 0,
+    "fixed_capitalization": 1,
+    "ner_processing": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [],
+  "original_word_count": 6,
+  "processed_word_count": 6,
+  "original_char_count": 31,
+  "processed_char_count": 31,
+  "confidence_scores": [
+    0.7333333333333333
+  ],
+  "average_confidence": 0.7333333333333333,
+  "flagged_segments": 1,
+  "parsing_time": 0.0,
+  "normalization_time": 0.012993097305297852,
+  "correction_time": 0.0020017623901367188,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-16T05:25:04.094195+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

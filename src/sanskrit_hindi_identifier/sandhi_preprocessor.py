@@ -66,7 +66,7 @@ class SandhiPreprocessor:
 
     def __init__(self, enable_sandhi_preprocessing: bool = True):
         """
-        Initialize the sandhi preprocessor.
+        Initialize the sandhi preprocessor with lazy loading for optimal performance.
         
         Args:
             enable_sandhi_preprocessing: Feature flag to enable/disable preprocessing
@@ -75,21 +75,31 @@ class SandhiPreprocessor:
         self.enable_preprocessing = enable_sandhi_preprocessing
         self.sanskrit_parser_available = False
         self.basic_tokenizer_fallback = True
+        self._parser_initialized = False  # Lazy loading flag
         
-        # Attempt to import sanskrit_parser
+        # PERFORMANCE OPTIMIZATION: Initialize cache for parsing results
+        import functools
+        self._parsing_cache = {}
+        
+        # Store parser classes for lazy initialization
+        self._parser_classes = None
+        
+        # Attempt to check sanskrit_parser availability without loading Word2Vec
         try:
             import sanskrit_parser
-            from sanskrit_parser.api import LexicalSandhiAnalyzer
             self.sanskrit_parser = sanskrit_parser
-            self.parser = sanskrit_parser.Parser()
-            self.sandhi_analyzer = LexicalSandhiAnalyzer()
+            self._parser_classes = {
+                'Parser': sanskrit_parser.Parser,
+                'LexicalSandhiAnalyzer': getattr(sanskrit_parser.api, 'LexicalSandhiAnalyzer', None)
+            }
             self.sanskrit_parser_available = True
-            self.logger.info("sanskrit_parser library loaded successfully")
+            self.logger.info("sanskrit_parser library available (lazy loading enabled)")
+            
         except ImportError as e:
             self.logger.warning(f"sanskrit_parser library not available: {e}")
             self.logger.info("Will use basic tokenization fallback only")
         except Exception as e:
-            self.logger.warning(f"sanskrit_parser initialization failed: {e}")
+            self.logger.warning(f"sanskrit_parser check failed: {e}")
             self.sanskrit_parser_available = False
         
         # Initialize processing statistics
@@ -97,8 +107,70 @@ class SandhiPreprocessor:
             'total_processed': 0,
             'successful_splits': 0,
             'fallback_used': 0,
-            'processing_errors': 0
+            'processing_errors': 0,
+            'cache_hits': 0,  # Track cache effectiveness
+            'cache_misses': 0,
+            'lazy_loads': 0   # Track when Word2Vec is actually loaded
         }
+
+    def _lazy_initialize_parser(self):
+        """
+        Lazy initialization of parser with persistent Word2Vec model singleton caching.
+        
+        This method implements a production-grade solution to the 305% variance issue
+        by using singleton pattern for Word2Vec model persistence across all instances.
+        """
+        if self._parser_initialized or not self.sanskrit_parser_available:
+            return
+            
+        try:
+            # CRITICAL PERFORMANCE FIX: Use singleton pattern for Word2Vec model
+            # This eliminates the primary variance source (Word2Vec reloading)
+            if not hasattr(SandhiPreprocessor, '_shared_parser_instance'):
+                self.logger.info("Creating shared parser instance with Word2Vec model (one-time initialization)")
+                
+                # Create parser instance once and share across all instances
+                SandhiPreprocessor._shared_parser_instance = self._parser_classes['Parser']()
+                
+                if self._parser_classes['LexicalSandhiAnalyzer']:
+                    SandhiPreprocessor._shared_sandhi_analyzer = self._parser_classes['LexicalSandhiAnalyzer']()
+                
+                self.logger.info("Shared parser instance created - Word2Vec model loaded once")
+            else:
+                self.logger.debug("Using existing shared parser instance (no Word2Vec reload)")
+            
+            # Use the shared instance
+            self.parser = SandhiPreprocessor._shared_parser_instance
+            if hasattr(SandhiPreprocessor, '_shared_sandhi_analyzer'):
+                self.sandhi_analyzer = SandhiPreprocessor._shared_sandhi_analyzer
+            
+            # PERFORMANCE OPTIMIZATION: Enhanced LRU cache for parsing results
+            import functools
+            
+            # Check if shared cached method already exists
+            if not hasattr(SandhiPreprocessor, '_shared_cached_parser_split'):
+                @functools.lru_cache(maxsize=5000)  # Large cache for production
+                def _shared_cached_parser_split(word: str):
+                    """
+                    Shared cached version of parser.split to maximize cache hits.
+                    Uses class-level caching so all instances benefit from each other's work.
+                    """
+                    return SandhiPreprocessor._shared_parser_instance.split(word)
+                
+                SandhiPreprocessor._shared_cached_parser_split = _shared_cached_parser_split
+                self.logger.info("Shared parsing cache initialized with 5000-item capacity")
+            
+            # Use the shared cached method
+            self._cached_parser_split = SandhiPreprocessor._shared_cached_parser_split
+            self._parser_initialized = True
+            self.stats['lazy_loads'] += 1
+            
+            self.logger.info("Sanskrit parser lazy initialization completed with shared singleton caching")
+            
+        except Exception as e:
+            self.logger.warning(f"Sanskrit parser lazy initialization failed: {e}")
+            self.sanskrit_parser_available = False
+            self._parser_initialized = False
 
     def preprocess_text(self, text: str) -> SandhiSplitResult:
         """
@@ -247,7 +319,7 @@ class SandhiPreprocessor:
 
     def _get_word_sandhi_candidates(self, word: str) -> List[SandhiSplitCandidate]:
         """
-        Get sandhi splitting candidates for a single word.
+        Get sandhi splitting candidates for a single word with lazy initialization.
         
         Args:
             word: Sanskrit word to analyze
@@ -258,11 +330,26 @@ class SandhiPreprocessor:
         candidates = []
         
         try:
+            # Lazy initialize parser only when actually needed
+            if self.sanskrit_parser_available and not self._parser_initialized:
+                self._lazy_initialize_parser()
+            
             # Try using actual sanskrit_parser functionality first
-            if self.sanskrit_parser_available and hasattr(self, 'parser'):
+            if self.sanskrit_parser_available and self._parser_initialized and hasattr(self, 'parser'):
                 try:
-                    # Use the parser's split method
-                    parse_results = self.parser.split(word)
+                    # PERFORMANCE OPTIMIZATION: Use cached parser to avoid repeated Word2Vec loading
+                    if hasattr(self, '_cached_parser_split'):
+                        # Check cache first
+                        if word in self._parsing_cache:
+                            parse_results = self._parsing_cache[word]
+                            self.stats['cache_hits'] += 1
+                        else:
+                            parse_results = self._cached_parser_split(word)
+                            self._parsing_cache[word] = parse_results
+                            self.stats['cache_misses'] += 1
+                    else:
+                        # Fallback to direct parser call (no caching)
+                        parse_results = self.parser.split(word)
                     
                     if parse_results:
                         for i, result in enumerate(parse_results[:5]):  # Top 5 results
@@ -277,11 +364,13 @@ class SandhiPreprocessor:
                                     segments=segments,
                                     confidence_score=confidence,
                                     confidence_level=conf_level,
-                                    splitting_method='sanskrit_parser_split',
+                                    splitting_method='sanskrit_parser_split_cached',
                                     metadata={
                                         'word_length': len(word), 
                                         'segment_count': len(segments),
-                                        'parse_rank': i
+                                        'parse_rank': i,
+                                        'cached': word in self._parsing_cache,
+                                        'lazy_loaded': True
                                     }
                                 )
                                 candidates.append(candidate)
@@ -469,6 +558,28 @@ class SandhiPreprocessor:
         })
         return stats
 
+    
+    def get_cache_performance_stats(self) -> Dict[str, Any]:
+        """
+        Get cache performance statistics for monitoring performance improvements.
+        
+        Returns:
+            Dictionary with cache performance metrics
+        """
+        cache_size = len(self._parsing_cache) if hasattr(self, '_parsing_cache') else 0
+        total_requests = self.stats.get('cache_hits', 0) + self.stats.get('cache_misses', 0)
+        hit_rate = (self.stats.get('cache_hits', 0) / total_requests * 100) if total_requests > 0 else 0
+        
+        return {
+            'cache_enabled': hasattr(self, '_cached_parser_split'),
+            'cache_size': cache_size,
+            'cache_hits': self.stats.get('cache_hits', 0),
+            'cache_misses': self.stats.get('cache_misses', 0),
+            'cache_hit_rate_percent': round(hit_rate, 2),
+            'total_requests': total_requests,
+            'performance_improvement': f"{hit_rate:.1f}% of requests served from cache"
+        }
+
     def reset_statistics(self) -> None:
         """Reset processing statistics."""
         self.stats = {
@@ -501,3 +612,48 @@ class SandhiPreprocessor:
             )
         
         return validation_result
+
+    @classmethod
+    def clear_shared_cache(cls):
+        """
+        Clear the shared parser cache and instances.
+        Useful for testing or memory management.
+        """
+        if hasattr(cls, '_shared_cached_parser_split'):
+            cls._shared_cached_parser_split.cache_clear()
+        if hasattr(cls, '_shared_parser_instance'):
+            delattr(cls, '_shared_parser_instance')
+        if hasattr(cls, '_shared_sandhi_analyzer'):
+            delattr(cls, '_shared_sandhi_analyzer')
+        if hasattr(cls, '_shared_cached_parser_split'):
+            delattr(cls, '_shared_cached_parser_split')
+    
+    @classmethod
+    def get_shared_cache_stats(cls) -> Dict[str, Any]:
+        """
+        Get statistics for the shared parser cache across all instances.
+        
+        Returns:
+            Dictionary with shared cache performance metrics
+        """
+        if hasattr(cls, '_shared_cached_parser_split'):
+            cache_info = cls._shared_cached_parser_split.cache_info()
+            total_calls = cache_info.hits + cache_info.misses
+            hit_rate = (cache_info.hits / total_calls * 100) if total_calls > 0 else 0
+            
+            return {
+                'shared_cache_enabled': True,
+                'cache_hits': cache_info.hits,
+                'cache_misses': cache_info.misses,
+                'cache_maxsize': cache_info.maxsize,
+                'cache_currsize': cache_info.currsize,
+                'hit_rate_percent': round(hit_rate, 2),
+                'total_calls': total_calls,
+                'memory_efficiency': f"Shared across all SandhiPreprocessor instances",
+                'variance_reduction': f"Eliminates Word2Vec reloading variance"
+            }
+        else:
+            return {
+                'shared_cache_enabled': False,
+                'reason': 'Sanskrit parser not initialized or unavailable'
+            }

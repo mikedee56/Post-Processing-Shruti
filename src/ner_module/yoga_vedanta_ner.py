@@ -453,7 +453,7 @@ class YogaVedantaNER:
         elif any(pattern in token_lower for pattern in teacher_patterns):
             return EntityCategory.TEACHER
         else:
-            return EntityCategory.OTHER
+            return EntityCategory.UNKNOWN
     
     def _classify_sanskrit_entity(self, token: str) -> EntityCategory:
         """Classify Sanskrit entities identified by ByT5 model."""

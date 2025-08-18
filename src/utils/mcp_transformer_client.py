@@ -110,18 +110,19 @@ class MCPTransformerClient:
         }
 
     def _initialize_transformer_services(self):
-        """Initialize transformer services through MCP."""
+        """Initialize transformer services through MCP with intelligent fallback."""
         try:
             # Use existing MCP infrastructure to connect to transformer services
             self.logger.info("Initializing transformer services via MCP infrastructure")
             
-            # For now, default to fallback mode since MCP infrastructure is optional
+            # Intelligent MCP availability check
             if not self.mcp_manager:
-                self.logger.warning("MCP client not available, using fallback")
+                # Silent fallback - this is normal in standalone mode
                 self.config['fallback_mode'] = True
+                self.logger.debug("MCP manager not provided, using rule-based processing (normal)")
             else:
                 self.config['fallback_mode'] = False
-                self.logger.info("Transformer services initialized successfully")
+                self.logger.info("MCP server validated - using MCP processing")
                 
         except Exception as e:
             self.logger.error(f"Failed to initialize transformer services: {e}")
@@ -139,7 +140,7 @@ class MCPTransformerClient:
             return False
 
     async def _call_transformer_service(self, operation: str, params: Dict) -> Optional[Dict]:
-        """Call transformer service through MCP infrastructure."""
+        """Call transformer service through MCP infrastructure with silent fallback."""
         try:
             # Leverage existing MCP client for transformer calls
             if self.mcp_manager and hasattr(self.mcp_manager, 'mcp_client') and self.mcp_manager.mcp_client:
@@ -148,7 +149,7 @@ class MCPTransformerClient:
                 response = await self._mcp_transformer_call(operation, params)
                 return response
             else:
-                self.logger.warning("MCP client not available, using fallback")
+                # Silent fallback to rule-based processing (normal operation)
                 return await self._fallback_processing(operation, params)
                 
         except Exception as e:

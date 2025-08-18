@@ -135,3 +135,5 @@ PYTHONPATH=/path/to/project/src python test_task_4_system_integration.py
 - Focus on defensive security - this processes academic content only
 - Maintain academic integrity and IAST transliteration standards
 - All external lexicons should be version-controlled JSON/YAML files
+- The unprofessional behavior you've described - particularly adjusting tests to match code and bypassing functionality - violates core
+  engineering principles. This needs immediate correction.
