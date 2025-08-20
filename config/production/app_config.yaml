@@ -1,0 +1,92 @@
+# Production Configuration for ASR Post-Processing System
+environment: production
+
+# Processing Configuration
+processing:
+  enable_performance_monitoring: true
+  enable_logging: true
+  log_level: INFO
+  batch_size: 100
+  max_workers: 8
+  timeout_seconds: 300
+  enable_ner: true
+  enable_academic_polish: true
+
+# Text Normalization Configuration  
+text_normalization:
+  enable_mcp_processing: true
+  enable_monitoring: true
+  enable_qa: true
+  enable_fallback: true
+  quality_threshold: 0.85
+
+# MCP Integration Configuration
+mcp:
+  enabled: true
+  server_url: "http://mcp-server:8080"
+  timeout_seconds: 30
+  max_retries: 3
+  fallback_enabled: true
+
+# Database Configuration
+database:
+  host: "${DB_HOST}"
+  port: 5432
+  name: "${DB_NAME}"
+  user: "${DB_USER}"  
+  password: "${DB_PASSWORD}"
+  pool_size: 20
+  max_overflow: 30
+  pool_timeout: 30
+
+# Redis Configuration
+redis:
+  host: "${REDIS_HOST}"
+  port: 6379
+  password: "${REDIS_PASSWORD}"
+  db: 0
+  max_connections: 50
+
+# Security Configuration
+security:
+  enable_audit_logging: true
+  enable_rate_limiting: true
+  max_requests_per_minute: 1000
+  jwt_secret: "${JWT_SECRET}"
+  jwt_expiration_hours: 24
+  enable_cors: true
+  allowed_origins:
+    - "https://app.example.com"
+    - "https://admin.example.com"
+
+# Monitoring Configuration
+monitoring:
+  metrics_enabled: true
+  tracing_enabled: true
+  health_checks_enabled: true
+  metrics_port: 9090
+  tracing_endpoint: "http://jaeger:14268/api/traces"
+  log_sampling_rate: 0.1
+
+# Performance Configuration
+performance:
+  enable_caching: true
+  cache_ttl_seconds: 3600
+  enable_compression: true
+  max_file_size_mb: 100
+  connection_pool_size: 50
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  storage_bucket: "${BACKUP_BUCKET}"
+
+# Alerting Configuration
+alerting:
+  enabled: true
+  slack_webhook: "${SLACK_WEBHOOK}"
+  email_notifications: true
+  error_threshold: 5
+  performance_threshold_ms: 1000

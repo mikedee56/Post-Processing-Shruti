@@ -8,15 +8,16 @@ engine with academic-grade validation and publication-ready formatting.
 Story 4.5: Scripture Intelligence Enhancement - Task 1 Implementation
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Set, Tuple
-from enum import Enum
 from pathlib import Path
 import logging
 import re
 import time
 
+
 from .hybrid_matching_engine import (
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, List, Optional, Any, Set, Tuple
     HybridMatchingEngine, HybridPipelineConfig, HybridMatchingResult,
     MatchingStage, SourceProvenance
 )

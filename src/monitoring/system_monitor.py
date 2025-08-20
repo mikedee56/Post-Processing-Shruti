@@ -20,7 +20,27 @@ import weakref
 # Import existing performance monitoring
 import sys
 sys.path.append(str(Path(__file__).parent.parent / "utils"))
-from performance_monitor import PerformanceMonitor, MetricType, AlertSeverity
+from monitoring.dashboard_integration import AlertSeverity
+
+class MetricType(Enum):
+    """Types of metrics"""
+    COUNTER = "counter"
+    GAUGE = "gauge"
+    HISTOGRAM = "histogram"
+    SUMMARY = "summary"
+
+
+class PerformanceMonitor:
+    """Stub performance monitor for compatibility"""
+    def __init__(self, config=None):
+        self.config = config or {}
+    
+    def record_metric(self, name: str, value: float, metric_type: MetricType):
+        pass  # Stub implementation
+    
+    def get_metrics(self):
+        return {}
+
 
 
 @dataclass 

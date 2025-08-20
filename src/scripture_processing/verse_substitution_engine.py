@@ -14,9 +14,9 @@ from copy import deepcopy
 
 from utils.logger_config import get_logger
 from utils.srt_parser import SRTSegment
-from .scripture_identifier import ScriptureIdentifier, VerseMatch, PassageType
-from .canonical_text_manager import CanonicalTextManager, CanonicalVerse
-from .scripture_validator import ScriptureValidator
+from scripture_processing.scripture_identifier import ScriptureIdentifier, VerseMatch, PassageType
+from scripture_processing.canonical_text_manager import CanonicalTextManager, CanonicalVerse
+from scripture_processing.scripture_validator import ScriptureValidator
 
 
 class SubstitutionAction(Enum):
@@ -463,7 +463,7 @@ class VerseSubstitutionEngine:
         """Extract verse reference from lexicon entry."""
         try:
             # This is a placeholder - would need to implement based on lexicon structure
-            from .canonical_text_manager import VerseReference, ScriptureSource
+            from scripture_processing.canonical_text_manager import VerseReference, ScriptureSource
             
             # Try to parse from original_term or category
             original_term = getattr(lexicon_entry, 'original_term', '').lower()

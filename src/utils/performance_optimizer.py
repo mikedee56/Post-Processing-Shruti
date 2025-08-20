@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 from collections import defaultdict, deque
 from threading import Lock
 
-from .performance_monitor import PerformanceMonitor, MetricType, AlertSeverity
+from utils.performance_monitor import PerformanceMonitor, MetricType, AlertSeverity
 
 
 @dataclass

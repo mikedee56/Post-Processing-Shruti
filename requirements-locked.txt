@@ -1,0 +1,58 @@
+# ASR Post-Processing Workflow Dependencies (Story 5.3 Locked Versions)
+# This file contains exact versions validated by dependency validator
+# Generated on: Story 5.3 Technical Debt Resolution
+
+# Core Python Dependencies
+python>=3.10
+
+# Data Processing Libraries (Validated Working)
+pandas==2.3.1
+numpy==1.26.4
+scipy==1.13.1
+
+# NLP and Language Processing
+# Note: Issues detected with some imports - using recommended versions
+inltk==0.9
+indic-nlp-library==0.92
+indic-transliteration==2.3.73  # Known import issues - use specific import paths
+
+# Story 2.4 Research Enhancement Dependencies
+sanskrit_parser==0.2.6  # Validated working with warnings
+
+# Text Processing and Fuzzy Matching (Validated Working)
+fuzzywuzzy==0.18.0
+python-Levenshtein==0.27.1
+rapidfuzz==3.13.0
+
+# File Format and Data Handling (Validated Working)
+pyyaml==6.0.2
+pysrt==1.1.2
+chardet==5.2.0
+
+# Configuration and Utilities (Validated Working)
+click==8.2.1
+tqdm==4.67.1
+colorama==0.4.6
+
+# Testing Framework 
+pytest==8.4.1
+# pytest-cov>=4.0.0  # Not currently installed - add if needed
+
+# Development Tools (Optional - add if needed)
+# black>=23.0.0
+# flake8>=6.0.0
+# mypy>=1.0.0
+
+# Logging and Monitoring (Validated Working)
+structlog==25.4.0
+
+# Additional dependencies found in environment
+wheel==0.45.1
+setuptools==75.6.0
+pip==24.3.1
+
+# Story 5.3 Technical Debt Resolution Notes:
+# 1. indic-transliteration and indic-nlp-library have import issues
+# 2. Use specific import paths: from indic_transliteration.sanskritnumerals import digit_2_word
+# 3. Sanskrit parser shows warnings but core functionality works
+# 4. All other dependencies validated as working correctly

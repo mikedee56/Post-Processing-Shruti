@@ -83,6 +83,15 @@ class CapitalizationEngine:
         # Context-sensitive rules
         self.context_rules = self._initialize_context_rules()
         
+        # Common words that should NOT be capitalized even if identified as entities
+        # This prevents over-capitalization of common terms like "verse", "chapter", etc.
+        self.common_words_exclusions = {
+            'verse', 'chapter', 'sutra', 'text', 'teaching', 'practice',
+            'study', 'lesson', 'section', 'part', 'book', 'volume',
+            'word', 'phrase', 'meaning', 'translation', 'commentary',
+            'tradition', 'philosophy', 'wisdom', 'knowledge', 'path'
+        }
+        
         self.logger.info("CapitalizationEngine initialized")
     
     def _initialize_category_rules(self) -> Dict[EntityCategory, CapitalizationRule]:
@@ -224,6 +233,11 @@ class CapitalizationEngine:
         for entity in entities:
             # Skip if already processed by special patterns
             if self._is_already_capitalized(entity.text):
+                continue
+            
+            # Skip common words that should not be capitalized (FIX: Prevents "verse" -> "Verse")
+            if entity.text.lower() in self.common_words_exclusions:
+                self.logger.debug(f"Skipping capitalization of common word: '{entity.text}'")
                 continue
             
             # Get appropriate capitalization rule

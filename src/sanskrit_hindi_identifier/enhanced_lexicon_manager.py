@@ -5,19 +5,21 @@ Extends the existing Story 2.1 lexicon management with ML-enhanced capabilities,
 dynamic expansion, and research-grade quality validation.
 """
 
-from dataclasses import dataclass, asdict
-from typing import Dict, List, Optional, Any, Tuple, Union
-from enum import Enum
-import logging
-import json
-import yaml
 from datetime import datetime
 from pathlib import Path
 import asyncio
+import json
+import logging
 
-from .lexicon_manager import LexiconManager, LexiconEntry, LexiconValidationResult, WordCategory
+import yaml
+
+
+from sanskrit_hindi_identifier.lexicon_manager import LexiconManager, LexiconEntry, LexiconValidationResult, WordCategory
+from dataclasses import dataclass, asdict
+from enum import Enum
+from typing import Dict, List, Optional, Any, Tuple, Union
 try:
-    from ..utils.mcp_transformer_client import MCPTransformerClient, SemanticClassification, CulturalContext
+    from utils.mcp_transformer_client import MCPTransformerClient, SemanticClassification, CulturalContext
 except ImportError:
     # Handle relative import issues during development
     import sys

@@ -1,0 +1,299 @@
+{
+  "investigation_id": "investigation_20250820_172523",
+  "timestamp": "2025-08-20T17:25:23.308508",
+  "system_info": {
+    "platform": "Windows-10-10.0.26100-SP0",
+    "architecture": [
+      "64bit",
+      "WindowsPE"
+    ],
+    "python_version": "3.10.11",
+    "python_implementation": "CPython",
+    "cpu_count": 20,
+    "memory_total": 68555845632,
+    "memory_available": 36287795200,
+    "disk_usage": {
+      "total": 2000381014016,
+      "free": 1595488141312
+    },
+    "working_directory": "D:\\Post-Processing-Shruti",
+    "python_path": [
+      "D:\\Post-Processing-Shruti\\src",
+      "D:\\Post-Processing-Shruti\\tests\\data",
+      "C:\\Users\\miked\\AppData\\Local\\Programs\\Python\\Python310\\python310.zip",
+      "C:\\Users\\miked\\AppData\\Local\\Programs\\Python\\Python310\\DLLs",
+      "C:\\Users\\miked\\AppData\\Local\\Programs\\Python\\Python310\\lib"
+    ]
+  },
+  "python_environment": {
+    "virtual_env": {
+      "active": true,
+      "path": "D:\\Post-Processing-Shruti\\.venv",
+      "base_prefix": "C:\\Users\\miked\\AppData\\Local\\Programs\\Python\\Python310"
+    },
+    "pip_version": "pip 23.0.1 from D:\\Post-Processing-Shruti\\.venv\\lib\\site-packages\\pip (python 3.10)",
+    "installed_packages": {},
+    "environment_variables": {},
+    "path_issues": [],
+    "error": "name 'os' is not defined"
+  },
+  "dependency_analysis": {
+    "total_dependencies": 9,
+    "installed_count": 9,
+    "missing_count": 0,
+    "error_count": 0,
+    "dependency_details": {
+      "pysrt": {
+        "name": "pysrt",
+        "version": "(1, 0, 1)",
+        "status": "installed",
+        "import_path": "pysrt",
+        "error_details": null,
+        "requirements": {
+          "import_path": "pysrt",
+          "required": true
+        }
+      },
+      "yaml": {
+        "name": "yaml",
+        "version": "6.0.2",
+        "status": "installed",
+        "import_path": "yaml",
+        "error_details": null,
+        "requirements": {
+          "import_path": "yaml",
+          "required": true
+        }
+      },
+      "pandas": {
+        "name": "pandas",
+        "version": "2.3.1",
+        "status": "installed",
+        "import_path": "pandas",
+        "error_details": null,
+        "requirements": {
+          "import_path": "pandas",
+          "required": true
+        }
+      },
+      "numpy": {
+        "name": "numpy",
+        "version": "1.26.4",
+        "status": "installed",
+        "import_path": "numpy",
+        "error_details": null,
+        "requirements": {
+          "import_path": "numpy",
+          "required": true
+        }
+      },
+      "fuzzywuzzy": {
+        "name": "fuzzywuzzy",
+        "version": "0.18.0",
+        "status": "installed",
+        "import_path": "fuzzywuzzy",
+        "error_details": null,
+        "requirements": {
+          "import_path": "fuzzywuzzy",
+          "required": true
+        }
+      },
+      "Levenshtein": {
+        "name": "Levenshtein",
+        "version": "0.27.1",
+        "status": "installed",
+        "import_path": "Levenshtein",
+        "error_details": null,
+        "requirements": {
+          "import_path": "Levenshtein",
+          "required": true
+        }
+      },
+      "structlog": {
+        "name": "structlog",
+        "version": "25.4.0",
+        "status": "installed",
+        "import_path": "structlog",
+        "error_details": null,
+        "requirements": {
+          "import_path": "structlog",
+          "required": false
+        }
+      },
+      "sanskrit_parser": {
+        "name": "sanskrit_parser",
+        "version": "0.2.6",
+        "status": "installed",
+        "import_path": "sanskrit_parser",
+        "error_details": null,
+        "requirements": {
+          "import_path": "sanskrit_parser",
+          "required": false
+        }
+      },
+      "inltk": {
+        "name": "inltk",
+        "version": null,
+        "status": "installed",
+        "import_path": "inltk",
+        "error_details": null,
+        "requirements": {
+          "import_path": "inltk",
+          "required": false
+        }
+      }
+    },
+    "critical_issues": []
+  },
+  "component_diagnostics": {
+    "total_components": 8,
+    "working_components": 6,
+    "failed_components": 2,
+    "component_details": {
+      "post_processors": {
+        "sanskrit_post_processor": {
+          "component": "post_processors.sanskrit_post_processor",
+          "status": "error",
+          "details": {
+            "module_imported": true,
+            "module_path": "post_processors.sanskrit_post_processor",
+            "component_found": true,
+            "instantiation": "failed: Logger._log() got an unexpected keyword argument 'operation'"
+          },
+          "recommendations": [
+            "Fix instantiation error: Logger._log() got an unexpected keyword argument 'operation'"
+          ],
+          "timestamp": "2025-08-20T17:25:24.722699"
+        }
+      },
+      "utils": {
+        "advanced_text_normalizer": {
+          "component": "utils.advanced_text_normalizer",
+          "status": "error",
+          "details": {
+            "module_imported": true,
+            "module_path": "utils.advanced_text_normalizer",
+            "component_found": true,
+            "instantiation": "failed: Logger._log() got an unexpected keyword argument 'operation'"
+          },
+          "recommendations": [
+            "Fix instantiation error: Logger._log() got an unexpected keyword argument 'operation'"
+          ],
+          "timestamp": "2025-08-20T17:25:24.781030"
+        },
+        "srt_parser": {
+          "component": "utils.srt_parser",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "utils.srt_parser",
+            "component_found": true,
+            "instantiation": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.781030"
+        },
+        "mcp_client": {
+          "component": "utils.mcp_client",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "utils.mcp_client",
+            "component_found": true,
+            "function_call": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.781030"
+        }
+      },
+      "sanskrit_hindi_identifier": {
+        "word_identifier": {
+          "component": "sanskrit_hindi_identifier.word_identifier",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "sanskrit_hindi_identifier.word_identifier",
+            "component_found": true,
+            "instantiation": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.846022"
+        },
+        "lexicon_manager": {
+          "component": "sanskrit_hindi_identifier.lexicon_manager",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "sanskrit_hindi_identifier.lexicon_manager",
+            "component_found": true,
+            "instantiation": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.859021"
+        }
+      },
+      "ner_module": {
+        "yoga_vedanta_ner": {
+          "component": "ner_module.yoga_vedanta_ner",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "ner_module.yoga_vedanta_ner",
+            "component_found": true,
+            "instantiation": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.884116"
+        },
+        "capitalization_engine": {
+          "component": "ner_module.capitalization_engine",
+          "status": "healthy",
+          "details": {
+            "module_imported": true,
+            "module_path": "ner_module.capitalization_engine",
+            "component_found": true,
+            "instantiation": "success"
+          },
+          "recommendations": [],
+          "timestamp": "2025-08-20T17:25:24.933110"
+        }
+      }
+    },
+    "critical_failures": [
+      "post_processors.sanskrit_post_processor: error",
+      "utils.advanced_text_normalizer: error"
+    ]
+  },
+  "api_error_analysis": {
+    "total_errors": 0,
+    "error_categories": {},
+    "error_patterns": [],
+    "root_causes": [],
+    "fix_priorities": []
+  },
+  "performance_metrics": {
+    "cpu_usage": 28.6,
+    "memory_usage": 47.3,
+    "disk_io": {
+      "read_bytes": 629202462720,
+      "write_bytes": 832005401600
+    },
+    "network_io": {
+      "bytes_sent": 86579989549,
+      "bytes_recv": 24302214232
+    },
+    "python_performance": {
+      "garbage_collection_counts": [
+        40,
+        4,
+        1
+      ],
+      "recursion_limit": 1000,
+      "thread_count": 1
+    }
+  },
+  "recommendations": [
+    "Fix failed components: post_processors.sanskrit_post_processor, utils.advanced_text_normalizer"
+  ],
+  "overall_status": "healthy_with_warnings"
+}

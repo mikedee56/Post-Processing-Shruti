@@ -20,7 +20,8 @@ import uuid
 # Import monitoring components
 import sys
 sys.path.append(str(Path(__file__).parent.parent / "utils"))
-from performance_monitor import MetricType, AlertSeverity
+from monitoring.dashboard_integration import AlertSeverity
+from monitoring.system_monitor import MetricType
 
 
 @dataclass

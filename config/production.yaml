@@ -1,0 +1,436 @@
+# Production Configuration for Story 5.4: Production Readiness Enhancement
+# Comprehensive configuration for production security, monitoring, and operational excellence
+
+# Environment Configuration
+environment: production
+instance_id: asr-processor-01
+service_version: "2.0.0"
+deployment_timestamp: "2024-01-20T10:00:00Z"
+
+# Security Configuration
+security:
+  # JWT Authentication
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}  # Set via environment variable
+    token_expiry_hours: 24
+    algorithm: "HS256"
+    
+  # Role-Based Access Control
+  rbac:
+    roles:
+      admin:
+        permissions: ["process_files", "view_files", "delete_files", "manage_users", "view_metrics", "manage_config"]
+        description: "Full system access"
+      operator:
+        permissions: ["process_files", "view_files", "view_metrics"]
+        description: "Process and monitor files"
+      reviewer:
+        permissions: ["view_files", "view_metrics"]
+        description: "Review results and metrics"
+      viewer:
+        permissions: ["view_files"]
+        description: "Read-only access"
+        
+  # Audit Logging
+  audit:
+    log_directory: "logs/audit"
+    retention_days: 90
+    max_log_size_mb: 100
+    backup_count: 10
+    critical_events_separate_log: true
+    
+  # Security Scanner
+  scanner:
+    enabled: true
+    scan_schedule_cron: "0 2 * * *"  # Daily at 2 AM
+    scan_patterns: ["*.py", "*.yaml", "*.yml", "*.json", "*.sh"]
+    exclude_patterns: [".git", "__pycache__", ".venv", "node_modules"]
+    vulnerability_thresholds:
+      critical: 0  # No critical vulnerabilities allowed
+      high: 2
+      medium: 10
+      low: 50
+
+# Production Monitoring Configuration  
+monitoring:
+  # System Monitoring
+  system_monitor:
+    metrics_retention_hours: 168  # 7 days
+    alert_thresholds:
+      cpu_percent: 80
+      memory_percent: 85
+      disk_percent: 90
+      response_time_ms: 1000
+      error_rate: 0.01
+      
+  # Production Monitor Enhancement
+  production:
+    environment: production
+    instance_id: asr-processor-01
+    
+    # Health Checks
+    health_checks:
+      api_endpoint:
+        type: http
+        url: "http://localhost:8080/health"
+        timeout: 5
+        expected_status: 200
+        interval_seconds: 30
+      database:
+        type: database
+        timeout: 10
+        interval_seconds: 60
+      file_system:
+        type: filesystem
+        paths: ["/app/data", "/app/logs", "/app/config"]
+        check_writable: true
+        interval_seconds: 300
+        
+    # Alerting Configuration
+    alerting:
+      slack_webhook: ${SLACK_WEBHOOK_URL}
+      email_config:
+        smtp_server: ${SMTP_SERVER}
+        smtp_port: 587
+        username: ${SMTP_USERNAME}
+        password: ${SMTP_PASSWORD}
+        from_address: "asr-alerts@company.com"
+        to_addresses: ["ops-team@company.com", "devs@company.com"]
+      alert_webhook: ${ALERT_WEBHOOK_URL}
+      
+    # SLA Targets
+    sla_targets:
+      availability: 99.9  # 99.9% uptime
+      response_time_ms: 1000  # 1 second max response
+      error_rate: 0.01  # 1% max error rate
+      
+    # External Integrations
+    prometheus_endpoint: ${PROMETHEUS_PUSHGATEWAY_URL}
+    grafana_dashboard_url: ${GRAFANA_DASHBOARD_URL}
+    
+    # Distributed Tracing
+    tracing_enabled: true
+    trace_endpoint: ${JAEGER_ENDPOINT}
+    
+    # Performance Metrics Collection
+    metrics_collection:
+      enabled: true
+      collection_interval_seconds: 60
+      retention_hours: 24
+      export_prometheus: true
+      
+    # Dashboard Integration
+    dashboard_integration:
+      prometheus:
+        pushgateway_url: ${PROMETHEUS_PUSHGATEWAY_URL}
+        prometheus_url: ${PROMETHEUS_URL}
+        job_name: "asr-processor"
+        instance: "${INSTANCE_ID:-localhost:8080}"
+      grafana:
+        grafana_url: ${GRAFANA_URL}
+        api_key: ${GRAFANA_API_KEY}
+        org_id: 1
+      custom:
+        enabled: true
+        update_interval_seconds: 30
+
+# Application Configuration
+application:
+  # Processing Configuration
+  processing:
+    max_concurrent_files: 5
+    processing_timeout_minutes: 30
+    retry_attempts: 3
+    retry_delay_seconds: 5
+    
+  # Quality Assurance
+  quality:
+    min_confidence_score: 0.8
+    enable_human_review_flag: true
+    review_threshold: 0.9
+    
+  # Performance
+  performance:
+    enable_caching: true
+    cache_ttl_minutes: 60
+    max_memory_usage_mb: 2048
+    thread_pool_size: 10
+
+# Database Configuration (Production)
+database:
+  # Primary Database
+  primary:
+    type: postgresql
+    host: ${DB_HOST}
+    port: 5432
+    database: ${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    pool_size: 20
+    max_overflow: 30
+    pool_timeout: 30
+    
+  # Redis for Caching
+  redis:
+    host: ${REDIS_HOST}
+    port: 6379
+    password: ${REDIS_PASSWORD}
+    db: 0
+    max_connections: 20
+
+# Storage Configuration
+storage:
+  # Input/Output Directories
+  directories:
+    raw_srts: "/app/data/raw_srts"
+    processed_srts: "/app/data/processed_srts"
+    lexicons: "/app/data/lexicons"
+    logs: "/app/logs"
+    metrics: "/app/data/metrics"
+    backups: "/app/data/backups"
+    
+  # Backup Configuration
+  backup:
+    enabled: true
+    schedule_cron: "0 3 * * *"  # Daily at 3 AM
+    retention_days: 30
+    compress: true
+    remote_backup:
+      enabled: true
+      provider: "s3"
+      bucket: ${BACKUP_S3_BUCKET}
+      region: ${AWS_REGION}
+
+# Logging Configuration
+logging:
+  version: 1
+  disable_existing_loggers: false
+  
+  formatters:
+    standard:
+      format: '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    detailed:
+      format: '%(asctime)s [%(levelname)s] %(name)s [%(filename)s:%(lineno)d]: %(message)s'
+    json:
+      format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "message": "%(message)s"}'
+      
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: standard
+      stream: ext://sys.stdout
+      
+    file:
+      class: logging.handlers.RotatingFileHandler
+      level: INFO
+      formatter: detailed
+      filename: /app/logs/app.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+      
+    json_file:
+      class: logging.handlers.RotatingFileHandler
+      level: INFO
+      formatter: json
+      filename: /app/logs/app.json
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+      
+  loggers:
+    '':  # Root logger
+      level: INFO
+      handlers: [console, file, json_file]
+      propagate: false
+      
+    security:
+      level: WARNING
+      handlers: [console, file]
+      propagate: false
+      
+    audit:
+      level: INFO
+      handlers: [console, file]
+      propagate: false
+
+# Deployment Configuration
+deployment:
+  # Docker Configuration
+  container:
+    image: "asr-processor:production"
+    tag: "${BUILD_NUMBER:-latest}"
+    pull_policy: "Always"
+    
+  # Kubernetes Configuration  
+  kubernetes:
+    namespace: "asr-production"
+    replicas: 3
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+        
+    # Auto-scaling
+    hpa:
+      enabled: true
+      min_replicas: 3
+      max_replicas: 10
+      target_cpu_percent: 70
+      target_memory_percent: 80
+      
+    # Health Checks
+    health_check:
+      liveness_probe:
+        path: "/health"
+        port: 8080
+        initial_delay_seconds: 60
+        period_seconds: 30
+        timeout_seconds: 10
+        failure_threshold: 3
+        
+      readiness_probe:
+        path: "/ready"
+        port: 8080
+        initial_delay_seconds: 30
+        period_seconds: 10
+        timeout_seconds: 5
+        failure_threshold: 3
+
+# Feature Flags
+features:
+  # Story 2.x Features
+  enable_sanskrit_processing: true
+  enable_contextual_modeling: true
+  enable_scripture_processing: true
+  enable_hybrid_matching: true
+  enable_research_integration: true
+  
+  # Story 3.x Features
+  enable_ner_system: true
+  enable_mcp_integration: true
+  
+  # Story 4.x Features
+  enable_quality_assurance: true
+  enable_academic_polish: true
+  
+  # Story 5.x Features
+  enable_production_monitoring: true
+  enable_security_scanning: true
+  enable_performance_optimization: true
+  enable_professional_standards: true
+
+# Scalability Infrastructure Configuration
+scalability:
+  # Load Balancing
+  load_balancing:
+    enabled: true
+    algorithm: "least_connections"  # round_robin, least_connections, weighted, response_time, cpu_based
+    health_check_interval_seconds: 30
+    health_check_timeout_seconds: 10
+    max_connections_per_instance: 100
+    
+    # Auto-scaling Configuration
+    auto_scaling:
+      enabled: true
+      scale_up_threshold: 80  # CPU percentage
+      scale_down_threshold: 20  # CPU percentage
+      min_instances: 2
+      max_instances: 10
+      cooldown_period_minutes: 5
+      
+    # Instance Configuration
+    instances:
+      - host: "asr-processor-01"
+        port: 8080
+        weight: 1
+        max_connections: 50
+      - host: "asr-processor-02"
+        port: 8080
+        weight: 1
+        max_connections: 50
+        
+  # Distributed Processing
+  distributed_processing:
+    enabled: true
+    
+    # Task Queue Configuration
+    task_queue:
+      type: "redis"  # redis, memory
+      redis:
+        host: ${REDIS_HOST}
+        port: 6379
+        password: ${REDIS_PASSWORD}
+        db: 1  # Separate DB for task queue
+        max_connections: 10
+      max_queue_size: 1000
+      task_timeout_minutes: 30
+      
+    # Worker Management
+    worker_management:
+      enabled: true
+      min_workers: 2
+      max_workers: 8
+      worker_threads_per_process: 4
+      worker_health_check_interval_seconds: 60
+      auto_restart_failed_workers: true
+      
+    # Processing Configuration
+    processing:
+      batch_size: 5
+      retry_attempts: 3
+      retry_delay_seconds: 30
+
+# Database Migration Configuration
+migration:
+  enabled: true
+  migrations_dir: "migrations"
+  migrations_table: "schema_migrations"
+  database:
+    type: postgresql
+    host: ${DB_HOST}
+    port: 5432
+    database: ${DB_NAME}
+    username: ${DB_MIGRATION_USERNAME}
+    password: ${DB_MIGRATION_PASSWORD}
+
+# Operational Procedures
+operations:
+  # Incident Response
+  incident_response:
+    escalation_matrix:
+      - level: 1
+        response_time_minutes: 15
+        contacts: ["oncall-primary@company.com"]
+      - level: 2
+        response_time_minutes: 30
+        contacts: ["oncall-secondary@company.com", "team-lead@company.com"]
+      - level: 3
+        response_time_minutes: 60
+        contacts: ["engineering-manager@company.com", "cto@company.com"]
+        
+  # Maintenance Windows
+  maintenance:
+    weekly_window:
+      day: "Sunday"
+      start_time: "02:00"
+      duration_hours: 4
+      timezone: "UTC"
+    emergency_contact: "ops-emergency@company.com"
+    
+  # Data Recovery Procedures
+  data_recovery:
+    backup_verification_schedule: "0 4 * * 1"  # Weekly Monday 4 AM
+    recovery_test_schedule: "0 5 1 * *"  # Monthly 1st day 5 AM
+    rpo_target_hours: 4  # Recovery Point Objective
+    rto_target_minutes: 60  # Recovery Time Objective
+    
+  # Runbook URLs
+  runbooks:
+    deployment: "https://wiki.company.com/runbooks/asr-deployment"
+    troubleshooting: "https://wiki.company.com/runbooks/asr-troubleshooting"
+    scaling: "https://wiki.company.com/runbooks/asr-scaling"
+    backup_recovery: "https://wiki.company.com/runbooks/asr-backup-recovery"
+    database_migration: "https://wiki.company.com/runbooks/asr-database-migrations"

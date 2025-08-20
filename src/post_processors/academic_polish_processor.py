@@ -25,235 +25,424 @@ class AcademicPolishProcessor:
     """Transforms professional SRT content to academic excellence standards"""
     
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        """Initialize Academic Polish Processor with standardized error handling."""
+        # Import ErrorHandler locally for consistent import pattern
+        from utils.error_handler import ErrorHandler
+        from utils.exception_hierarchy import ProcessingError
         
-        # Academic capitalization patterns - sentence start rules
-        self.capitalization_patterns = [
-            # Sentence start after period, question mark, exclamation
-            (r'\.(\s+)([a-z])', lambda m: f'.{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
-            (r'\?(\s+)([a-z])', lambda m: f'?{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
-            (r'!(\s+)([a-z])', lambda m: f'!{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
+        # Initialize error handler first for consistent error handling
+        try:
+            self._error_handler = ErrorHandler(component="AcademicPolishProcessor")
+            self.logger = self._error_handler.logger
             
-            # Line start capitalization (for subtitle lines)
-            (r'^([a-z])', lambda m: m.group(1).upper(), 'Capitalize first word of subtitle line'),
+            self._error_handler.log_operation_start("academic_polish_processor_initialization", {
+                'component': 'AcademicPolishProcessor',
+                'initialization_type': 'pattern_compilation'
+            })
             
-            # After em-dash (continuing thought patterns)
-            (r'—(\s*)([a-z])', lambda m: f'—{m.group(1)}{m.group(2).upper()}', 'Capitalize after em-dash'),
+            # Academic capitalization patterns - sentence start rules
+            try:
+                self.capitalization_patterns = [
+                    # Sentence start after period, question mark, exclamation
+                    (r'\.(\\s+)([a-z])', lambda m: f'.{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
+                    (r'\\?(\\s+)([a-z])', lambda m: f'?{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
+                    (r'!(\\s+)([a-z])', lambda m: f'!{m.group(1)}{m.group(2).upper()}', 'Capitalize first word of sentence'),
+                    
+                    # Line start capitalization (for subtitle lines)
+                    (r'^([a-z])', lambda m: m.group(1).upper(), 'Capitalize first word of subtitle line'),
+                    
+                    # After em-dash (continuing thought patterns)
+                    (r'—(\\s*)([a-z])', lambda m: f'—{m.group(1)}{m.group(2).upper()}', 'Capitalize after em-dash'),
+                    
+                    # After colon in formal contexts
+                    (r':(\\s+)([a-z])', lambda m: f':{m.group(1)}{m.group(2).upper()}', 'Capitalize after colon'),
+                ]
+                
+                self._error_handler.log_operation_success("capitalization_patterns_compilation", {
+                    'patterns_count': len(self.capitalization_patterns)
+                })
+                
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("capitalization_patterns_compilation", e, {
+                    'component': 'AcademicPolishProcessor',
+                    'stage': 'pattern_compilation'
+                })
+                # Use basic patterns as fallback
+                self.capitalization_patterns = [
+                    (r'^([a-z])', lambda m: m.group(1).upper(), 'Basic line start capitalization')
+                ]
+                self.logger.warning(f"Using fallback capitalization patterns: {error_details}")
             
-            # After colon in formal contexts
-            (r':(\s+)([a-z])', lambda m: f':{m.group(1)}{m.group(2).upper()}', 'Capitalize after colon'),
-        ]
-        
-        # Sanskrit/Hindi term standardization - context-aware proper nouns
-        self.sanskrit_term_patterns = [
-            # Major deities - always capitalize
-            (r'\bkrishna\b', 'Krishna', 'Capitalize deity name'),
-            (r'\bkṛṣṇa\b', 'Kṛṣṇa', 'Capitalize deity name'),
-            (r'\brama\b(?!\s+(cooking|bed))', 'Rama', 'Capitalize deity name (context-aware)'),
-            (r'\bhanuman\b', 'Hanuman', 'Capitalize deity name'),
-            (r'\bshiva\b', 'Shiva', 'Capitalize deity name'),
-            (r'\bśiva\b', 'Śiva', 'Capitalize deity name'),
-            (r'\bvishnu\b', 'Vishnu', 'Capitalize deity name'),
-            (r'\bviṣṇu\b', 'Viṣṇu', 'Capitalize deity name'),
-            (r'\bbrahma\b(?!\s+knowledge)', 'Brahma', 'Capitalize deity name (context-aware)'),
+            # Sanskrit/Hindi term standardization - context-aware proper nouns
+            try:
+                self.sanskrit_term_patterns = [
+                    # Major deities - always capitalize
+                    (r'\\bkrishna\\b', 'Krishna', 'Capitalize deity name'),
+                    (r'\\bkṛṣṇa\\b', 'Kṛṣṇa', 'Capitalize deity name'),
+                    (r'\\brama\\b(?!\\s+(cooking|bed))', 'Rama', 'Capitalize deity name (context-aware)'),
+                    (r'\\bhanuman\\b', 'Hanuman', 'Capitalize deity name'),
+                    (r'\\bshiva\\b', 'Shiva', 'Capitalize deity name'),
+                    (r'\\bśiva\\b', 'Śiva', 'Capitalize deity name'),
+                    (r'\\bvishnu\\b', 'Vishnu', 'Capitalize deity name'),
+                    (r'\\bviṣṇu\\b', 'Viṣṇu', 'Capitalize deity name'),
+                    (r'\\bbrahma\\b(?!\\s+knowledge)', 'Brahma', 'Capitalize deity name (context-aware)'),
+                    
+                    # Sacred texts - always capitalize
+                    (r'\\bbhagavad\\s+gita\\b', 'Bhagavad Gita', 'Capitalize sacred text'),
+                    (r'\\bramayana\\b', 'Ramayana', 'Capitalize sacred text'),
+                    (r'\\brāmāyaṇa\\b', 'Rāmāyaṇa', 'Capitalize sacred text'),
+                    (r'\\bmahabharata\\b', 'Mahabharata', 'Capitalize sacred text'),
+                    (r'\\bmahābhārata\\b', 'Mahābhārata', 'Capitalize sacred text'),
+                    (r'\\bupanishads?\\b', 'Upanishads', 'Capitalize sacred text'),
+                    (r'\\bupaniṣads?\\b', 'Upaniṣads', 'Capitalize sacred text'),
+                    (r'\\bvedas?\\b', 'Vedas', 'Capitalize sacred text'),
+                    
+                    # Philosophical concepts - context-sensitive
+                    (r'\\bdharma\\b(?=\\s+[A-Z])', 'Dharma', 'Capitalize when used as proper concept'),
+                    (r'\\bkarma\\b(?=\\s+[A-Z])', 'Karma', 'Capitalize when used as proper concept'),
+                    (r'\\byoga\\b(?=\\s+(Vedanta|Sutra))', 'Yoga', 'Capitalize when part of proper title'),
+                    (r'\\bvedanta\\b', 'Vedanta', 'Capitalize philosophical system'),
+                    (r'\\bsankhya\\b', 'Sankhya', 'Capitalize philosophical system'),
+                    (r'\\bsāṅkhya\\b', 'Sāṅkhya', 'Capitalize philosophical system'),
+                    (r'\\badvaita\\b', 'Advaita', 'Capitalize philosophical doctrine'),
+                    
+                    # Specific terms in titles or formal contexts
+                    (r'\\bguru\\b(?=\\s+[A-Z])', 'Guru', 'Capitalize in formal title context'),
+                    (r'\\bswami\\b(?=\\s+[A-Z])', 'Swami', 'Capitalize in formal title context'),
+                    (r'\\bācārya\\b(?=\\s+[A-Z])', 'Ācārya', 'Capitalize in formal title context'),
+                    
+                    # ENHANCED: Additional spiritual terminology based on QA findings
+                    (r'\\bgita\\b', 'Gita', 'Capitalize when referring to Bhagavad Gita'),
+                    (r'\\bpurana\\b', 'Purana', 'Capitalize sacred text category'),
+                    (r'\\bsmriti\\b', 'Smriti', 'Capitalize scripture category'),
+                    (r'\\bsruti\\b', 'Sruti', 'Capitalize scripture category'),
+                    
+                    # ENHANCED: Yoga systems and spiritual practices  
+                    (r'\\brajayoga\\b', 'Raja Yoga', 'Capitalize yoga system'),
+                    (r'\\bhatha yoga\\b', 'Hatha Yoga', 'Capitalize yoga system'),
+                    (r'\\bkundalini yoga\\b', 'Kundalini Yoga', 'Capitalize yoga system'),
+                    
+                    # ENHANCED: Philosophical schools and teachers
+                    (r'\\bshankaracharya\\b', 'Shankaracharya', 'Capitalize spiritual teacher'),
+                    (r'\\bpatanjali\\b', 'Patanjali', 'Capitalize sage/author'),
+                    (r'\\bvalmiki\\b', 'Valmiki', 'Capitalize sage/author'),
+                    (r'\\bvyasa\\b', 'Vyasa', 'Capitalize sage/author'),
+                ]
+                
+                self._error_handler.log_operation_success("sanskrit_term_patterns_compilation", {
+                    'patterns_count': len(self.sanskrit_term_patterns)
+                })
+                
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("sanskrit_term_patterns_compilation", e, {
+                    'component': 'AcademicPolishProcessor',
+                    'stage': 'pattern_compilation'
+                })
+                # Use basic Sanskrit terms as fallback
+                self.sanskrit_term_patterns = [
+                    (r'\\bkrishna\\b', 'Krishna', 'Basic deity capitalization'),
+                    (r'\\bdharma\\b', 'Dharma', 'Basic concept capitalization')
+                ]
+                self.logger.warning(f"Using fallback Sanskrit term patterns: {error_details}")
             
-            # Sacred texts - always capitalize
-            (r'\bbhagavad\s+gita\b', 'Bhagavad Gita', 'Capitalize sacred text'),
-            (r'\bramayana\b', 'Ramayana', 'Capitalize sacred text'),
-            (r'\brāmāyaṇa\b', 'Rāmāyaṇa', 'Capitalize sacred text'),
-            (r'\bmahabharata\b', 'Mahabharata', 'Capitalize sacred text'),
-            (r'\bmahābhārata\b', 'Mahābhārata', 'Capitalize sacred text'),
-            (r'\bupanishads?\b', 'Upanishads', 'Capitalize sacred text'),
-            (r'\bupaniṣads?\b', 'Upaniṣads', 'Capitalize sacred text'),
-            (r'\bvedas?\b', 'Vedas', 'Capitalize sacred text'),
+            # Filler word removal patterns - CRITICAL MISSING FUNCTIONALITY
+            try:
+                self.filler_word_patterns = [
+                    # Common filler words at start of sentences/segments
+                    (r'^\\s*(?:um|uh|er|ah|eh),?\\s*', '', 'Remove filler word at start'),
+                    (r'^\\s*(?:you know|like|well|so),?\\s*', '', 'Remove filler phrase at start'),
+                    
+                    # Mid-sentence filler words with surrounding punctuation
+                    (r',\\s*(?:um|uh|er|ah|eh),?\\s*', ', ', 'Remove mid-sentence filler word'),
+                    (r',\\s*(?:you know|like|I mean),?\\s*', ', ', 'Remove mid-sentence filler phrase'),
+                    
+                    # Filler words before punctuation
+                    (r'\\s+(?:um|uh|er|ah|eh)\\s*([,.;:])', r'\\1', 'Remove filler before punctuation'),
+                    
+                    # Repeated words/stuttering
+                    (r'\\b(\\w+)\\s+\\1\\b', r'\\1', 'Remove word repetition'),
+                    
+                    # False starts and corrections
+                    (r'\\b(?:I mean|let me rephrase|actually|rather),?\\s*', '', 'Remove correction phrases'),
+                    (r'\\b(?:what I meant was|let me correct that),?\\s*', '', 'Remove correction phrases'),
+                    
+                    # Hesitation patterns
+                    (r'\\s*(?:and and|the the|of of|in in)\\s*', ' ', 'Remove hesitation repetitions'),
+                ]
+                
+                self._error_handler.log_operation_success("filler_word_patterns_compilation", {
+                    'patterns_count': len(self.filler_word_patterns)
+                })
+                
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("filler_word_patterns_compilation", e, {
+                    'component': 'AcademicPolishProcessor',
+                    'stage': 'pattern_compilation'
+                })
+                # Use basic filler patterns as fallback
+                self.filler_word_patterns = [
+                    (r'^\\s*(?:um|uh),?\\s*', '', 'Basic filler removal')
+                ]
+                self.logger.warning(f"Using fallback filler word patterns: {error_details}")
             
-            # Philosophical concepts - context-sensitive
-            (r'\bdharma\b(?=\s+[A-Z])', 'Dharma', 'Capitalize when used as proper concept'),
-            (r'\bkarma\b(?=\s+[A-Z])', 'Karma', 'Capitalize when used as proper concept'),
-            (r'\byoga\b(?=\s+(Vedanta|Sutra))', 'Yoga', 'Capitalize when part of proper title'),
-            (r'\bvedanta\b', 'Vedanta', 'Capitalize philosophical system'),
-            (r'\bsankhya\b', 'Sankhya', 'Capitalize philosophical system'),
-            (r'\bsāṅkhya\b', 'Sāṅkhya', 'Capitalize philosophical system'),
-            (r'\badvaita\b', 'Advaita', 'Capitalize philosophical doctrine'),
+            # Format consistency patterns
+            try:
+                self.format_consistency_patterns = [
+                    # Standardize spacing around punctuation
+                    (r'\\.{2,}', '...', 'Standardize ellipsis'),
+                    (r'\\s+\\.', '.', 'Remove space before period'),
+                    (r'\\s+,', ',', 'Remove space before comma'),
+                    (r'\\s+;', ';', 'Remove space before semicolon'),
+                    (r'\\s+:', ':', 'Remove space before colon'),
+                    
+                    # Standardize quotation marks
+                    (r'"([^"]*)"', r'"\\1"', 'Standardize quotation marks'),
+                    (r"'([^']*)'", r"'\\1'", 'Standardize single quotes'),
+                    
+                    # Fix multiple spaces
+                    (r'  +', ' ', 'Collapse multiple spaces'),
+                    
+                    # Standardize dash usage
+                    (r'\\s*-\\s*', '—', 'Use em-dash for interruptions'),
+                    (r'\\s*--\\s*', '—', 'Use em-dash instead of double hyphen'),
+                ]
+                
+                self._error_handler.log_operation_success("format_consistency_patterns_compilation", {
+                    'patterns_count': len(self.format_consistency_patterns)
+                })
+                
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("format_consistency_patterns_compilation", e, {
+                    'component': 'AcademicPolishProcessor',
+                    'stage': 'pattern_compilation'
+                })
+                # Use basic format patterns as fallback
+                self.format_consistency_patterns = [
+                    (r'  +', ' ', 'Basic space normalization')
+                ]
+                self.logger.warning(f"Using fallback format consistency patterns: {error_details}")
             
-            # Specific terms in titles or formal contexts
-            (r'\bguru\b(?=\s+[A-Z])', 'Guru', 'Capitalize in formal title context'),
-            (r'\bswami\b(?=\s+[A-Z])', 'Swami', 'Capitalize in formal title context'),
-            (r'\bācārya\b(?=\s+[A-Z])', 'Ācārya', 'Capitalize in formal title context'),
+            # Sanskrit terms that should remain lowercase in common usage
+            self.common_usage_terms = {
+                'karma', 'dharma', 'yoga', 'guru', 'mantra', 'chakra', 'prana',
+                'ahimsa', 'moksha', 'samadhi', 'satsang', 'tapas'
+            }
             
-            # ENHANCED: Additional spiritual terminology based on QA findings
-            (r'gita', 'Gita', 'Capitalize when referring to Bhagavad Gita'),
-            (r'purana', 'Purana', 'Capitalize sacred text category'),
-            (r'smriti', 'Smriti', 'Capitalize scripture category'),
-            (r'sruti', 'Sruti', 'Capitalize scripture category'),
+            # Academic proper nouns that should always be capitalized
+            self.academic_proper_nouns = {
+                'God', 'Divine', 'Absolute', 'Supreme', 'Self', 'Truth', 'Reality',
+                'Consciousness', 'Brahman', 'Ātman', 'Paramātmā'
+            }
             
-            # ENHANCED: Yoga systems and spiritual practices  
-            (r'rajayoga', 'Raja Yoga', 'Capitalize yoga system'),
-            (r'hatha yoga', 'Hatha Yoga', 'Capitalize yoga system'),
-            (r'kundalini yoga', 'Kundalini Yoga', 'Capitalize yoga system'),
+            self._error_handler.log_operation_success("academic_polish_processor_initialization", {
+                'capitalization_patterns': len(self.capitalization_patterns),
+                'sanskrit_patterns': len(self.sanskrit_term_patterns),
+                'filler_patterns': len(self.filler_word_patterns),
+                'format_patterns': len(self.format_consistency_patterns),
+                'common_terms': len(self.common_usage_terms),
+                'proper_nouns': len(self.academic_proper_nouns)
+            })
             
-            # ENHANCED: Philosophical schools and teachers
-            (r'shankaracharya', 'Shankaracharya', 'Capitalize spiritual teacher'),
-            (r'patanjali', 'Patanjali', 'Capitalize sage/author'),
-            (r'valmiki', 'Valmiki', 'Capitalize sage/author'),
-            (r'vyasa', 'Vyasa', 'Capitalize sage/author'),
-        ]
-        
-        # Filler word removal patterns - CRITICAL MISSING FUNCTIONALITY
-        self.filler_word_patterns = [
-            # Common filler words at start of sentences/segments
-            (r'^\s*(?:um|uh|er|ah|eh),?\s*', '', 'Remove filler word at start'),
-            (r'^\s*(?:you know|like|well|so),?\s*', '', 'Remove filler phrase at start'),
+        except Exception as e:
+            # If error handler initialization fails, use basic logging
+            import logging
+            self.logger = logging.getLogger(__name__)
+            self.logger.error(f"Failed to initialize AcademicPolishProcessor with error handler: {e}")
             
-            # Mid-sentence filler words with surrounding punctuation
-            (r',\s*(?:um|uh|er|ah|eh),?\s*', ', ', 'Remove mid-sentence filler word'),
-            (r',\s*(?:you know|like|I mean),?\s*', ', ', 'Remove mid-sentence filler phrase'),
+            # Initialize with minimal patterns for fallback
+            self.capitalization_patterns = [(r'^([a-z])', lambda m: m.group(1).upper(), 'Basic capitalization')]
+            self.sanskrit_term_patterns = [(r'\\bkrishna\\b', 'Krishna', 'Basic Sanskrit term')]
+            self.filler_word_patterns = [(r'^\\s*(?:um|uh),?\\s*', '', 'Basic filler removal')]
+            self.format_consistency_patterns = [(r'  +', ' ', 'Basic space normalization')]
+            self.common_usage_terms = {'karma', 'dharma', 'yoga'}
+            self.academic_proper_nouns = {'God', 'Divine'}
             
-            # Filler words before punctuation
-            (r'\s+(?:um|uh|er|ah|eh)\s*([,.;:])', r'\1', 'Remove filler before punctuation'),
-            
-            # Repeated words/stuttering
-            (r'\b(\w+)\s+\1\b', r'\1', 'Remove word repetition'),
-            
-            # False starts and corrections
-            (r'\b(?:I mean|let me rephrase|actually|rather),?\s*', '', 'Remove correction phrases'),
-            (r'\b(?:what I meant was|let me correct that),?\s*', '', 'Remove correction phrases'),
-            
-            # Hesitation patterns
-            (r'\s*(?:and and|the the|of of|in in)\s*', ' ', 'Remove hesitation repetitions'),
-        ]
-        
-        # Format consistency patterns
-        self.format_consistency_patterns = [
-            # Standardize spacing around punctuation
-            (r'\.{2,}', '...', 'Standardize ellipsis'),
-            (r'\s+\.', '.', 'Remove space before period'),
-            (r'\s+,', ',', 'Remove space before comma'),
-            (r'\s+;', ';', 'Remove space before semicolon'),
-            (r'\s+:', ':', 'Remove space before colon'),
-            
-            # Standardize quotation marks
-            (r'"([^"]*)"', r'"\1"', 'Standardize quotation marks'),
-            (r"'([^']*)'", r"'\1'", 'Standardize single quotes'),
-            
-            # Fix multiple spaces
-            (r'  +', ' ', 'Collapse multiple spaces'),
-            
-            # Standardize dash usage
-            (r'\s*-\s*', '—', 'Use em-dash for interruptions'),
-            (r'\s*--\s*', '—', 'Use em-dash instead of double hyphen'),
-        ]
-        
-        # Sanskrit terms that should remain lowercase in common usage
-        self.common_usage_terms = {
-            'karma', 'dharma', 'yoga', 'guru', 'mantra', 'chakra', 'prana',
-            'ahimsa', 'moksha', 'samadhi', 'satsang', 'tapas'
-        }
-        
-        # Academic proper nouns that should always be capitalized
-        self.academic_proper_nouns = {
-            'God', 'Divine', 'Absolute', 'Supreme', 'Self', 'Truth', 'Reality',
-            'Consciousness', 'Brahman', 'Ātman', 'Paramātmā'
-        }
+            self._error_handler = None
+            raise ProcessingError(f"Critical failure initializing AcademicPolishProcessor: {str(e)}")
     
     def polish_srt_content(self, content: str) -> Tuple[str, List[PolishIssue]]:
-        """Apply academic polish enhancements to SRT content"""
+        """Apply academic polish enhancements to SRT content with standardized error handling."""
+        if self._error_handler:
+            self._error_handler.log_operation_start("polish_srt_content", {
+                'content_length': len(content),
+                'content_lines': len(content.split('\n')),
+                'content_preview': content[:100] + "..." if len(content) > 100 else content
+            })
+        
         polished_content = content
         issues = []
-        lines = content.split('\n')
         
-        for line_num, original_line in enumerate(lines, 1):
-            # Skip timestamp lines and empty lines
-            if self._is_timestamp_line(original_line) or not original_line.strip():
-                continue
+        try:
+            lines = content.split('\n')
             
-            line = original_line
-            line_issues = []
+            for line_num, original_line in enumerate(lines, 1):
+                try:
+                    # Skip timestamp lines and empty lines
+                    if self._is_timestamp_line(original_line) or not original_line.strip():
+                        continue
+                    
+                    line = original_line
+                    line_issues = []
+                    
+                    # Apply filler word removal first (highest priority for academic polish)
+                    try:
+                        for pattern, replacement, description in self.filler_word_patterns:
+                            if re.search(pattern, line, re.IGNORECASE):
+                                new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
+                                if new_line != line:
+                                    line_issues.append(PolishIssue(
+                                        line_number=line_num,
+                                        issue_type='filler_word_removal',
+                                        description=description,
+                                        original_text=line,
+                                        suggested_fix=new_line,
+                                        priority='critical'  # Filler removal is critical for academic standards
+                                    ))
+                                    line = new_line
+                    except Exception as e:
+                        if self._error_handler:
+                            error_details = self._error_handler.handle_processing_error("filler_word_removal", e, {
+                                'line_number': line_num,
+                                'line_text': line[:50] + "..." if len(line) > 50 else line
+                            })
+                            self.logger.warning(f"Filler word removal failed for line {line_num}: {error_details}")
+                        # Continue processing without filler removal for this line
+                    
+                    # Apply capitalization fixes
+                    try:
+                        for pattern, replacement, description in self.capitalization_patterns:
+                            if isinstance(replacement, str):
+                                # Simple string replacement
+                                if re.search(pattern, line, re.IGNORECASE):
+                                    new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
+                                    if new_line != line:
+                                        line_issues.append(PolishIssue(
+                                            line_number=line_num,
+                                            issue_type='capitalization',
+                                            description=description,
+                                            original_text=line,
+                                            suggested_fix=new_line,
+                                            priority='major'
+                                        ))
+                                        line = new_line
+                            else:
+                                # Function-based replacement
+                                matches = list(re.finditer(pattern, line))
+                                if matches:
+                                    new_line = re.sub(pattern, replacement, line)
+                                    if new_line != line:
+                                        line_issues.append(PolishIssue(
+                                            line_number=line_num,
+                                            issue_type='capitalization',
+                                            description=description,
+                                            original_text=line,
+                                            suggested_fix=new_line,
+                                            priority='major'
+                                        ))
+                                        line = new_line
+                    except Exception as e:
+                        if self._error_handler:
+                            error_details = self._error_handler.handle_processing_error("capitalization_fixes", e, {
+                                'line_number': line_num,
+                                'line_text': line[:50] + "..." if len(line) > 50 else line
+                            })
+                            self.logger.warning(f"Capitalization fixes failed for line {line_num}: {error_details}")
+                        # Continue processing without capitalization fixes for this line
+                    
+                    # Apply Sanskrit term standardization
+                    try:
+                        for pattern, replacement, description in self.sanskrit_term_patterns:
+                            if re.search(pattern, line, re.IGNORECASE):
+                                new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
+                                if new_line != line:
+                                    line_issues.append(PolishIssue(
+                                        line_number=line_num,
+                                        issue_type='sanskrit_standardization',
+                                        description=description,
+                                        original_text=line,
+                                        suggested_fix=new_line,
+                                        priority='major'
+                                    ))
+                                    line = new_line
+                    except Exception as e:
+                        if self._error_handler:
+                            error_details = self._error_handler.handle_processing_error("sanskrit_standardization", e, {
+                                'line_number': line_num,
+                                'line_text': line[:50] + "..." if len(line) > 50 else line
+                            })
+                            self.logger.warning(f"Sanskrit standardization failed for line {line_num}: {error_details}")
+                        # Continue processing without Sanskrit standardization for this line
+                    
+                    # Apply format consistency fixes
+                    try:
+                        for pattern, replacement, description in self.format_consistency_patterns:
+                            if re.search(pattern, line):
+                                new_line = re.sub(pattern, replacement, line)
+                                if new_line != line:
+                                    line_issues.append(PolishIssue(
+                                        line_number=line_num,
+                                        issue_type='format_consistency',
+                                        description=description,
+                                        original_text=line,
+                                        suggested_fix=new_line,
+                                        priority='minor'
+                                    ))
+                                    line = new_line
+                    except Exception as e:
+                        if self._error_handler:
+                            error_details = self._error_handler.handle_processing_error("format_consistency", e, {
+                                'line_number': line_num,
+                                'line_text': line[:50] + "..." if len(line) > 50 else line
+                            })
+                            self.logger.warning(f"Format consistency fixes failed for line {line_num}: {error_details}")
+                        # Continue processing without format consistency fixes for this line
+                    
+                    # Replace the line in the content if changes were made
+                    if line != original_line:
+                        lines[line_num - 1] = line
+                        issues.extend(line_issues)
+                        
+                except Exception as e:
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("line_processing", e, {
+                            'line_number': line_num,
+                            'original_line': original_line[:50] + "..." if len(original_line) > 50 else original_line
+                        })
+                        self.logger.error(f"Failed to process line {line_num}: {error_details}")
+                    # Skip this line and continue with the next one
+                    continue
             
-            # Apply filler word removal first (highest priority for academic polish)
-            for pattern, replacement, description in self.filler_word_patterns:
-                if re.search(pattern, line, re.IGNORECASE):
-                    new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
-                    if new_line != line:
-                        line_issues.append(PolishIssue(
-                            line_number=line_num,
-                            issue_type='filler_word_removal',
-                            description=description,
-                            original_text=line,
-                            suggested_fix=new_line,
-                            priority='critical'  # Filler removal is critical for academic standards
-                        ))
-                        line = new_line
+            polished_content = '\n'.join(lines)
             
-            # Apply capitalization fixes
-            for pattern, replacement, description in self.capitalization_patterns:
-                if isinstance(replacement, str):
-                    # Simple string replacement
-                    if re.search(pattern, line, re.IGNORECASE):
-                        new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
-                        if new_line != line:
-                            line_issues.append(PolishIssue(
-                                line_number=line_num,
-                                issue_type='capitalization',
-                                description=description,
-                                original_text=line,
-                                suggested_fix=new_line,
-                                priority='major'
-                            ))
-                            line = new_line
-                else:
-                    # Function-based replacement
-                    matches = list(re.finditer(pattern, line))
-                    if matches:
-                        new_line = re.sub(pattern, replacement, line)
-                        if new_line != line:
-                            line_issues.append(PolishIssue(
-                                line_number=line_num,
-                                issue_type='capitalization',
-                                description=description,
-                                original_text=line,
-                                suggested_fix=new_line,
-                                priority='major'
-                            ))
-                            line = new_line
+            if self._error_handler:
+                self._error_handler.log_operation_success("polish_srt_content", {
+                    'original_lines': len(content.split('\n')),
+                    'processed_lines': len(lines),
+                    'issues_found': len(issues),
+                    'content_length_change': len(polished_content) - len(content)
+                })
             
-            # Apply Sanskrit term standardization
-            for pattern, replacement, description in self.sanskrit_term_patterns:
-                if re.search(pattern, line, re.IGNORECASE):
-                    new_line = re.sub(pattern, replacement, line, flags=re.IGNORECASE)
-                    if new_line != line:
-                        line_issues.append(PolishIssue(
-                            line_number=line_num,
-                            issue_type='sanskrit_standardization',
-                            description=description,
-                            original_text=line,
-                            suggested_fix=new_line,
-                            priority='major'
-                        ))
-                        line = new_line
+            return polished_content, issues
             
-            # Apply format consistency fixes
-            for pattern, replacement, description in self.format_consistency_patterns:
-                if re.search(pattern, line):
-                    new_line = re.sub(pattern, replacement, line)
-                    if new_line != line:
-                        line_issues.append(PolishIssue(
-                            line_number=line_num,
-                            issue_type='format_consistency',
-                            description=description,
-                            original_text=line,
-                            suggested_fix=new_line,
-                            priority='minor'
-                        ))
-                        line = new_line
+        except Exception as e:
+            if self._error_handler:
+                error_details = self._error_handler.handle_processing_error("polish_srt_content_critical", e, {
+                    'content_length': len(content),
+                    'content_preview': content[:100] + "..." if len(content) > 100 else content
+                })
+                self.logger.error(f"Critical failure in SRT content polishing: {error_details}")
             
-            # Replace the line in the content if changes were made
-            if line != original_line:
-                lines[line_num - 1] = line
-                issues.extend(line_issues)
-        
-        polished_content = '\n'.join(lines)
-        return polished_content, issues
+            # Return original content with error issue
+            critical_issue = PolishIssue(
+                line_number=0,
+                issue_type='processing_error',
+                description=f'Critical processing error: {str(e)}',
+                original_text=content[:100] + "..." if len(content) > 100 else content,
+                suggested_fix="Manual review required",
+                priority='critical'
+            )
+            
+            return content, [critical_issue]  # Return original content on critical failure
     
     def fix_subtitle_numbering(self, content: str) -> Tuple[str, List[PolishIssue]]:
         """Fix subtitle numbering sequence issues"""

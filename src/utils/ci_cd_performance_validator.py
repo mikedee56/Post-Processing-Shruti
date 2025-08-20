@@ -5,18 +5,19 @@ This module implements automated performance testing and validation for CI/CD pi
 ensuring sub-second processing targets and preventing performance regressions in production.
 """
 
+from pathlib import Path
 import json
 import logging
 import subprocess
 import sys
-import time
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, Callable
-from enum import Enum
 import tempfile
 import threading
+import time
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, Union, Callable
 
 # Import existing performance components
 sys.path.append(str(Path(__file__).parent))

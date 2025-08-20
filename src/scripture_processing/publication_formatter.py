@@ -8,18 +8,19 @@ readiness with consultant review integration.
 Story 4.5: Scripture Intelligence Enhancement - Task 3 Implementation
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Set, Tuple, Union
-from enum import Enum
 from pathlib import Path
-import logging
-import re
 import datetime
 import json
+import logging
+import re
+
 
 from .academic_citation_manager import AcademicCitationManager, AcademicCitation, CitationStyle
 from .advanced_verse_matcher import AdvancedVerseMatcher, ContextualMatchingResult
 from .canonical_text_manager import CanonicalTextManager, VerseCandidate
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, List, Optional, Any, Set, Tuple, Union
 from utils.logger_config import get_logger
 
 

@@ -16,8 +16,8 @@ import logging
 import re
 import datetime
 
-from .canonical_text_manager import CanonicalTextManager, VerseCandidate, ScriptureSource
-from .scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
+from scripture_processing.canonical_text_manager import CanonicalTextManager, VerseCandidate, ScriptureSource
+from scripture_processing.scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
 from utils.logger_config import get_logger
 
 

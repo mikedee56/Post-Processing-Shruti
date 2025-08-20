@@ -1,0 +1,35 @@
+{
+  "file_path": "C:\\Users\\miked\\AppData\\Local\\Temp\\tmp1gkavruj.srt",
+  "processing_time": 0.6633801460266113,
+  "total_segments": 1,
+  "segments_modified": 1,
+  "corrections_applied": {
+    "sanskrit_hindi_direct_replacement": 2,
+    "ner_entities_identified": 2,
+    "ner_capitalizations": 1,
+    "mcp_context_aware_number_processing": 1,
+    "fixed_capitalization": 1,
+    "ner_processing": 1
+  },
+  "timestamp_integrity_verified": true,
+  "errors_encountered": [],
+  "warnings_encountered": [
+    "High semantic drift (0.447) in segment"
+  ],
+  "original_word_count": 10,
+  "processed_word_count": 9,
+  "original_char_count": 56,
+  "processed_char_count": 43,
+  "confidence_scores": [
+    0.6192460317460317
+  ],
+  "average_confidence": 0.6192460317460317,
+  "flagged_segments": 1,
+  "parsing_time": 0.0010008811950683594,
+  "normalization_time": 0.006998538970947266,
+  "correction_time": 0.650383472442627,
+  "validation_time": 0.0,
+  "processing_timestamp": "2025-08-18T23:36:16.173538+00:00",
+  "processor_version": "1.0.0",
+  "configuration_used": {}
+}

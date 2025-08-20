@@ -19,7 +19,7 @@
       "suggested_category": "UNKNOWN",
       "confidence": 0.75,
       "source": "auto_discovery",
-      "frequency": 1041,
+      "frequency": 1058,
       "context_examples": [
         "Today we study Yoga and Dharma from ancient scriptures segment 1.",
         "Today we study Yoga and Dharma from ancient scriptures segment 2.",
@@ -190,7 +190,8 @@
         "Today we study Yoga and Dharma from ancient scriptures.Segment 16.",
         "Today we study Yoga and Dharma from ancient scriptures.",
         "Dharma and Yoga practices help us understand Vishnu.",
-        "Dharma and Yoga practices help us understand Vishnu and Shiva."
+        "Dharma and Yoga practices help us understand Vishnu and Shiva.",
+        "Today we study Yoga and Dharma"
       ],
       "suggested_variations": [
         "Yog"
@@ -204,7 +205,7 @@
       "suggested_category": "UNKNOWN",
       "confidence": 0.75,
       "source": "auto_discovery",
-      "frequency": 676,
+      "frequency": 698,
       "context_examples": [
         "Today we study Yoga and Dharma from ancient scriptures segment 1.",
         "Today we study Yoga and Dharma from ancient scriptures segment 2.",
@@ -309,7 +310,10 @@
         "Today we study Yoga and Dharma from ancient scriptures.Segment 16.",
         "Today we study Yoga and Dharma from ancient scriptures.",
         "Dharma and Yoga practices help us understand Vishnu.",
-        "Dharma and Yoga practices help us understand Vishnu and Shiva."
+        "Dharma and Yoga practices help us understand Vishnu and Shiva.",
+        "Today we study Yoga and Dharma",
+        "And 1 by 1, the students learned about Dharma.",
+        "And 1 by 1, the students learned about Dharma"
       ],
       "suggested_variations": [
         "dharm"
@@ -399,7 +403,7 @@
       "suggested_category": "UNKNOWN",
       "confidence": 0.75,
       "source": "auto_discovery",
-      "frequency": 276,
+      "frequency": 290,
       "context_examples": [
         "Today we will discuss, Chapter 2 Verse 25 from the Bhagavad Gita.",
         "Chapter 2 Verse 25",
@@ -449,7 +453,8 @@
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 2.",
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 7.",
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 12.",
-        "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 17."
+        "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 17.",
+        "Today we study Kṛṣṇa in Chapter 2 verse 25."
       ],
       "suggested_variations": [],
       "suggested_transliteration": "Verse",
@@ -461,7 +466,7 @@
       "suggested_category": "UNKNOWN",
       "confidence": 0.75,
       "source": "auto_discovery",
-      "frequency": 276,
+      "frequency": 290,
       "context_examples": [
         "The ancient teachers Kṛṣṇa and Patanjali Guide us in Yoga Practice.",
         "The ancient teachers Kṛṣṇa and Patanjali",
@@ -511,7 +516,8 @@
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 2.",
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 7.",
         "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 12.",
-        "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 17."
+        "Kṛṣṇa teaches us about Chapter 2 Verse 25.Segment 17.",
+        "Today we study Kṛṣṇa in Chapter 2 verse 25."
       ],
       "suggested_variations": [
         "Kṛṣṇ"
@@ -557,12 +563,13 @@
       "suggested_category": "UNKNOWN",
       "confidence": 0.75,
       "source": "auto_discovery",
-      "frequency": 12,
+      "frequency": 17,
       "context_examples": [
         "One by one, the students learned that Two plus two equals four in mathematics.",
         "One by one, the students learned that 2 plus 2 equals 4 in mathematics.",
         "One by one, the students learned that 2 plus 2 equals 4",
-        "And One by one, the students learned about Shiva."
+        "And One by one, the students learned about Shiva.",
+        "And One by one, the students learned about the eternal Nature of the soul."
       ],
       "suggested_variations": [],
       "suggested_transliteration": "One",
@@ -715,6 +722,20 @@
       "suggested_transliteration": "Are",
       "user_feedback": null,
       "created_date": "2025-08-17T20:42:32.141865"
+    },
+    {
+      "text": "nature",
+      "suggested_category": "UNKNOWN",
+      "confidence": 0.75,
+      "source": "auto_discovery",
+      "frequency": 5,
+      "context_examples": [
+        "And One by one, the students learned about the eternal Nature of the soul."
+      ],
+      "suggested_variations": [],
+      "suggested_transliteration": "Nature",
+      "user_feedback": null,
+      "created_date": "2025-08-19T07:56:19.793501"
     }
   ]
 }

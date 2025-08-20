@@ -12,13 +12,13 @@ import logging
 
 from utils.logger_config import get_logger
 from utils.srt_parser import SRTSegment
-from .scripture_identifier import ScriptureIdentifier
-from .canonical_text_manager import CanonicalTextManager
-from .verse_substitution_engine import VerseSubstitutionEngine, SubstitutionResult
-from .scripture_validator import ScriptureValidator
-from .scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
-from .verse_selection_system import VerseSelectionSystem, SelectionStrategy
-from .hybrid_matching_engine import HybridMatchingEngine, HybridPipelineConfig
+from scripture_processing.scripture_identifier import ScriptureIdentifier
+from scripture_processing.canonical_text_manager import CanonicalTextManager
+from scripture_processing.verse_substitution_engine import VerseSubstitutionEngine, SubstitutionResult
+from scripture_processing.scripture_validator import ScriptureValidator
+from scripture_processing.scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
+from scripture_processing.verse_selection_system import VerseSelectionSystem, SelectionStrategy
+from scripture_processing.hybrid_matching_engine import HybridMatchingEngine, HybridPipelineConfig
 
 
 @dataclass
@@ -50,121 +50,211 @@ class ScriptureProcessor:
     
     def __init__(self, config: Dict = None, scripture_dir: Path = None):
         """
-        Initialize the Scripture Processor.
+        Initialize the Scripture Processor with standardized error handling.
         
         Args:
             config: Configuration parameters
             scripture_dir: Directory containing scripture databases
         """
-        self.logger = get_logger(__name__)
-        self.config = config or {}
+        # Import ErrorHandler locally for consistent import pattern
+        from utils.error_handler import ErrorHandler
+        from utils.exception_hierarchy import ProcessingError, ConfigurationError, DependencyError
         
-        # Story 2.4.3 - Hybrid matching configuration
-        self.enable_hybrid_matching = self.config.get('enable_hybrid_matching', False)
-        self.hybrid_engine = None
-        
-        # Story 4.5 - Academic enhancement configuration
-        self.enable_academic_enhancement = self.config.get('enable_academic_enhancement', False)
-        self.academic_citation_manager = None
-        self.publication_formatter = None
-        self.academic_validator = None
-        
-        # Initialize components
-        self.canonical_manager = CanonicalTextManager(
-            scripture_dir=scripture_dir,
-            config=self.config.get('canonical_manager', {})
-        )
-        
-        self.scripture_identifier = ScriptureIdentifier(
-            lexicon_manager=None,  # Will use default
-            config=self.config.get('scripture_identifier', {})
-        )
-        
-        self.validator = ScriptureValidator(
-            config=self.config.get('validator', {})
-        )
-        
-        self.substitution_engine = VerseSubstitutionEngine(
-            scripture_identifier=self.scripture_identifier,
-            canonical_manager=self.canonical_manager,
-            validator=self.validator,
-            config=self.config.get('substitution_engine', {})
-        )
-        
-        self.iast_formatter = ScriptureIASTFormatter(
-            config=self.config.get('iast_formatter', {})
-        )
-        
-        self.selection_system = VerseSelectionSystem(
-            canonical_manager=self.canonical_manager,
-            scripture_identifier=self.scripture_identifier,
-            validator=self.validator,
-            config=self.config.get('selection_system', {})
-        )
-        
-        # Processing configuration
-        self.enable_substitution = self.config.get('enable_substitution', True)
-        self.enable_iast_formatting = self.config.get('enable_iast_formatting', True)
-        self.enable_validation = self.config.get('enable_validation', True)
-        self.formatting_style = VerseFormatting(
-            self.config.get('formatting_style', 'academic')
-        )
-        
-        # Initialize hybrid matching engine if enabled (Story 2.4.3)
-        if self.enable_hybrid_matching:
+        # Initialize error handler first for consistent error handling
+        try:
+            self._error_handler = ErrorHandler(component="ScriptureProcessor")
+            self.logger = self._error_handler.logger
+            
+            self._error_handler.log_operation_start("scripture_processor_initialization", {
+                'component': 'ScriptureProcessor',
+                'config_provided': config is not None,
+                'scripture_dir_provided': scripture_dir is not None
+            })
+            
+            self.config = config or {}
+            
+            # Story 2.4.3 - Hybrid matching configuration
+            self.enable_hybrid_matching = self.config.get('enable_hybrid_matching', False)
+            self.hybrid_engine = None
+            
+            # Story 4.5 - Academic enhancement configuration
+            self.enable_academic_enhancement = self.config.get('enable_academic_enhancement', False)
+            self.academic_citation_manager = None
+            self.publication_formatter = None
+            self.academic_validator = None
+            
+            # Initialize components with error handling
             try:
-                hybrid_config = HybridPipelineConfig()
-                if 'hybrid_pipeline' in self.config:
-                    # Update config with user settings
-                    for key, value in self.config['hybrid_pipeline'].items():
-                        if hasattr(hybrid_config, key):
-                            setattr(hybrid_config, key, value)
-                
-                self.hybrid_engine = HybridMatchingEngine(
-                    canonical_manager=self.canonical_manager,
-                    config=hybrid_config,
-                    cache_dir=scripture_dir / "hybrid_cache" if scripture_dir else None
+                self.canonical_manager = CanonicalTextManager(
+                    scripture_dir=scripture_dir,
+                    config=self.config.get('canonical_manager', {})
                 )
-                
-                self.logger.info("Hybrid matching engine initialized (Story 2.4.3)")
-                
+                self._error_handler.log_operation_success("canonical_manager_initialization", {
+                    'scripture_dir': str(scripture_dir) if scripture_dir else 'default'
+                })
             except Exception as e:
-                self.logger.error(f"Failed to initialize hybrid matching engine: {e}")
-                self.enable_hybrid_matching = False
-        
-        # Initialize academic enhancement components if enabled (Story 4.5)
-        if self.enable_academic_enhancement:
+                error_details = self._error_handler.handle_processing_error("canonical_manager_initialization", e, {
+                    'scripture_dir': str(scripture_dir) if scripture_dir else 'None'
+                })
+                raise DependencyError(f"Failed to initialize CanonicalTextManager: {error_details}")
+            
             try:
-                from .academic_citation_manager import AcademicCitationManager
-                from .publication_formatter import PublicationFormatter  
-                from ..utils.academic_validator import AcademicValidator
-                
-                # Initialize academic components
-                self.academic_citation_manager = AcademicCitationManager(
-                    config=self.config.get('academic_citation', {})
+                self.scripture_identifier = ScriptureIdentifier(
+                    lexicon_manager=None,  # Will use default
+                    config=self.config.get('scripture_identifier', {})
                 )
-                
-                self.publication_formatter = PublicationFormatter(
-                    canonical_manager=self.canonical_manager,
-                    citation_manager=self.academic_citation_manager,
-                    config=self.config.get('publication_formatter', {})
-                )
-                
-                self.academic_validator = AcademicValidator(
-                    config=self.config.get('academic_validator', {})
-                )
-                
-                self.logger.info("Academic enhancement components initialized (Story 4.5)")
-                
+                self._error_handler.log_operation_success("scripture_identifier_initialization", {})
             except Exception as e:
-                self.logger.error(f"Failed to initialize academic enhancement components: {e}")
-                self.enable_academic_enhancement = False
-        
-        self.logger.info("Scripture processor initialized with all components")
+                error_details = self._error_handler.handle_processing_error("scripture_identifier_initialization", e, {})
+                raise DependencyError(f"Failed to initialize ScriptureIdentifier: {error_details}")
+            
+            try:
+                self.validator = ScriptureValidator(
+                    config=self.config.get('validator', {})
+                )
+                self._error_handler.log_operation_success("scripture_validator_initialization", {})
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("scripture_validator_initialization", e, {})
+                raise DependencyError(f"Failed to initialize ScriptureValidator: {error_details}")
+            
+            try:
+                self.substitution_engine = VerseSubstitutionEngine(
+                    scripture_identifier=self.scripture_identifier,
+                    canonical_manager=self.canonical_manager,
+                    validator=self.validator,
+                    config=self.config.get('substitution_engine', {})
+                )
+                self._error_handler.log_operation_success("verse_substitution_engine_initialization", {})
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("verse_substitution_engine_initialization", e, {})
+                raise DependencyError(f"Failed to initialize VerseSubstitutionEngine: {error_details}")
+            
+            try:
+                self.iast_formatter = ScriptureIASTFormatter(
+                    config=self.config.get('iast_formatter', {})
+                )
+                self._error_handler.log_operation_success("iast_formatter_initialization", {})
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("iast_formatter_initialization", e, {})
+                raise DependencyError(f"Failed to initialize ScriptureIASTFormatter: {error_details}")
+            
+            try:
+                self.selection_system = VerseSelectionSystem(
+                    canonical_manager=self.canonical_manager,
+                    scripture_identifier=self.scripture_identifier,
+                    validator=self.validator,
+                    config=self.config.get('selection_system', {})
+                )
+                self._error_handler.log_operation_success("verse_selection_system_initialization", {})
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("verse_selection_system_initialization", e, {})
+                raise DependencyError(f"Failed to initialize VerseSelectionSystem: {error_details}")
+            
+            # Processing configuration
+            try:
+                self.enable_substitution = self.config.get('enable_substitution', True)
+                self.enable_iast_formatting = self.config.get('enable_iast_formatting', True)
+                self.enable_validation = self.config.get('enable_validation', True)
+                
+                formatting_style_str = self.config.get('formatting_style', 'academic')
+                self.formatting_style = VerseFormatting(formatting_style_str)
+                
+                self._error_handler.log_operation_success("processing_configuration", {
+                    'enable_substitution': self.enable_substitution,
+                    'enable_iast_formatting': self.enable_iast_formatting,
+                    'enable_validation': self.enable_validation,
+                    'formatting_style': formatting_style_str
+                })
+            except Exception as e:
+                error_details = self._error_handler.handle_processing_error("processing_configuration", e, {
+                    'config_keys': list(self.config.keys())
+                })
+                raise ConfigurationError(f"Invalid processing configuration: {error_details}")
+            
+            # Initialize hybrid matching engine if enabled (Story 2.4.3)
+            if self.enable_hybrid_matching:
+                try:
+                    hybrid_config = HybridPipelineConfig()
+                    if 'hybrid_pipeline' in self.config:
+                        # Update config with user settings
+                        for key, value in self.config['hybrid_pipeline'].items():
+                            if hasattr(hybrid_config, key):
+                                setattr(hybrid_config, key, value)
+                    
+                    self.hybrid_engine = HybridMatchingEngine(
+                        canonical_manager=self.canonical_manager,
+                        config=hybrid_config,
+                        cache_dir=scripture_dir / "hybrid_cache" if scripture_dir else None
+                    )
+                    
+                    self._error_handler.log_operation_success("hybrid_matching_engine_initialization", {
+                        'cache_dir': str(scripture_dir / "hybrid_cache") if scripture_dir else 'None'
+                    })
+                    
+                except Exception as e:
+                    error_details = self._error_handler.handle_processing_error("hybrid_matching_engine_initialization", e, {
+                        'enable_hybrid_matching': self.enable_hybrid_matching,
+                        'scripture_dir': str(scripture_dir) if scripture_dir else 'None'
+                    })
+                    self.logger.error(f"Failed to initialize hybrid matching engine: {error_details}")
+                    self.enable_hybrid_matching = False
+            
+            # Initialize academic enhancement components if enabled (Story 4.5)
+            if self.enable_academic_enhancement:
+                try:
+                    from scripture_processing.academic_citation_manager import AcademicCitationManager
+                    from scripture_processing.publication_formatter import PublicationFormatter  
+                    from utils.academic_validator import AcademicValidator
+                    
+                    # Initialize academic components
+                    self.academic_citation_manager = AcademicCitationManager(
+                        config=self.config.get('academic_citation', {})
+                    )
+                    
+                    self.publication_formatter = PublicationFormatter(
+                        canonical_manager=self.canonical_manager,
+                        citation_manager=self.academic_citation_manager,
+                        config=self.config.get('publication_formatter', {})
+                    )
+                    
+                    self.academic_validator = AcademicValidator(
+                        config=self.config.get('academic_validator', {})
+                    )
+                    
+                    self._error_handler.log_operation_success("academic_enhancement_initialization", {
+                        'citation_manager': self.academic_citation_manager is not None,
+                        'publication_formatter': self.publication_formatter is not None,
+                        'academic_validator': self.academic_validator is not None
+                    })
+                    
+                except Exception as e:
+                    error_details = self._error_handler.handle_processing_error("academic_enhancement_initialization", e, {
+                        'enable_academic_enhancement': self.enable_academic_enhancement
+                    })
+                    self.logger.error(f"Failed to initialize academic enhancement components: {error_details}")
+                    self.enable_academic_enhancement = False
+            
+            self._error_handler.log_operation_success("scripture_processor_initialization", {
+                'components_initialized': [
+                    'canonical_manager', 'scripture_identifier', 'validator',
+                    'substitution_engine', 'iast_formatter', 'selection_system'
+                ],
+                'hybrid_matching_enabled': self.enable_hybrid_matching,
+                'academic_enhancement_enabled': self.enable_academic_enhancement
+            })
+            
+        except Exception as e:
+            # If error handler initialization fails, use basic logging
+            from utils.logger_config import get_logger
+            self.logger = get_logger(__name__)
+            self.logger.error(f"Failed to initialize ScriptureProcessor with error handler: {e}")
+            
+            self._error_handler = None
+            raise ProcessingError(f"Critical failure initializing ScriptureProcessor: {str(e)}")
     
     def process_text(self, text: str, context: Dict = None) -> ScriptureProcessingResult:
         """
-        Process text for scripture identification and substitution.
+        Process text for scripture identification and substitution with standardized error handling.
         
         Args:
             text: Input text to process
@@ -173,6 +263,14 @@ class ScriptureProcessor:
         Returns:
             Complete scripture processing result
         """
+        if self._error_handler:
+            self._error_handler.log_operation_start("scripture_text_processing", {
+                'text_length': len(text),
+                'text_preview': text[:100] + "..." if len(text) > 100 else text,
+                'context_provided': context is not None,
+                'context_keys': list(context.keys()) if context else []
+            })
+        
         context = context or {}
         processing_metadata = {'steps_completed': []}
         detailed_results = {}
@@ -183,16 +281,20 @@ class ScriptureProcessor:
         iast_formatted = False
         validation_passed = True
         
+        # Initialize hybrid matching variables
+        hybrid_matching_used = False
+        hybrid_confidence = 0.0
+        hybrid_stages = []
+        
         try:
             # Story 2.4.3 - Use hybrid matching if enabled
-            hybrid_matching_used = False
-            hybrid_confidence = 0.0
-            hybrid_stages = []
-            
             if self.enable_hybrid_matching and self.hybrid_engine:
-                self.logger.info("Using hybrid matching engine for scripture identification...")
-                
                 try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("hybrid_scripture_matching", {
+                            'hybrid_engine_available': self.hybrid_engine is not None
+                        })
+                    
                     hybrid_result = self.hybrid_engine.match_verse_passage(text, context)
                     
                     if hybrid_result.pipeline_success and hybrid_result.matched_verse:
@@ -206,31 +308,70 @@ class ScriptureProcessor:
                         detailed_results['hybrid_result'] = hybrid_result
                         processing_metadata['hybrid_matching'] = True
                         
-                        self.logger.info(
-                            f"Hybrid matching succeeded: {hybrid_confidence:.3f} confidence, "
-                            f"stages: {hybrid_stages}"
-                        )
+                        if self._error_handler:
+                            self._error_handler.log_operation_success("hybrid_scripture_matching", {
+                                'confidence': hybrid_confidence,
+                                'stages_completed': hybrid_stages,
+                                'verses_found': verses_identified
+                            })
+                        
                     else:
                         # Fall back to traditional identification
-                        self.logger.info("Hybrid matching failed, falling back to traditional identification")
+                        if self._error_handler:
+                            self._error_handler.log_operation_warning("hybrid_scripture_matching_fallback", {
+                                'pipeline_success': hybrid_result.pipeline_success,
+                                'matched_verse_found': hybrid_result.matched_verse is not None
+                            })
+                        
                         verse_matches = self.scripture_identifier.identify_scripture_passages(text)
                         verses_identified = len(verse_matches)
                         
                 except Exception as e:
-                    self.logger.error(f"Error in hybrid matching: {e}, falling back to traditional")
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("hybrid_scripture_matching", e, {
+                            'text_preview': text[:50] + "..." if len(text) > 50 else text
+                        })
+                        self.logger.error(f"Error in hybrid matching: {error_details}, falling back to traditional")
+                    
                     verse_matches = self.scripture_identifier.identify_scripture_passages(text)
                     verses_identified = len(verse_matches)
             else:
                 # Step 1: Traditional scripture identification
-                self.logger.info("Identifying scripture passages...")
-                verse_matches = self.scripture_identifier.identify_scripture_passages(text)
-                verses_identified = len(verse_matches)
+                try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("traditional_scripture_identification", {
+                            'text_length': len(text)
+                        })
+                    
+                    verse_matches = self.scripture_identifier.identify_scripture_passages(text)
+                    verses_identified = len(verse_matches)
+                    
+                    if self._error_handler:
+                        self._error_handler.log_operation_success("traditional_scripture_identification", {
+                            'verses_identified': verses_identified
+                        })
+                        
+                except Exception as e:
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("traditional_scripture_identification", e, {
+                            'text_preview': text[:50] + "..." if len(text) > 50 else text
+                        })
+                        self.logger.error(f"Scripture identification failed: {error_details}")
+                    
+                    # Set empty results on identification failure
+                    verse_matches = []
+                    verses_identified = 0
             
             detailed_results['verse_matches'] = verse_matches
             processing_metadata['steps_completed'].append('identification')
             
             if verses_identified == 0:
-                self.logger.info("No scripture passages identified")
+                if self._error_handler:
+                    self._error_handler.log_operation_success("scripture_text_processing_no_verses", {
+                        'verses_identified': 0,
+                        'text_preview': text[:50] + "..." if len(text) > 50 else text
+                    })
+                
                 return ScriptureProcessingResult(
                     original_text=text,
                     processed_text=processed_text,
@@ -247,39 +388,125 @@ class ScriptureProcessor:
             
             # Step 2: Verse substitution (if enabled)
             if self.enable_substitution:
-                self.logger.info(f"Processing {verses_identified} identified verses for substitution...")
-                substitution_result = self.substitution_engine.substitute_verses_in_text(processed_text)
-                processed_text = substitution_result.substituted_text
-                substitutions_made = len(substitution_result.operations_performed)
-                detailed_results['substitution_result'] = substitution_result
-                processing_metadata['steps_completed'].append('substitution')
-                
-                self.logger.info(f"Made {substitutions_made} verse substitutions")
+                try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("verse_substitution", {
+                            'verses_to_process': verses_identified
+                        })
+                    
+                    substitution_result = self.substitution_engine.substitute_verses_in_text(processed_text)
+                    processed_text = substitution_result.substituted_text
+                    substitutions_made = len(substitution_result.operations_performed)
+                    detailed_results['substitution_result'] = substitution_result
+                    processing_metadata['steps_completed'].append('substitution')
+                    
+                    if self._error_handler:
+                        self._error_handler.log_operation_success("verse_substitution", {
+                            'substitutions_made': substitutions_made,
+                            'text_length_change': len(processed_text) - len(text)
+                        })
+                        
+                except Exception as e:
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("verse_substitution", e, {
+                            'verses_identified': verses_identified,
+                            'text_preview': processed_text[:50] + "..." if len(processed_text) > 50 else processed_text
+                        })
+                        self.logger.error(f"Verse substitution failed: {error_details}")
+                    
+                    # Continue with original text on substitution failure
+                    substitutions_made = 0
             
             # Step 3: IAST formatting (if enabled)
             if self.enable_iast_formatting and substitutions_made > 0:
-                self.logger.info("Applying IAST formatting to processed verses...")
-                formatted_text = self._apply_iast_formatting_to_text(processed_text)
-                if formatted_text != processed_text:
-                    processed_text = formatted_text
-                    iast_formatted = True
-                    processing_metadata['steps_completed'].append('iast_formatting')
+                try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("iast_formatting", {
+                            'substitutions_made': substitutions_made
+                        })
+                    
+                    formatted_text = self._apply_iast_formatting_to_text(processed_text)
+                    if formatted_text != processed_text:
+                        processed_text = formatted_text
+                        iast_formatted = True
+                        processing_metadata['steps_completed'].append('iast_formatting')
+                        
+                        if self._error_handler:
+                            self._error_handler.log_operation_success("iast_formatting", {
+                                'formatting_applied': True,
+                                'text_length_change': len(formatted_text) - len(text)
+                            })
+                    else:
+                        if self._error_handler:
+                            self._error_handler.log_operation_warning("iast_formatting_no_change", {
+                                'text_preview': processed_text[:50] + "..." if len(processed_text) > 50 else processed_text
+                            })
+                            
+                except Exception as e:
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("iast_formatting", e, {
+                            'processed_text_preview': processed_text[:50] + "..." if len(processed_text) > 50 else processed_text
+                        })
+                        self.logger.error(f"IAST formatting failed: {error_details}")
+                    
+                    # Continue without IAST formatting on failure
+                    iast_formatted = False
             
             # Step 4: Validation (if enabled)
             if self.enable_validation:
-                self.logger.info("Validating scripture processing results...")
-                validation_results = self._validate_processing_results(
-                    text, processed_text, detailed_results.get('substitution_result')
-                )
-                validation_passed = validation_results['overall_valid']
-                detailed_results['validation'] = validation_results
-                processing_metadata['steps_completed'].append('validation')
+                try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("scripture_validation", {
+                            'substitutions_made': substitutions_made,
+                            'iast_formatted': iast_formatted
+                        })
+                    
+                    validation_results = self._validate_processing_results(
+                        text, processed_text, detailed_results.get('substitution_result')
+                    )
+                    validation_passed = validation_results['overall_valid']
+                    detailed_results['validation'] = validation_results
+                    processing_metadata['steps_completed'].append('validation')
+                    
+                    if self._error_handler:
+                        self._error_handler.log_operation_success("scripture_validation", {
+                            'validation_passed': validation_passed,
+                            'validation_results': validation_results
+                        })
+                        
+                except Exception as e:
+                    if self._error_handler:
+                        error_details = self._error_handler.handle_processing_error("scripture_validation", e, {
+                            'original_text_preview': text[:50] + "..." if len(text) > 50 else text,
+                            'processed_text_preview': processed_text[:50] + "..." if len(processed_text) > 50 else processed_text
+                        })
+                        self.logger.error(f"Scripture validation failed: {error_details}")
+                    
+                    # Continue with failed validation status
+                    validation_passed = False
             
             processing_metadata['success'] = True
             
+            if self._error_handler:
+                self._error_handler.log_operation_success("scripture_text_processing", {
+                    'verses_identified': verses_identified,
+                    'substitutions_made': substitutions_made,
+                    'iast_formatted': iast_formatted,
+                    'validation_passed': validation_passed,
+                    'hybrid_matching_used': hybrid_matching_used,
+                    'steps_completed': processing_metadata['steps_completed']
+                })
+            
         except Exception as e:
-            self.logger.error(f"Error during scripture processing: {e}")
+            if self._error_handler:
+                error_details = self._error_handler.handle_processing_error("scripture_text_processing_critical", e, {
+                    'original_text_preview': text[:50] + "..." if len(text) > 50 else text,
+                    'context_provided': context is not None
+                })
+                self.logger.error(f"Critical failure in scripture processing: {error_details}")
+            
             processing_metadata['error'] = str(e)
+            processing_metadata['success'] = False
             validation_passed = False
         
         return ScriptureProcessingResult(

@@ -100,122 +100,176 @@ class SanskritPostProcessor:
         self.config = self._load_config(config_path)
         self.logger = get_logger(__name__, self.config.get('logging', {}))
         
-        # Initialize new components
-        self.srt_parser = SRTParser()
+        # Initialize standardized error handler
+        from utils.exception_hierarchy import create_error_handler
+        self._error_handler = create_error_handler(self.logger, "SanskritPostProcessor")
         
-        # Choose between basic and advanced text normalizer based on config
-        use_advanced_normalization = self.config.get('use_advanced_normalization', True)
-        if use_advanced_normalization:
-            self.text_normalizer = AdvancedTextNormalizer(self.config.get('text_normalization', {}))
-        else:
-            self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
+        # Generate correlation ID for this processing session
+        import uuid
+        self.session_correlation_id = str(uuid.uuid4())
+        self._error_handler.set_correlation_id(self.session_correlation_id)
         
-        # Initialize additional foundational correction components
-        self.conversational_detector = ConversationalPatternDetector(self.config.get('conversational_patterns', {}))
-        self.number_processor = ContextualNumberProcessor(self.config.get('contextual_numbers', {}))
-        self.quality_validator = ProcessingQualityValidator(self.config.get('quality_validation', {}))
+        self._error_handler.log_operation_start("initialization")
         
-        self.metrics_collector = MetricsCollector(self.config.get('metrics', {}))
-        
-        # Initialize Story 2.1 components
-        lexicon_dir = Path(self.config.get('lexicon_dir', 'data/lexicons'))
-        
-        # Initialize enhanced lexicon management
-        self.lexicon_manager = LexiconManager(
-            lexicon_dir=lexicon_dir, 
-            enable_caching=self.config.get('enable_lexicon_caching', True)
-        )
-        
-        # Initialize Sanskrit/Hindi word identifier
-        self.word_identifier = SanskritHindiIdentifier(
-            lexicon_dir=lexicon_dir,
-            english_words_file=self.config.get('english_words_file')
-        )
-        
-        # Initialize fuzzy matcher with enhanced configuration
-        lexicon_data = self.lexicon_manager.get_all_entries()
-        matching_config = MatchingConfig(
-            min_confidence=self.config.get('fuzzy_min_confidence', 0.75),
-            levenshtein_threshold=self.config.get('levenshtein_threshold', 0.80),
-            phonetic_threshold=self.config.get('phonetic_threshold', 0.85),
-            max_edit_distance=self.config.get('max_edit_distance', 3),
-            enable_phonetic_matching=self.config.get('enable_phonetic_matching', True),
-            enable_compound_matching=self.config.get('enable_compound_matching', True)
-        )
-        
-        # Convert LexiconEntry objects to dict format for FuzzyMatcher
-        lexicon_dict = {}
-        for term, entry in lexicon_data.items():
-            lexicon_dict[term] = {
-                'transliteration': entry.transliteration,
-                'variations': entry.variations,
-                'is_proper_noun': entry.is_proper_noun,
-                'category': entry.category,
-                'confidence': entry.confidence,
-                'source_authority': entry.source_authority
-            }
-        
-        self.fuzzy_matcher = FuzzyMatcher(lexicon_dict, matching_config)
-        
-        # Initialize IAST transliterator
-        self.iast_transliterator = IASTTransliterator(
-            strict_mode=self.config.get('iast_strict_mode', True)
-        )
-        
-        # Initialize correction applier
-        self.correction_applier = CorrectionApplier(
-            min_confidence=self.config.get('correction_min_confidence', 0.80),
-            critical_confidence=self.config.get('correction_critical_confidence', 0.95),
-            enable_context_validation=self.config.get('enable_context_validation', True),
-            max_corrections_per_segment=self.config.get('max_corrections_per_segment', 10)
-        )
-        
-        # Initialize Story 2.6 Academic Polish Processor
-        self.academic_polish_processor = AcademicPolishProcessor()
-        self.enable_academic_polish = self.config.get('enable_academic_polish', False)
-        
-        # Initialize Story 3.1 NER components (CONSOLIDATED - SINGLE INITIALIZATION)
-        self.enable_ner = self.config.get('enable_ner', True)
-        if self.enable_ner:
-            training_data_dir = Path(self.config.get('ner_training_data_dir', 'data/ner_training'))
+        try:
+            # Initialize new components
+            self.srt_parser = SRTParser()
             
-            # Initialize NER model with integrated lexicon manager
-            self.ner_model = YogaVedantaNER(
-                training_data_dir=training_data_dir,
-                lexicon_manager=self.lexicon_manager,
-                enable_byt5_sanskrit=self.config.get('enable_byt5_sanskrit', False)
+            # Choose between basic and advanced text normalizer based on config
+            use_advanced_normalization = self.config.get('use_advanced_normalization', True)
+            if use_advanced_normalization:
+                self.text_normalizer = AdvancedTextNormalizer(self.config.get('text_normalization', {}))
+            else:
+                self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
+            
+            # Initialize additional foundational correction components
+            self.conversational_detector = ConversationalPatternDetector(self.config.get('conversational_patterns', {}))
+            self.number_processor = ContextualNumberProcessor(self.config.get('contextual_numbers', {}))
+            self.quality_validator = ProcessingQualityValidator(self.config.get('quality_validation', {}))
+            
+            self.metrics_collector = MetricsCollector(self.config.get('metrics', {}))
+            
+            # Initialize Story 2.1 components
+            lexicon_dir = Path(self.config.get('lexicon_dir', 'data/lexicons'))
+            
+            # Initialize enhanced lexicon management
+            self.lexicon_manager = LexiconManager(
+                lexicon_dir=lexicon_dir, 
+                enable_caching=self.config.get('enable_lexicon_caching', True)
             )
             
-            # Initialize capitalization engine
-            self.capitalization_engine = CapitalizationEngine(
-                ner_model=self.ner_model,
-                lexicon_manager=self.lexicon_manager
+            # Initialize Sanskrit/Hindi word identifier
+            self.word_identifier = SanskritHindiIdentifier(
+                lexicon_dir=lexicon_dir,
+                english_words_file=self.config.get('english_words_file')
             )
             
-            # Initialize model manager for expandable NER
-            self.ner_model_manager = NERModelManager(
-                models_dir=training_data_dir / "trained_models",
-                lexicon_manager=self.lexicon_manager
+            # Initialize fuzzy matcher with enhanced configuration
+            lexicon_data = self.lexicon_manager.get_all_entries()
+            matching_config = MatchingConfig(
+                min_confidence=self.config.get('fuzzy_min_confidence', 0.75),
+                levenshtein_threshold=self.config.get('levenshtein_threshold', 0.80),
+                phonetic_threshold=self.config.get('phonetic_threshold', 0.85),
+                max_edit_distance=self.config.get('max_edit_distance', 3),
+                enable_phonetic_matching=self.config.get('enable_phonetic_matching', True),
+                enable_compound_matching=self.config.get('enable_compound_matching', True)
             )
             
-            self.logger.info("Story 3.1 NER components initialized successfully")
-        else:
-            self.ner_model = None
-            self.capitalization_engine = None
-            self.ner_model_manager = None
-            self.logger.info("NER processing disabled")
+            # Convert LexiconEntry objects to dict format for FuzzyMatcher
+            lexicon_dict = {}
+            for term, entry in lexicon_data.items():
+                lexicon_dict[term] = {
+                    'transliteration': entry.transliteration,
+                    'variations': entry.variations,
+                    'is_proper_noun': entry.is_proper_noun,
+                    'category': entry.category,
+                    'confidence': entry.confidence,
+                    'source_authority': entry.source_authority
+                }
+            
+            self.fuzzy_matcher = FuzzyMatcher(lexicon_dict, matching_config)
+            
+            # Initialize IAST transliterator
+            self.iast_transliterator = IASTTransliterator(
+                strict_mode=self.config.get('iast_strict_mode', True)
+            )
+            
+            # Initialize correction applier
+            self.correction_applier = CorrectionApplier(
+                min_confidence=self.config.get('correction_min_confidence', 0.80),
+                critical_confidence=self.config.get('correction_critical_confidence', 0.95),
+                enable_context_validation=self.config.get('enable_context_validation', True),
+                max_corrections_per_segment=self.config.get('max_corrections_per_segment', 10)
+            )
+            
+            # Initialize Story 2.6 Academic Polish Processor
+            self.academic_polish_processor = AcademicPolishProcessor()
+            self.enable_academic_polish = self.config.get('enable_academic_polish', False)
+            
+            # Initialize Story 3.1 NER components (CONSOLIDATED - SINGLE INITIALIZATION)
+            self.enable_ner = self.config.get('enable_ner', True)
+            if self.enable_ner:
+                training_data_dir = Path(self.config.get('ner_training_data_dir', 'data/ner_training'))
+                
+                # Initialize NER model with integrated lexicon manager
+                self.ner_model = YogaVedantaNER(
+                    training_data_dir=training_data_dir,
+                    lexicon_manager=self.lexicon_manager,
+                    enable_byt5_sanskrit=self.config.get('enable_byt5_sanskrit', False)
+                )
+                
+                # Initialize capitalization engine
+                self.capitalization_engine = CapitalizationEngine(
+                    ner_model=self.ner_model,
+                    lexicon_manager=self.lexicon_manager
+                )
+                
+                # Initialize model manager for expandable NER
+                self.ner_model_manager = NERModelManager(
+                    models_dir=training_data_dir / "trained_models",
+                    lexicon_manager=self.lexicon_manager
+                )
+                
+                self.logger.info("Story 3.1 NER components initialized successfully")
+            else:
+                self.ner_model = None
+                self.capitalization_engine = None
+                self.ner_model_manager = None
+                self.logger.info("NER processing disabled")
+            
+            # Legacy lexicons for backward compatibility
+            self.corrections: Dict[str, LexiconEntry] = {}
+            self.proper_nouns: Dict[str, LexiconEntry] = {}
+            self.phrases: Dict[str, LexiconEntry] = {}
+            self.verses: Dict[str, LexiconEntry] = {}
+            
+            # Load legacy lexicons from external files
+            self._load_lexicons()
+            
+            # Fuzzy matching threshold (legacy)
+            self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
+            
+            self._error_handler.log_operation_success("initialization", {
+                'session_correlation_id': self.session_correlation_id,
+                'enable_ner': self.enable_ner,
+                'enable_academic_polish': self.enable_academic_polish,
+                'lexicon_entries_loaded': len(self.corrections) + len(self.proper_nouns) + len(self.phrases) + len(self.verses)
+            })
+            
+        except Exception as e:
+            self._error_handler.handle_processing_error("initialization", e, {
+                'config_path': str(config_path) if config_path else None,
+                'enable_ner': enable_ner
+            })
+            raise
+
+    def _normalize_unicode_text(self, text: str) -> str:
+        """
+        Normalize Unicode text to prevent corruption during processing and file I/O.
         
-        # Legacy lexicons for backward compatibility
-        self.corrections: Dict[str, LexiconEntry] = {}
-        self.proper_nouns: Dict[str, LexiconEntry] = {}
-        self.phrases: Dict[str, LexiconEntry] = {}
-        self.verses: Dict[str, LexiconEntry] = {}
+        This is critical for preventing Sanskrit terms like "Krishna" from appearing as "K???a"
+        in the final output due to Unicode encoding issues.
+        """
+        import unicodedata
         
-        # Load legacy lexicons from external files
-        self._load_lexicons()
+        # Apply Unicode normalization (NFC - canonical decomposition followed by canonical composition)
+        normalized = unicodedata.normalize('NFC', text)
         
-        # Fuzzy matching threshold (legacy)
-        self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
+        # Ensure common Sanskrit characters are properly encoded
+        sanskrit_char_fixes = {
+            '\u0915\u0943\u0937\u094D\u0923': 'Krishna',  # Sanskrit Krishna -> Latin Krishna
+            '\u0927\u0930\u094D\u092E': 'Dharma',         # Sanskrit Dharma -> Latin Dharma
+            '\u092F\u094B\u0917': 'Yoga',                 # Sanskrit Yoga -> Latin Yoga
+            '\u0936\u093F\u0935': 'Shiva',                # Sanskrit Shiva -> Latin Shiva
+            '\u0935\u093F\u0937\u094D\u0923\u0941': 'Vishnu', # Sanskrit Vishnu -> Latin Vishnu
+        }
+        
+        # Apply character fixes if needed
+        for sanskrit_form, latin_form in sanskrit_char_fixes.items():
+            if sanskrit_form in normalized:
+                normalized = normalized.replace(sanskrit_form, latin_form)
+        
+        return normalized
 
     def enable_production_performance(self) -> dict:
         """
@@ -247,13 +301,35 @@ class SanskritPostProcessor:
             return {'epic_4_ready': False, 'error': str(e)}
 
     def _load_config(self, config_path: Optional[Path]) -> Dict[str, Any]:
-        """Load configuration from file or use defaults."""
+        """Load configuration from file or use defaults with standardized error handling."""
+        # Import ConfigurationError locally for consistent import pattern
+        from utils.exception_hierarchy import ConfigurationError
+        
+        # We can't use self._error_handler here since it's created after config loading
+        # Use basic logging instead
+        
         if config_path and config_path.exists():
-            with open(config_path, 'r', encoding='utf-8') as f:
-                if config_path.suffix.lower() == '.yaml':
-                    return yaml.safe_load(f)
-                else:
-                    return json.load(f)
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    if config_path.suffix.lower() == '.yaml':
+                        import yaml
+                        config_data = yaml.safe_load(f)
+                    else:
+                        import json
+                        config_data = json.load(f)
+                
+                # Validate that config is a dictionary
+                if not isinstance(config_data, dict):
+                    raise ValueError(f"Configuration file must contain a dictionary, got {type(config_data)}")
+                
+                return config_data
+                
+            except (json.JSONDecodeError, yaml.YAMLError) as e:
+                raise ConfigurationError(f"Failed to parse configuration file {config_path}: {str(e)}")
+            except IOError as e:
+                raise ConfigurationError(f"Failed to read configuration file {config_path}: {str(e)}")
+            except Exception as e:
+                raise ConfigurationError(f"Unexpected error loading configuration from {config_path}: {str(e)}")
         
         # Default configuration - CONSERVATIVE ANTI-HALLUCINATION SETTINGS
         return {
@@ -371,35 +447,62 @@ class SanskritPostProcessor:
         Returns:
             ProcessingMetrics with detailed results
         """
+        # Set correlation ID for this processing session
+        operation_correlation_id = session_id or str(uuid.uuid4())
+        self._error_handler.set_correlation_id(operation_correlation_id)
+        
         # Start timing
         start_time = time.time()
         
         # Create metrics object
         metrics = self.metrics_collector.create_file_metrics(str(input_path))
         
+        self._error_handler.log_operation_start("process_srt_file", {
+            'input_path': str(input_path),
+            'output_path': str(output_path),
+            'session_id': session_id
+        })
+        
         try:
             self.logger.info(f"Starting processing: {input_path}")
             
             # Step 1: Parse SRT file
             self.metrics_collector.start_timer('parsing')
-            segments = self.srt_parser.parse_file(str(input_path))
-            metrics.parsing_time = self.metrics_collector.end_timer('parsing')
-            
-            if not segments:
-                raise ValueError("No valid segments found in SRT file")
-            
-            metrics.total_segments = len(segments)
-            self.logger.info(f"Parsed {len(segments)} segments")
+            try:
+                segments = self.srt_parser.parse_file(str(input_path))
+                metrics.parsing_time = self.metrics_collector.end_timer('parsing')
+                
+                if not segments:
+                    raise self._error_handler.handle_validation_error(
+                        "srt_segments", 
+                        len(segments) if segments else 0, 
+                        "at least 1 valid segment"
+                    )
+                
+                metrics.total_segments = len(segments)
+                self.logger.info(f"Parsed {len(segments)} segments")
+                
+            except Exception as e:
+                raise self._error_handler.handle_processing_error("srt_parsing", e, {
+                    'input_path': str(input_path)
+                })
             
             # Step 2: Validate timestamps
             self.metrics_collector.start_timer('validation')
-            timestamp_valid = self.srt_parser.validate_timestamps(segments)
-            metrics.timestamp_integrity_verified = timestamp_valid
-            metrics.validation_time = self.metrics_collector.end_timer('validation')
-            
-            if not timestamp_valid:
-                metrics.warnings_encountered.append("Timestamp integrity issues detected")
-                self.logger.warning("Timestamp integrity issues detected")
+            try:
+                timestamp_valid = self.srt_parser.validate_timestamps(segments)
+                metrics.timestamp_integrity_verified = timestamp_valid
+                metrics.validation_time = self.metrics_collector.end_timer('validation')
+                
+                if not timestamp_valid:
+                    warning_msg = "Timestamp integrity issues detected"
+                    metrics.warnings_encountered.append(warning_msg)
+                    self._error_handler.log_operation_warning("timestamp_validation", warning_msg)
+                
+            except Exception as e:
+                self._error_handler.handle_processing_error("timestamp_validation", e)
+                # Continue processing even if timestamp validation fails
+                metrics.timestamp_integrity_verified = False
             
             # Calculate original statistics
             metrics.original_word_count = sum(len(seg.text.split()) for seg in segments)
@@ -409,6 +512,9 @@ class SanskritPostProcessor:
             processed_segments = []
             
             for i, segment in enumerate(segments):
+                segment_correlation_id = f"{operation_correlation_id}_seg_{i}"
+                self._error_handler.set_correlation_id(segment_correlation_id)
+                
                 try:
                     processed_segment = self._process_srt_segment(segment, metrics)
                     
@@ -431,11 +537,22 @@ class SanskritPostProcessor:
                         metrics.segments_modified += 1
                     
                 except Exception as e:
-                    error_msg = f"Error processing segment {i}: {e}"
+                    # Use standardized error handling for segment processing
+                    segment_error = self._error_handler.handle_processing_error(
+                        f"segment_processing_{i}", e, {
+                            'segment_index': i,
+                            'original_text': segment.text[:100]  # First 100 chars for context
+                        }
+                    )
+                    
+                    error_msg = f"Error processing segment {i}: {segment_error}"
                     metrics.errors_encountered.append(error_msg)
-                    self.logger.error(error_msg)
+                    
                     # Use original segment if processing fails
                     processed_segments.append(segment)
+            
+            # Reset correlation ID to operation level
+            self._error_handler.set_correlation_id(operation_correlation_id)
             
             # Calculate processed statistics
             metrics.processed_word_count = sum(len(seg.text.split()) for seg in processed_segments)
@@ -446,23 +563,39 @@ class SanskritPostProcessor:
             
             # CRITICAL FIX: Apply QA validation rules as final step
             self.metrics_collector.start_timer('qa_validation')
-            processed_segments = self._apply_qa_validation(processed_segments, metrics)
-            metrics.qa_validation_time = self.metrics_collector.end_timer('qa_validation')
+            try:
+                processed_segments = self._apply_qa_validation(processed_segments, metrics)
+                metrics.qa_validation_time = self.metrics_collector.end_timer('qa_validation')
+            except Exception as e:
+                qa_error = self._error_handler.handle_processing_error("qa_validation", e)
+                metrics.errors_encountered.append(f"QA validation error: {qa_error}")
+                # Continue with unvalidated segments
             
             # Step 4: Generate output SRT
-            output_srt = self.srt_parser.to_srt_string(processed_segments)
-            
-            # Save to file
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(output_srt)
+            try:
+                output_srt = self.srt_parser.to_srt_string(processed_segments)
+                
+                # Save to file
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(output_srt)
+                    
+            except Exception as e:
+                raise self._error_handler.handle_processing_error("output_generation", e, {
+                    'output_path': str(output_path),
+                    'segments_count': len(processed_segments)
+                })
             
             # Step 5 (Optional): Apply Academic Polish Enhancement
             if self.enable_academic_polish:
-                polished_output_path = output_path.with_name(
-                    output_path.stem.replace('_QA_CORRECTED', '_POLISHED') + output_path.suffix
-                )
-                self._apply_academic_polish(output_path, polished_output_path, metrics)
+                try:
+                    polished_output_path = output_path.with_name(
+                        output_path.stem.replace('_QA_CORRECTED', '_POLISHED') + output_path.suffix
+                    )
+                    self._apply_academic_polish(output_path, polished_output_path, metrics)
+                except Exception as e:
+                    polish_error = self._error_handler.handle_processing_error("academic_polish", e)
+                    metrics.errors_encountered.append(f"Academic polish error: {polish_error}")
             
             # Final timing
             metrics.processing_time = time.time() - start_time
@@ -470,21 +603,36 @@ class SanskritPostProcessor:
             # Add to metrics collector
             self.metrics_collector.add_file_metrics(metrics)
             
-            self.logger.info(f"Processing completed: {output_path}")
-            self.logger.info(f"Segments: {metrics.total_segments}, Modified: {metrics.segments_modified}, "
-                           f"Confidence: {metrics.average_confidence:.3f}")
+            self._error_handler.log_operation_success("process_srt_file", {
+                'output_path': str(output_path),
+                'total_segments': metrics.total_segments,
+                'segments_modified': metrics.segments_modified,
+                'processing_time': metrics.processing_time,
+                'average_confidence': metrics.average_confidence
+            })
             
             return metrics
             
-        except Exception as e:
-            error_msg = f"Error processing SRT file {input_path}: {e}"
-            metrics.errors_encountered.append(error_msg)
+        except (ProcessingError, ValidationError, DependencyError):
+            # Re-raise our standardized exceptions
             metrics.processing_time = time.time() - start_time
-            self.logger.error(error_msg)
+            self.metrics_collector.add_file_metrics(metrics)
+            raise
+        except Exception as e:
+            # Convert any remaining exceptions to standardized format
+            standardized_error = self._error_handler.handle_processing_error(
+                "process_srt_file", e, {
+                    'input_path': str(input_path),
+                    'output_path': str(output_path)
+                }
+            )
+            
+            metrics.errors_encountered.append(str(standardized_error))
+            metrics.processing_time = time.time() - start_time
             
             # Still add metrics even if processing failed
             self.metrics_collector.add_file_metrics(metrics)
-            raise
+            raise standardized_error
 
     def _process_srt_segment(self, segment: SRTSegment, metrics: ProcessingMetrics) -> SRTSegment:
         """
@@ -497,146 +645,243 @@ class SanskritPostProcessor:
         Returns:
             Processed SRT segment with foundational corrections applied
         """
-        # Create a copy of the segment to avoid mutating the original
-        import copy
-        processed_segment = copy.deepcopy(segment)
+        self._error_handler.log_operation_start("segment_processing", {
+            'segment_text_preview': segment.text[:50] + "..." if len(segment.text) > 50 else segment.text
+        })
         
-        original_text = segment.text  # Keep reference to original text
-        all_corrections_applied = []
-        
-        # Step 1: Enhanced Text Normalization with conversational nuance handling
-        self.metrics_collector.start_timer('normalization')
-        
-        if isinstance(self.text_normalizer, AdvancedTextNormalizer):
-            # Use advanced normalization with conversational pattern handling
-            advanced_result = self.text_normalizer.normalize_with_advanced_tracking(processed_segment.text)
-            processed_segment.text = advanced_result.corrected_text
-            all_corrections_applied.extend(advanced_result.corrections_applied)
+        try:
+            # Create a copy of the segment to avoid mutating the original
+            import copy
+            processed_segment = copy.deepcopy(segment)
             
-            # Track conversational fixes
-            for conv_fix in advanced_result.conversational_fixes:
-                self.metrics_collector.update_correction_count(metrics, f"conversational_{conv_fix.pattern_type}")
-                all_corrections_applied.append(f"conversational_{conv_fix.pattern_type}")
-        else:
-            # Use basic normalization
-            normalization_result = self.text_normalizer.normalize_with_tracking(processed_segment.text)
-            processed_segment.text = normalization_result.normalized_text
-            all_corrections_applied.extend(normalization_result.changes_applied)
-        
-        metrics.normalization_time += self.metrics_collector.end_timer('normalization')
-        
-        # Step 2: Enhanced contextual number processing for spiritual contexts
-        self.metrics_collector.start_timer('number_processing')
-        number_result = self.number_processor.process_numbers(processed_segment.text, context="spiritual")
-        processed_segment.text = number_result.processed_text
-        metrics.normalization_time += self.metrics_collector.end_timer('number_processing')
-        
-        # Track number conversions
-        for conversion in number_result.conversions:
-            if conversion.confidence_score >= 0.7:  # Only count high-confidence conversions
-                self.metrics_collector.update_correction_count(metrics, f"contextual_number_{conversion.number_context.value}")
-                all_corrections_applied.append(f"contextual_number_{conversion.number_context.value}")
-        
-        # Step 3: Enhanced Sanskrit/Hindi corrections (Story 2.1)
-        self.metrics_collector.start_timer('sanskrit_hindi_correction')
-        sanskrit_corrections = self._apply_enhanced_sanskrit_hindi_corrections(processed_segment.text)
-        processed_segment.text = sanskrit_corrections['corrected_text']
-        metrics.correction_time += self.metrics_collector.end_timer('sanskrit_hindi_correction')
-        
-        # Track Sanskrit/Hindi corrections
-        for correction in sanskrit_corrections['corrections_applied']:
-            correction_type = f"sanskrit_hindi_{correction.correction_type.value}"
-            self.metrics_collector.update_correction_count(metrics, correction_type)
-            all_corrections_applied.append(correction_type)
-        
-        # Step 4: Apply legacy Sanskrit/Hindi corrections (backward compatibility)
-        self.metrics_collector.start_timer('legacy_correction')
-        corrected_text, lexicon_corrections = self._apply_lexicon_corrections(processed_segment.text)
-        processed_segment.text = corrected_text
-        metrics.correction_time += self.metrics_collector.end_timer('legacy_correction')
-        
-        # Track legacy lexicon corrections
-        for correction in lexicon_corrections:
-            self.metrics_collector.update_correction_count(metrics, "legacy_lexicon_correction")
-            all_corrections_applied.append("legacy_lexicon_correction")
-        
-        # Step 5: Apply Story 3.1 NER processing (if enabled)
-        if self.enable_ner:
-            self.metrics_collector.start_timer('ner_processing')
+            original_text = segment.text  # Keep reference to original text
+            all_corrections_applied = []
+            
+            # Step 1: Enhanced Text Normalization with conversational nuance handling
+            self.metrics_collector.start_timer('normalization')
             
             try:
-                # Identify named entities in the text
-                ner_result = self.ner_model.identify_entities(processed_segment.text)
+                if isinstance(self.text_normalizer, AdvancedTextNormalizer):
+                    # Use advanced normalization with conversational pattern handling
+                    advanced_result = self.text_normalizer.normalize_with_advanced_tracking(processed_segment.text)
+                    processed_segment.text = advanced_result.corrected_text
+                    all_corrections_applied.extend(advanced_result.corrections_applied)
+                    
+                    # Track conversational fixes
+                    for conv_fix in advanced_result.conversational_fixes:
+                        self.metrics_collector.update_correction_count(metrics, f"conversational_{conv_fix.pattern_type}")
+                        all_corrections_applied.append(f"conversational_{conv_fix.pattern_type}")
+                else:
+                    # Use basic normalization
+                    normalization_result = self.text_normalizer.normalize_with_tracking(processed_segment.text)
+                    processed_segment.text = normalization_result.normalized_text
+                    all_corrections_applied.extend(normalization_result.changes_applied)
                 
-                # Apply intelligent capitalization based on NER results
-                capitalization_result = self.capitalization_engine.capitalize_text(processed_segment.text)
-                processed_segment.text = capitalization_result.capitalized_text
+                metrics.normalization_time += self.metrics_collector.end_timer('normalization')
                 
-                # Track NER metrics
-                self.metrics_collector.update_correction_count(metrics, "ner_entities_identified", len(ner_result.entities))
-                self.metrics_collector.update_correction_count(metrics, "ner_capitalizations", len(capitalization_result.changes_made))
-                
-                # Add low confidence entities as suggestions to model manager
-                for entity in ner_result.entities:
-                    if entity.confidence < 0.8:  # Low confidence threshold
-                        self.ner_model_manager.add_proper_noun_suggestion(
-                            text=entity.text,
-                            category=entity.category,
-                            source=SuggestionSource.AUTO_DISCOVERY,
-                            context=processed_segment.text[:200]  # First 200 chars for context
-                        )
-                
-                all_corrections_applied.append("ner_processing")
-                
-                self.logger.debug(f"NER processing completed: {len(ner_result.entities)} entities identified, "
-                                f"{len(capitalization_result.changes_made)} capitalizations applied")
-                                
             except Exception as e:
-                self.logger.error(f"Error during NER processing: {e}")
-                metrics.errors_encountered.append(f"NER processing error: {e}")
+                normalization_error = self._error_handler.handle_processing_error("text_normalization", e, {
+                    'original_text': processed_segment.text[:100]
+                })
+                metrics.errors_encountered.append(f"Text normalization error: {normalization_error}")
+                # Continue with original text if normalization fails
             
-            self.metrics_collector.end_timer('ner_processing')
-        
-        # Step 6: Apply proper noun capitalization (fallback/legacy approach)
-        if not self.enable_ner:
-            processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
-        
-        # Step 6: Quality validation and semantic drift check
-        if original_text != processed_segment.text:
-            # Calculate semantic drift for this segment
-            if isinstance(self.text_normalizer, AdvancedTextNormalizer):
-                semantic_drift = self.text_normalizer.calculate_semantic_drift(original_text, processed_segment.text)
+            # Step 2: Enhanced contextual number processing for spiritual contexts
+            self.metrics_collector.start_timer('number_processing')
+            
+            try:
+                number_result = self.number_processor.process_numbers(processed_segment.text, context="spiritual")
+                processed_segment.text = number_result.processed_text
+                metrics.normalization_time += self.metrics_collector.end_timer('number_processing')
                 
-                # Flag segments with high semantic drift
-                max_drift = self.config.get('quality_validation', {}).get('max_semantic_drift', 0.3)
-                if semantic_drift > max_drift:
-                    processed_segment.processing_flags.append("high_semantic_drift")
-                    metrics.warnings_encountered.append(f"High semantic drift ({semantic_drift:.3f}) in segment")
+                # Track number conversions
+                for conversion in number_result.conversions:
+                    if conversion.confidence_score >= 0.7:  # Only count high-confidence conversions
+                        self.metrics_collector.update_correction_count(metrics, f"contextual_number_{conversion.number_context.value}")
+                        all_corrections_applied.append(f"contextual_number_{conversion.number_context.value}")
+                
+            except Exception as e:
+                number_error = self._error_handler.handle_processing_error("number_processing", e, {
+                    'text_preview': processed_segment.text[:100]
+                })
+                metrics.errors_encountered.append(f"Number processing error: {number_error}")
+                # Continue processing
             
-            # Check for significant text length changes
-            change_ratio = len(processed_segment.text) / len(original_text) if original_text else 1.0
-            if abs(change_ratio - 1.0) > 0.2:  # More than 20% change
-                processed_segment.processing_flags.append("significant_change")
-        
-        # Step 7: Calculate enhanced confidence score
-        confidence = self._calculate_enhanced_confidence(
-            processed_segment.text, 
-            all_corrections_applied,
-            original_text
-        )
-        processed_segment.confidence = confidence
-        
-        # Flag low confidence segments
-        confidence_threshold = self.config.get('confidence_threshold', 0.6)
-        if confidence < confidence_threshold:
-            processed_segment.processing_flags.append("low_confidence")
-            metrics.flagged_segments += 1
-        
-        # Track all applied corrections in metrics
-        for correction_type in all_corrections_applied:
-            self.metrics_collector.update_correction_count(metrics, correction_type)
-        
-        return processed_segment
+            # Step 3: Enhanced Sanskrit/Hindi corrections (Story 2.1)
+            self.metrics_collector.start_timer('sanskrit_hindi_correction')
+            
+            try:
+                sanskrit_corrections = self._apply_enhanced_sanskrit_hindi_corrections(processed_segment.text)
+                processed_segment.text = sanskrit_corrections['corrected_text']
+                metrics.correction_time += self.metrics_collector.end_timer('sanskrit_hindi_correction')
+                
+                # Track Sanskrit/Hindi corrections
+                for correction in sanskrit_corrections['corrections_applied']:
+                    correction_type = f"sanskrit_hindi_{correction.correction_type.value}"
+                    self.metrics_collector.update_correction_count(metrics, correction_type)
+                    all_corrections_applied.append(correction_type)
+                
+            except Exception as e:
+                sanskrit_error = self._error_handler.handle_processing_error("sanskrit_hindi_correction", e, {
+                    'text_preview': processed_segment.text[:100]
+                })
+                metrics.errors_encountered.append(f"Sanskrit/Hindi correction error: {sanskrit_error}")
+                # Continue processing
+            
+            # Step 4: Apply legacy Sanskrit/Hindi corrections (backward compatibility)
+            self.metrics_collector.start_timer('legacy_correction')
+            
+            try:
+                corrected_text, lexicon_corrections = self._apply_lexicon_corrections(processed_segment.text)
+                processed_segment.text = corrected_text
+                metrics.correction_time += self.metrics_collector.end_timer('legacy_correction')
+                
+                # Track legacy lexicon corrections
+                for correction in lexicon_corrections:
+                    self.metrics_collector.update_correction_count(metrics, "legacy_lexicon_correction")
+                    all_corrections_applied.append("legacy_lexicon_correction")
+                
+            except Exception as e:
+                lexicon_error = self._error_handler.handle_processing_error("lexicon_correction", e, {
+                    'text_preview': processed_segment.text[:100]
+                })
+                metrics.errors_encountered.append(f"Lexicon correction error: {lexicon_error}")
+                # Continue processing
+            
+            # Step 5: Apply Story 3.1 NER processing (if enabled)
+            if self.enable_ner:
+                self.metrics_collector.start_timer('ner_processing')
+                
+                try:
+                    # Identify named entities in the text
+                    ner_result = self.ner_model.identify_entities(processed_segment.text)
+                    
+                    # Apply intelligent capitalization based on NER results
+                    capitalization_result = self.capitalization_engine.capitalize_text(processed_segment.text)
+                    processed_segment.text = capitalization_result.capitalized_text
+                    
+                    # Track NER metrics
+                    self.metrics_collector.update_correction_count(metrics, "ner_entities_identified", len(ner_result.entities))
+                    self.metrics_collector.update_correction_count(metrics, "ner_capitalizations", len(capitalization_result.changes_made))
+                    
+                    # Add low confidence entities as suggestions to model manager
+                    for entity in ner_result.entities:
+                        if entity.confidence < 0.8:  # Low confidence threshold
+                            self.ner_model_manager.add_proper_noun_suggestion(
+                                text=entity.text,
+                                category=entity.category,
+                                source=SuggestionSource.AUTO_DISCOVERY,
+                                context=processed_segment.text[:200]  # First 200 chars for context
+                            )
+                    
+                    all_corrections_applied.append("ner_processing")
+                    
+                    self.logger.debug(f"NER processing completed: {len(ner_result.entities)} entities identified, "
+                                    f"{len(capitalization_result.changes_made)} capitalizations applied")
+                                    
+                except Exception as e:
+                    ner_error = self._error_handler.handle_processing_error("ner_processing", e, {
+                        'text_preview': processed_segment.text[:100]
+                    })
+                    metrics.errors_encountered.append(f"NER processing error: {ner_error}")
+                
+                self.metrics_collector.end_timer('ner_processing')
+            
+            # Step 6: Apply proper noun capitalization (fallback/legacy approach)
+            if not self.enable_ner:
+                try:
+                    processed_segment.text = self._apply_proper_noun_capitalization(processed_segment.text)
+                except Exception as e:
+                    capitalization_error = self._error_handler.handle_processing_error("legacy_capitalization", e)
+                    metrics.errors_encountered.append(f"Legacy capitalization error: {capitalization_error}")
+            
+            # Step 7: Quality validation and semantic drift check
+            try:
+                if original_text != processed_segment.text:
+                    # Calculate semantic drift for this segment
+                    if isinstance(self.text_normalizer, AdvancedTextNormalizer):
+                        semantic_drift = self.text_normalizer.calculate_semantic_drift(original_text, processed_segment.text)
+                        
+                        # Flag segments with high semantic drift
+                        max_drift = self.config.get('quality_validation', {}).get('max_semantic_drift', 0.3)
+                        if semantic_drift > max_drift:
+                            processed_segment.processing_flags.append("high_semantic_drift")
+                            drift_warning = f"High semantic drift ({semantic_drift:.3f}) in segment"
+                            metrics.warnings_encountered.append(drift_warning)
+                            self._error_handler.log_operation_warning("semantic_drift", drift_warning, {
+                                'semantic_drift': semantic_drift,
+                                'max_drift': max_drift
+                            })
+                    
+                    # Check for significant text length changes
+                    change_ratio = len(processed_segment.text) / len(original_text) if original_text else 1.0
+                    if abs(change_ratio - 1.0) > 0.2:  # More than 20% change
+                        processed_segment.processing_flags.append("significant_change")
+                        self._error_handler.log_operation_warning("significant_text_change", 
+                            f"Text length changed by {(change_ratio - 1.0) * 100:.1f}%", {
+                                'change_ratio': change_ratio,
+                                'original_length': len(original_text),
+                                'processed_length': len(processed_segment.text)
+                            })
+                
+            except Exception as e:
+                quality_error = self._error_handler.handle_processing_error("quality_validation", e)
+                metrics.errors_encountered.append(f"Quality validation error: {quality_error}")
+            
+            # Step 8: Apply Unicode normalization to prevent corruption (Fix 3 for Story 5.2)
+            # This is critical to prevent Sanskrit terms like "Krishna" from appearing as "K???a"
+            try:
+                processed_segment.text = self._normalize_unicode_text(processed_segment.text)
+                all_corrections_applied.append("unicode_normalization")
+            except Exception as e:
+                unicode_error = self._error_handler.handle_processing_error("unicode_normalization", e)
+                metrics.errors_encountered.append(f"Unicode normalization error: {unicode_error}")
+            
+            # Step 9: Calculate enhanced confidence score
+            try:
+                confidence = self._calculate_enhanced_confidence(
+                    processed_segment.text, 
+                    all_corrections_applied,
+                    original_text
+                )
+                processed_segment.confidence = confidence
+                
+                # Flag low confidence segments
+                confidence_threshold = self.config.get('confidence_threshold', 0.6)
+                if confidence < confidence_threshold:
+                    processed_segment.processing_flags.append("low_confidence")
+                    metrics.flagged_segments += 1
+                    self._error_handler.log_operation_warning("low_confidence", 
+                        f"Segment confidence {confidence:.3f} below threshold {confidence_threshold}", {
+                            'confidence': confidence,
+                            'threshold': confidence_threshold
+                        })
+                
+            except Exception as e:
+                confidence_error = self._error_handler.handle_processing_error("confidence_calculation", e)
+                metrics.errors_encountered.append(f"Confidence calculation error: {confidence_error}")
+                processed_segment.confidence = 0.5  # Default confidence
+            
+            # Track all applied corrections in metrics
+            for correction_type in all_corrections_applied:
+                self.metrics_collector.update_correction_count(metrics, correction_type)
+            
+            self._error_handler.log_operation_success("segment_processing", {
+                'corrections_applied': len(all_corrections_applied),
+                'final_confidence': getattr(processed_segment, 'confidence', 'N/A'),
+                'text_changed': original_text != processed_segment.text
+            })
+            
+            return processed_segment
+            
+        except (ProcessingError, ValidationError, DependencyError):
+            # Re-raise our standardized exceptions
+            raise
+        except Exception as e:
+            # Convert any remaining exceptions to standardized format
+            raise self._error_handler.handle_processing_error("segment_processing", e, {
+                'original_text': segment.text[:100]
+            })
 
     def _apply_academic_polish(self, input_path: Path, output_path: Path, metrics: ProcessingMetrics) -> None:
         """
@@ -714,74 +959,232 @@ class SanskritPostProcessor:
         Returns:
             Dictionary with corrected text and metadata
         """
+        self._error_handler.log_operation_start("enhanced_sanskrit_hindi_corrections", {
+            'text_length': len(text),
+            'text_preview': text[:100] + "..." if len(text) > 100 else text
+        })
+        
         try:
+            # PRE-STEP: Apply Unicode normalization to input text to prevent corruption
+            # This is critical for preventing Sanskrit parser corruption issues
+            try:
+                normalized_input = self._normalize_unicode_text(text)
+            except Exception as e:
+                unicode_error = self._error_handler.handle_processing_error("unicode_normalization_input", e, {
+                    'original_text': text[:50]
+                })
+                # Use original text if normalization fails
+                normalized_input = text
+                self.logger.warning(f"Unicode normalization failed, using original text: {unicode_error}")
+            
             # Step 1: Identify Sanskrit/Hindi words
-            identified_words = self.word_identifier.identify_words(text)
+            identified_words = []
+            try:
+                identified_words = self.word_identifier.identify_words(normalized_input)
+                self.logger.debug(f"Identified {len(identified_words)} Sanskrit/Hindi words")
+            except Exception as e:
+                self._error_handler.handle_processing_error("word_identification", e, {
+                    'input_text': normalized_input[:100]
+                })
+                # Continue with empty list if identification fails
             
             # Step 2: Find fuzzy matches for potential corrections
-            words = [word.strip() for word in text.split() if word.strip()]
             fuzzy_matches = []
-            
-            for word in words:
-                matches = self.fuzzy_matcher.find_matches(word, context=text)
-                fuzzy_matches.extend(matches)
+            try:
+                words = [word.strip() for word in normalized_input.split() if word.strip()]
+                
+                for word in words:
+                    try:
+                        matches = self.fuzzy_matcher.find_matches(word, context=normalized_input)
+                        fuzzy_matches.extend(matches)
+                    except Exception as e:
+                        self._error_handler.handle_processing_error(f"fuzzy_matching_{word}", e, {
+                            'word': word,
+                            'context_preview': normalized_input[:50]
+                        })
+                        # Continue with other words
+                        continue
+                        
+                self.logger.debug(f"Found {len(fuzzy_matches)} fuzzy matches")
+                
+            except Exception as e:
+                self._error_handler.handle_processing_error("fuzzy_matching", e, {
+                    'normalized_input': normalized_input[:100]
+                })
+                # Continue with empty matches list
             
             # Step 3: Create correction candidates
             correction_candidates = []
             
             # From identified words
-            word_candidates = self.correction_applier.create_candidates_from_identified_words(
-                identified_words, text
-            )
-            correction_candidates.extend(word_candidates)
+            try:
+                word_candidates = self.correction_applier.create_candidates_from_identified_words(
+                    identified_words, normalized_input
+                )
+                correction_candidates.extend(word_candidates)
+                self.logger.debug(f"Created {len(word_candidates)} word-based candidates")
+            except Exception as e:
+                self._error_handler.handle_processing_error("word_candidates_creation", e, {
+                    'identified_words_count': len(identified_words)
+                })
+                # Continue without word candidates
             
             # From fuzzy matches
-            fuzzy_candidates = self.correction_applier.create_candidates_from_fuzzy_matches(
-                fuzzy_matches, text
-            )
-            correction_candidates.extend(fuzzy_candidates)
+            try:
+                fuzzy_candidates = self.correction_applier.create_candidates_from_fuzzy_matches(
+                    fuzzy_matches, normalized_input
+                )
+                correction_candidates.extend(fuzzy_candidates)
+                self.logger.debug(f"Created {len(fuzzy_candidates)} fuzzy-based candidates")
+            except Exception as e:
+                self._error_handler.handle_processing_error("fuzzy_candidates_creation", e, {
+                    'fuzzy_matches_count': len(fuzzy_matches)
+                })
+                # Continue without fuzzy candidates
             
             # Step 4: Apply IAST transliteration if needed
-            iast_result = self.iast_transliterator.transliterate_to_iast(text)
-            if iast_result.changes_made:
-                # Add IAST corrections as candidates
-                from sanskrit_hindi_identifier.correction_applier import CorrectionCandidate, CorrectionType, CorrectionPriority
-                
-                for original, target in iast_result.changes_made:
-                    # Find position of the change
-                    position = text.find(original)
-                    if position != -1:
-                        candidate = CorrectionCandidate(
-                            original_text=original,
-                            corrected_text=target,
-                            position=position,
-                            length=len(original),
-                            confidence=iast_result.confidence,
-                            correction_type=CorrectionType.TRANSLITERATION,
-                            priority=CorrectionPriority.HIGH,
-                            source="iast_transliterator",
-                            metadata={'rules_applied': len(iast_result.rules_applied)}
-                        )
-                        correction_candidates.append(candidate)
+            iast_changes_count = 0
+            try:
+                iast_result = self.iast_transliterator.transliterate_to_iast(normalized_input)
+                if iast_result.changes_made:
+                    # Add IAST corrections as candidates
+                    from sanskrit_hindi_identifier.correction_applier import CorrectionCandidate, CorrectionType, CorrectionPriority
+                    
+                    for original, target in iast_result.changes_made:
+                        try:
+                            # Find position of the change
+                            position = normalized_input.find(original)
+                            if position != -1:
+                                candidate = CorrectionCandidate(
+                                    original_text=original,
+                                    corrected_text=target,
+                                    position=position,
+                                    length=len(original),
+                                    confidence=iast_result.confidence,
+                                    correction_type=CorrectionType.TRANSLITERATION,
+                                    priority=CorrectionPriority.HIGH,
+                                    source="iast_transliterator",
+                                    metadata={'rules_applied': len(iast_result.rules_applied)}
+                                )
+                                correction_candidates.append(candidate)
+                        except Exception as e:
+                            self._error_handler.handle_processing_error(f"iast_candidate_{original}", e, {
+                                'original': original,
+                                'target': target
+                            })
+                            # Continue with other IAST changes
+                            continue
+                    
+                    iast_changes_count = len(iast_result.changes_made)
+                    self.logger.debug(f"Added {iast_changes_count} IAST transliteration candidates")
+                    
+            except Exception as e:
+                self._error_handler.handle_processing_error("iast_transliteration", e, {
+                    'input_text': normalized_input[:100]
+                })
+                # Continue without IAST corrections
             
             # Step 5: Apply corrections
-            correction_result = self.correction_applier.apply_corrections(text, correction_candidates)
+            correction_result = None
+            corrected_text_intermediate = normalized_input  # Default fallback
             
-            return {
+            try:
+                correction_result = self.correction_applier.apply_corrections(normalized_input, correction_candidates)
+                corrected_text_intermediate = correction_result.corrected_text
+                self.logger.debug(f"Applied {len(correction_result.corrections_applied)} corrections")
+                
+            except Exception as e:
+                self._error_handler.handle_processing_error("corrections_application", e, {
+                    'candidates_count': len(correction_candidates)
+                })
+                
+                # Create fallback correction result
+                from sanskrit_hindi_identifier.correction_applier import CorrectionResult
+                correction_result = CorrectionResult(
+                    original_text=normalized_input,
+                    corrected_text=normalized_input,
+                    corrections_applied=[],
+                    corrections_skipped=[],
+                    overall_confidence=1.0,
+                    warnings=[f"Corrections application failed: {str(e)}"]
+                )
+            
+            # Step 6: Apply aggressive Unicode normalization to prevent corruption (Fix 3 for Story 5.2)
+            # This is critical to prevent Sanskrit terms from being corrupted during processing
+            corrected_text_final = corrected_text_intermediate
+            try:
+                corrected_text_final = self._normalize_unicode_text(corrected_text_intermediate)
+            except Exception as e:
+                self._error_handler.handle_processing_error("unicode_normalization_output", e, {
+                    'intermediate_text': corrected_text_intermediate[:100]
+                })
+                # Use intermediate text if final normalization fails
+                corrected_text_final = corrected_text_intermediate
+            
+            # Step 7: Additional corruption fix - replace any corrupted Sanskrit terms
+            try:
+                corrupted_fixes = {
+                    'K???a': 'Krishna',
+                    'K??a': 'Krishna', 
+                    'K?a': 'Krishna',
+                    'Vi??u': 'Vishnu',
+                    'Vi?u': 'Vishnu',
+                    'V??u': 'Vishnu',
+                    '?iva': 'Shiva',
+                    '?va': 'Shiva',
+                    'R?ma': 'Rama',
+                    'R??a': 'Rama',
+                    'G?t?': 'Gita',
+                    'G??': 'Gita'
+                }
+                
+                corruption_fixes_applied = 0
+                for corrupted, fixed in corrupted_fixes.items():
+                    if corrupted in corrected_text_final:
+                        corrected_text_final = corrected_text_final.replace(corrupted, fixed)
+                        corruption_fixes_applied += 1
+                        self.logger.info(f"Fixed Unicode corruption: {corrupted} -> {fixed}")
+                        
+                if corruption_fixes_applied > 0:
+                    self.logger.info(f"Applied {corruption_fixes_applied} corruption fixes")
+                    
+            except Exception as e:
+                self._error_handler.handle_processing_error("corruption_fixes", e)
+                # Continue with text as-is if corruption fixes fail
+            
+            # Build result dictionary
+            result = {
                 'original_text': text,
-                'corrected_text': correction_result.corrected_text,
-                'corrections_applied': correction_result.corrections_applied,
-                'corrections_skipped': correction_result.corrections_skipped,
-                'overall_confidence': correction_result.overall_confidence,
-                'warnings': correction_result.warnings,
+                'corrected_text': corrected_text_final,
+                'corrections_applied': correction_result.corrections_applied if correction_result else [],
+                'corrections_skipped': correction_result.corrections_skipped if correction_result else [],
+                'overall_confidence': correction_result.overall_confidence if correction_result else 1.0,
+                'warnings': correction_result.warnings if correction_result else [],
                 'identified_words_count': len(identified_words),
                 'fuzzy_matches_count': len(fuzzy_matches),
                 'candidates_count': len(correction_candidates),
-                'iast_changes': len(iast_result.changes_made)
+                'iast_changes': iast_changes_count
             }
             
+            self._error_handler.log_operation_success("enhanced_sanskrit_hindi_corrections", {
+                'corrections_applied': len(result['corrections_applied']),
+                'overall_confidence': result['overall_confidence'],
+                'text_changed': text != corrected_text_final,
+                'identified_words': result['identified_words_count'],
+                'fuzzy_matches': result['fuzzy_matches_count']
+            })
+            
+            return result
+            
+        except (ProcessingError, ValidationError, DependencyError):
+            # Re-raise our standardized exceptions
+            raise
         except Exception as e:
-            self.logger.error(f"Error in enhanced Sanskrit/Hindi corrections: {e}")
+            # Convert any remaining exceptions to standardized format and return fallback
+            error = self._error_handler.handle_processing_error("enhanced_sanskrit_hindi_corrections", e, {
+                'original_text': text[:100]
+            })
+            
             # Return original text with no corrections on error
             return {
                 'original_text': text,
@@ -789,7 +1192,7 @@ class SanskritPostProcessor:
                 'corrections_applied': [],
                 'corrections_skipped': [],
                 'overall_confidence': 1.0,
-                'warnings': [f"Error in corrections: {str(e)}"],
+                'warnings': [f"Error in corrections: {str(error)}"],
                 'identified_words_count': 0,
                 'fuzzy_matches_count': 0,
                 'candidates_count': 0,

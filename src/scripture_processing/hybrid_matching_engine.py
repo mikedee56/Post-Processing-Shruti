@@ -20,8 +20,8 @@ import time
 from utils.logger_config import get_logger
 from utils.sanskrit_phonetic_hasher import SanskritPhoneticHasher, PhoneticCandidateMatch
 from utils.sequence_alignment_engine import SequenceAlignmentEngine, AlignmentResult
-from .canonical_text_manager import CanonicalTextManager, VerseCandidate, ScriptureSource
-from .scripture_identifier import ScriptureMatch
+from scripture_processing.canonical_text_manager import CanonicalTextManager, VerseCandidate, ScriptureSource
+from scripture_processing.scripture_identifier import ScriptureMatch
 from contextual_modeling.semantic_similarity_calculator import SemanticSimilarityCalculator
 
 
