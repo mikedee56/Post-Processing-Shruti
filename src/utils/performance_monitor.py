@@ -139,6 +139,26 @@ class PerformanceMonitor:
             }
         }
     
+    def add_metric_threshold(self, metric_type: MetricType, threshold: float, severity: AlertSeverity):
+        """Add or update a metric threshold for alerting.
+        
+        Args:
+            metric_type: The type of metric to monitor
+            threshold: The threshold value for triggering alerts
+            severity: The severity level for the alert
+        """
+        # Convert MetricType enum to string key for storage
+        metric_key = metric_type.value
+        
+        # Initialize if not exists
+        if metric_key not in self.alert_thresholds:
+            self.alert_thresholds[metric_key] = {}
+        
+        # Store the threshold
+        self.alert_thresholds[metric_key][severity.value.upper()] = threshold
+        
+        self.logger.debug(f"Added {severity.value} threshold for {metric_key}: {threshold}")
+    
     def record_metric(self, metric_type: MetricType, value: float, component: str, 
                      tags: Optional[Dict[str, str]] = None, context: Optional[str] = None):
         """Record a performance metric for analysis."""
