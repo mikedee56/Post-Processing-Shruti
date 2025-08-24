@@ -15,67 +15,78 @@ from pathlib import Path
 from utils.mcp_client import MCPClient, MCPConfig, create_mcp_client
 from utils.mcp_reliability import MCPHealthMonitor, MCPCircuitBreakerAdvanced, GracefulDegradationManager
 from utils.mcp_epic4_foundation import Epic4ExtensibleMCPArchitecture, create_epic4_foundation
-from utils.advanced_text_normalizer import AdvancedTextNormalizer, ProfessionalStandardsValidator
+from utils.advanced_text_normalizer import AdvancedTextNormalizer
+from utils.professional_standards import TechnicalQualityGate
 
 
-class TestProfessionalStandardsValidator:
-    """Test Professional Standards Validator per CEO directive"""
+class TestTechnicalQualityGate:
+    """Test Technical Quality Gate per CEO directive - replaces deprecated ProfessionalStandardsValidator"""
     
-    def test_validator_initialization(self):
-        """Test professional standards validator initialization"""
-        validator = ProfessionalStandardsValidator()
-        assert validator is not None
-        assert validator.validation_history == []
-        assert validator.integrity_checks_enabled is True
+    def test_quality_gate_initialization(self):
+        """Test technical quality gate initialization"""
+        quality_gate = TechnicalQualityGate()
+        assert quality_gate is not None
+        assert hasattr(quality_gate, 'gates')
+        assert len(quality_gate.gates) > 0
     
-    def test_technical_claims_validation(self):
-        """Test technical claims validation with evidence"""
-        validator = ProfessionalStandardsValidator()
+    def test_code_quality_validation(self):
+        """Test code quality validation with metrics"""
+        quality_gate = TechnicalQualityGate()
         
-        # Valid claims with proper evidence
-        valid_claims = {
-            'test_claim': {
-                'factual_basis': 'Testing MCP integration functionality',
-                'verification_method': 'unit_testing',
-                'supporting_data': {'test_type': 'integration', 'timestamp': time.time()}
+        # Valid metrics meeting thresholds
+        valid_metrics = {
+            'test_coverage': 0.9,  # 90% coverage
+            'cyclomatic_complexity': 8,  # Below threshold of 10
+            'duplication_percentage': 0.03,  # 3% duplication
+            'security_vulnerabilities': {
+                'critical': 0, 'high': 0, 'medium': 0, 'low': 1
+            },
+            'performance': {
+                'response_time_ms': 80,  # Below 100ms
+                'memory_usage_mb': 1024  # Below 2048MB
             }
         }
         
-        result = validator.validate_technical_claims(valid_claims)
-        assert result['claims_verified'] is True
-        assert result['professional_compliance'] is True
-        assert 'test_claim' in result['verified_claims']
+        result = quality_gate.validate_code_quality(valid_metrics)
+        assert result.passes is True
+        assert result.overall_score > 0.8
+        assert len(result.violations) == 0
     
-    def test_test_manipulation_prevention(self):
-        """Test prevention of test manipulation"""
-        validator = ProfessionalStandardsValidator()
+    def test_quality_gate_violations(self):
+        """Test quality gate with violations"""
+        quality_gate = TechnicalQualityGate()
         
-        # Clean test results
-        clean_results = {
-            'tests_executed': 10,
-            'tests_passed': 8,
-            'tests_failed': 2
+        # Metrics failing thresholds
+        failing_metrics = {
+            'test_coverage': 0.7,  # Below 85% threshold
+            'cyclomatic_complexity': 15,  # Above threshold of 10
+            'security_vulnerabilities': {
+                'critical': 1, 'high': 2, 'medium': 1, 'low': 0
+            }
         }
         
-        integrity_check = validator.prevent_test_manipulation(clean_results)
-        assert integrity_check['test_integrity_maintained'] is True
-        assert integrity_check['professional_compliance'] is True
+        result = quality_gate.validate_code_quality(failing_metrics)
+        assert result.passes is False
+        assert result.overall_score < 0.5
+        assert len(result.violations) > 0
     
-    def test_crisis_reporting_validation(self):
-        """Test crisis reporting validation"""
-        validator = ProfessionalStandardsValidator()
+    def test_professional_compliance_reporting(self):
+        """Test professional compliance reporting"""
+        quality_gate = TechnicalQualityGate()
         
-        # Valid crisis report with evidence
-        crisis_report = {
-            'technical_symptoms': 'MCP connection failures',
-            'reproduction_steps': ['Connect to MCP server', 'Send request', 'Observe timeout'],
-            'impact_measurement': {'failure_rate': 0.8, 'response_time': 30.0}
+        # Quality metrics for reporting
+        metrics = {
+            'test_coverage': 0.88,
+            'cyclomatic_complexity': 6,
+            'duplication_percentage': 0.02,
+            'security_vulnerabilities': {'critical': 0, 'high': 0, 'medium': 0, 'low': 0},
+            'performance': {'response_time_ms': 65, 'memory_usage_mb': 800}
         }
         
-        validation = validator.validate_crisis_reporting(crisis_report)
-        assert validation['crisis_technically_verified'] is True
-        assert validation['evidence_substantiated'] is True
-        assert validation['escalation_warranted'] is True
+        report = quality_gate.generate_quality_report(metrics, 'detailed')
+        assert '✅ PASS' in report
+        assert 'Overall Score:' in report
+        assert 'Production Ready: Yes' in report
 
 
 class TestMCPClient:

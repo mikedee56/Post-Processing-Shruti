@@ -14,10 +14,11 @@ import re
 import time
 
 
-from .hybrid_matching_engine import (
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any, Set, Tuple
+
+from .hybrid_matching_engine import (
     HybridMatchingEngine, HybridPipelineConfig, HybridMatchingResult,
     MatchingStage, SourceProvenance
 )
@@ -139,7 +140,7 @@ class AdvancedVerseMatcher:
                 phonetic_weight=0.25,
                 sequence_weight=0.35,
                 semantic_weight=0.40,  # Higher semantic weight for academic context
-                min_confidence_threshold=self.config.academic_confidence_threshold,
+                fallback_threshold=self.config.academic_confidence_threshold,
                 enable_fallback_to_traditional=True
             )
             self.hybrid_engine = HybridMatchingEngine(

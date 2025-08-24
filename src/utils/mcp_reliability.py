@@ -13,7 +13,7 @@ from enum import Enum
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from utils.advanced_text_normalizer import ProfessionalStandardsValidator
+from utils.professional_standards import TechnicalQualityGate
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class MCPHealthMonitor:
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         self.health_history: List[HealthCheckResult] = []
         self.alert_thresholds = self.config.get('alert_thresholds', {})
         self.monitoring_enabled = self.config.get('enable_health_monitoring', True)
@@ -229,7 +229,7 @@ class MCPCircuitBreakerAdvanced:
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         
         # Circuit breaker configuration
         self.failure_threshold = self.config.get('failure_threshold', 5)
@@ -408,7 +408,7 @@ class GracefulDegradationManager:
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         self.degradation_strategies: Dict[str, Callable] = {}
         self.current_degradation_level = 0  # 0 = normal, 1-5 = increasing degradation
         

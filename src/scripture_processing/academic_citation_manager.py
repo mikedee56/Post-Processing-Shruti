@@ -215,23 +215,29 @@ class AcademicCitationManager:
                 'full': 'Bhagavad Gītā',
                 'devanagari': 'भगवद्गीता'
             },
-            ScriptureSource.MUNDAKA_UPANISHAD: {
-                'standard': 'MuU',
-                'scholarly': 'Muṇḍ.',
-                'full': 'Muṇḍaka Upaniṣad',
-                'devanagari': 'मुण्डक उपनिषद्'
-            },
-            ScriptureSource.KATHA_UPANISHAD: {
-                'standard': 'KaU',
-                'scholarly': 'Kaṭh.',
-                'full': 'Kaṭha Upaniṣad',
-                'devanagari': 'कठ उपनिषद्'
+            ScriptureSource.UPANISHADS: {
+                'standard': 'Up',
+                'scholarly': 'Upan.',
+                'full': 'Upaniṣads',
+                'devanagari': 'उपनिषद्'
             },
             ScriptureSource.YOGA_SUTRAS: {
                 'standard': 'YS',
                 'scholarly': 'Yoga.',
                 'full': 'Yoga Sūtras',
                 'devanagari': 'योग सूत्र'
+            },
+            ScriptureSource.VEDAS: {
+                'standard': 'V',
+                'scholarly': 'Ved.',
+                'full': 'Vedas',
+                'devanagari': 'वेद'
+            },
+            ScriptureSource.PURANAS: {
+                'standard': 'P',
+                'scholarly': 'Pur.',
+                'full': 'Purāṇas',
+                'devanagari': 'पुराण'
             }
         }
         
@@ -243,9 +249,9 @@ class AcademicCitationManager:
                 'traditional_dating': 'c. 400 BCE - 400 CE',
                 'modern_editions': ['Gita Press', 'Harvard Oriental Series']
             },
-            ScriptureSource.MUNDAKA_UPANISHAD: {
-                'traditional_author': 'Unknown',
-                'part_of': 'Atharva Veda',
+            ScriptureSource.UPANISHADS: {
+                'traditional_author': 'Various Ṛṣis',
+                'part_of': 'Vedic Literature',
                 'traditional_dating': 'c. 800-200 BCE',
                 'modern_editions': ['Ānandāśrama', 'Harvard Oriental Series']
             },
@@ -254,6 +260,18 @@ class AcademicCitationManager:
                 'part_of': 'Yoga Darśana',
                 'traditional_dating': 'c. 400 CE',
                 'modern_editions': ['Yoga Institute', 'Harvard Oriental Series']
+            },
+            ScriptureSource.VEDAS: {
+                'traditional_author': 'Various Ṛṣis',
+                'part_of': 'Śruti Literature',
+                'traditional_dating': 'c. 1500-500 BCE',
+                'modern_editions': ['Vaidik Saṃśodhan Maṇḍal', 'Harvard Oriental Series']
+            },
+            ScriptureSource.PURANAS: {
+                'traditional_author': 'Vyāsa and others',
+                'part_of': 'Smṛti Literature', 
+                'traditional_dating': 'c. 300-1500 CE',
+                'modern_editions': ['Motilal Banarsidass', 'Sanskrit Series']
             }
         }
     

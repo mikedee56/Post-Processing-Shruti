@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import json
 
-from utils.advanced_text_normalizer import ProfessionalStandardsValidator
+from utils.professional_standards import TechnicalQualityGate
 from utils.mcp_client import MCPClient, MCPConfig
 from utils.mcp_reliability import MCPHealthMonitor, MCPCircuitBreakerAdvanced, GracefulDegradationManager
 
@@ -76,7 +76,7 @@ class Epic4ExtensibleMCPArchitecture:
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         
         # Core MCP infrastructure
         self.mcp_client = MCPClient(MCPConfig(**self.config.get('mcp_client', {})))

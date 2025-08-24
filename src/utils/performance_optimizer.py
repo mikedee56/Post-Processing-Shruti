@@ -920,36 +920,36 @@ class PerformanceOptimizer:
     def _stabilize_memory_allocation_patterns(self, processor) -> None:
         """Control memory allocation patterns to reduce variance."""
         try:
-        # Pre-allocate frequently used objects to reduce allocation variance
-        import gc
-        
-        # Disable garbage collection during processing to eliminate GC variance
-        gc.disable()
-        
-        # Pre-allocate metrics objects to reduce object creation variance
-        if hasattr(processor, 'metrics_collector'):
-            # Create a pool of pre-allocated metrics objects
-            processor._metrics_pool = []
-            for i in range(10):
-                metrics = processor.metrics_collector.create_file_metrics(f"pool_{i}")
-                processor._metrics_pool.append(metrics)
-            processor._metrics_pool_index = 0
+            # Pre-allocate frequently used objects to reduce allocation variance
+            import gc
             
-            # Replace metrics creation with pool access
-            original_create = processor.metrics_collector.create_file_metrics
-            def pooled_create_metrics(name):
-                # Use pre-allocated metrics to eliminate creation variance
-                if hasattr(processor, '_metrics_pool') and processor._metrics_pool:
-                    index = processor._metrics_pool_index % len(processor._metrics_pool)
-                    processor._metrics_pool_index += 1
-                    return processor._metrics_pool[index]
-                return original_create(name)
-            processor.metrics_collector.create_file_metrics = pooled_create_metrics
+            # Disable garbage collection during processing to eliminate GC variance
+            gc.disable()
             
-        self.logger.debug("Memory allocation variance stabilization applied")
-        
-    except Exception as e:
-        self.logger.warning(f"Could not stabilize memory allocation: {e}")
+            # Pre-allocate metrics objects to reduce object creation variance
+            if hasattr(processor, 'metrics_collector'):
+                # Create a pool of pre-allocated metrics objects
+                processor._metrics_pool = []
+                for i in range(10):
+                    metrics = processor.metrics_collector.create_file_metrics(f"pool_{i}")
+                    processor._metrics_pool.append(metrics)
+                processor._metrics_pool_index = 0
+                
+                # Replace metrics creation with pool access
+                original_create = processor.metrics_collector.create_file_metrics
+                def pooled_create_metrics(name):
+                    # Use pre-allocated metrics to eliminate creation variance
+                    if hasattr(processor, '_metrics_pool') and processor._metrics_pool:
+                        index = processor._metrics_pool_index % len(processor._metrics_pool)
+                        processor._metrics_pool_index += 1
+                        return processor._metrics_pool[index]
+                    return original_create(name)
+                processor.metrics_collector.create_file_metrics = pooled_create_metrics
+                
+            self.logger.debug("Memory allocation variance stabilization applied")
+            
+        except Exception as e:
+            self.logger.warning(f"Could not stabilize memory allocation: {e}")
 
 def _cache_external_library_operations(self, processor) -> None:
     """Cache all external library operations to eliminate call variance."""

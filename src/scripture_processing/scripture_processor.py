@@ -19,6 +19,7 @@ from scripture_processing.scripture_validator import ScriptureValidator
 from scripture_processing.scripture_iast_formatter import ScriptureIASTFormatter, VerseFormatting
 from scripture_processing.verse_selection_system import VerseSelectionSystem, SelectionStrategy
 from scripture_processing.hybrid_matching_engine import HybridMatchingEngine, HybridPipelineConfig
+from scripture_processing.asr_scripture_matcher import ASRScriptureMatcher, MatchingStrategy
 
 
 @dataclass
@@ -76,6 +77,10 @@ class ScriptureProcessor:
             # Story 2.4.3 - Hybrid matching configuration
             self.enable_hybrid_matching = self.config.get('enable_hybrid_matching', False)
             self.hybrid_engine = None
+            
+            # Epic 5 - ASR Scripture Matching (Digital Dharma implementation)
+            self.enable_asr_matching = self.config.get('enable_asr_matching', True)
+            self.asr_matcher = None
             
             # Story 4.5 - Academic enhancement configuration
             self.enable_academic_enhancement = self.config.get('enable_academic_enhancement', False)
@@ -198,6 +203,25 @@ class ScriptureProcessor:
                     })
                     self.logger.error(f"Failed to initialize hybrid matching engine: {error_details}")
                     self.enable_hybrid_matching = False
+            
+            # Initialize ASR Scripture Matcher if enabled (Epic 5 - Digital Dharma)
+            if self.enable_asr_matching:
+                try:
+                    self.asr_matcher = ASRScriptureMatcher(
+                        scripture_data_path=scripture_dir if scripture_dir else Path("data/scriptures")
+                    )
+                    
+                    self._error_handler.log_operation_success("asr_scripture_matcher_initialization", {
+                        'scripture_dir': str(scripture_dir) if scripture_dir else 'default'
+                    })
+                    
+                except Exception as e:
+                    error_details = self._error_handler.handle_processing_error("asr_scripture_matcher_initialization", e, {
+                        'enable_asr_matching': self.enable_asr_matching,
+                        'scripture_dir': str(scripture_dir) if scripture_dir else 'None'
+                    })
+                    self.logger.error(f"Failed to initialize ASR Scripture Matcher: {error_details}")
+                    self.enable_asr_matching = False
             
             # Initialize academic enhancement components if enabled (Story 4.5)
             if self.enable_academic_enhancement:
@@ -613,6 +637,86 @@ class ScriptureProcessor:
         
         return validation_results
     
+    def match_asr_to_scripture(self, asr_text: str, 
+                              min_confidence: float = 0.3,
+                              max_results: int = 5) -> Dict[str, Any]:
+        """
+        Match garbled ASR output to canonical scriptural verses.
+        
+        This method implements the Digital Dharma research insights for
+        matching ASR approximations to exact scriptural quotes.
+        Enhanced for Tulsi Ramayana (Hindi) support.
+        
+        Args:
+            asr_text: The ASR-generated text (possibly garbled)
+            min_confidence: Minimum confidence threshold for matches (default 0.3, balanced threshold)
+            max_results: Maximum number of results to return
+            
+        Returns:
+            Dictionary containing:
+                - matches: List of matched verses with confidence scores
+                - original_text: The original ASR text
+                - report: Human-readable match report
+                - processing_metadata: Details about the matching process
+        """
+        if not self.enable_asr_matching or not self.asr_matcher:
+            return {
+                'matches': [],
+                'original_text': asr_text,
+                'report': 'ASR Scripture Matching is not enabled or initialized',
+                'processing_metadata': {'enabled': False}
+            }
+        
+        try:
+            # Perform ASR-to-scripture matching with balanced confidence threshold
+            matches = self.asr_matcher.match_asr_to_verse(
+                asr_text, 
+                min_confidence=min_confidence
+            )
+            
+            # Format results
+            formatted_matches = []
+            for match in matches[:max_results]:
+                formatted_matches.append({
+                    'verse_reference': match.verse_reference,
+                    'canonical_text': match.canonical_text,
+                    'confidence': match.confidence_score,
+                    'strategy': match.matching_strategy.value,
+                    'translation': match.canonical_verse.get('translation', ''),
+                    'source': match.canonical_verse.get('source', 'unknown'),
+                    'details': match.match_details
+                })
+            
+            # Generate human-readable report
+            report = self.asr_matcher.format_match_report(
+                matches, 
+                asr_text, 
+                max_results=max_results
+            )
+            
+            return {
+                'matches': formatted_matches,
+                'original_text': asr_text,
+                'report': report,
+                'processing_metadata': {
+                    'enabled': True,
+                    'total_matches': len(matches),
+                    'returned_matches': len(formatted_matches),
+                    'min_confidence': min_confidence,
+                    'strategies_used': list(set(m.matching_strategy.value for m in matches)),
+                    'sources_searched': ['bhagavad_gita', 'yoga_sutras', 'upanishads', 'ramayana']
+                }
+            }
+            
+        except Exception as e:
+            self.logger.error(f"ASR scripture matching failed: {e}")
+            return {
+                'matches': [],
+                'original_text': asr_text,
+                'report': f'ASR Scripture Matching failed: {str(e)}',
+                'processing_metadata': {'enabled': True, 'error': str(e)}
+            }
+
     def get_processing_statistics(self) -> Dict[str, Any]:
         """Get processing statistics from all components."""
         return {

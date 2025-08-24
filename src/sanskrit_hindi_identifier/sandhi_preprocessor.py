@@ -115,17 +115,22 @@ class SandhiPreprocessor:
 
     def _lazy_initialize_parser(self):
         """
-        Lazy initialization of parser with persistent Word2Vec model singleton caching.
+        Lazy initialization of parser with aggressive Word2Vec singleton enforcement.
         
-        This method implements a production-grade solution to the 305% variance issue
-        by using singleton pattern for Word2Vec model persistence across all instances.
+        This method implements a production-grade solution to eliminate Word2Vec reloading
+        by monkey-patching the gensim library to prevent multiple loads.
         """
         if self._parser_initialized or not self.sanskrit_parser_available:
             return
             
         try:
-            # CRITICAL PERFORMANCE FIX: Use singleton pattern for Word2Vec model
-            # This eliminates the primary variance source (Word2Vec reloading)
+            # CRITICAL PERFORMANCE FIX: Monkey-patch gensim to prevent Word2Vec reloading
+            if not hasattr(SandhiPreprocessor, '_word2vec_singleton_enforced'):
+                self._enforce_word2vec_singleton()
+                SandhiPreprocessor._word2vec_singleton_enforced = True
+                self.logger.info("Word2Vec singleton enforcement applied globally")
+            
+            # Use singleton pattern for parser instance
             if not hasattr(SandhiPreprocessor, '_shared_parser_instance'):
                 self.logger.info("Creating shared parser instance with Word2Vec model (one-time initialization)")
                 
@@ -144,7 +149,7 @@ class SandhiPreprocessor:
             if hasattr(SandhiPreprocessor, '_shared_sandhi_analyzer'):
                 self.sandhi_analyzer = SandhiPreprocessor._shared_sandhi_analyzer
             
-            # PERFORMANCE OPTIMIZATION: Enhanced LRU cache for parsing results
+            # Enhanced LRU cache for parsing results
             import functools
             
             # Check if shared cached method already exists
@@ -171,6 +176,74 @@ class SandhiPreprocessor:
             self.logger.warning(f"Sanskrit parser lazy initialization failed: {e}")
             self.sanskrit_parser_available = False
             self._parser_initialized = False
+
+    def _enforce_word2vec_singleton(self):
+        """
+        Monkey-patch gensim.models.Word2Vec to enforce singleton behavior.
+        
+        This prevents the massive performance variance caused by Word2Vec reloading
+        during Sanskrit text processing.
+        """
+        try:
+            import gensim.models
+            
+            # Store original Word2Vec class
+            if not hasattr(SandhiPreprocessor, '_original_word2vec_class'):
+                SandhiPreprocessor._original_word2vec_class = gensim.models.Word2Vec
+                SandhiPreprocessor._word2vec_singleton_instance = None
+                SandhiPreprocessor._word2vec_model_path = None
+            
+            # Create singleton Word2Vec class
+            class SingletonWord2Vec:
+                def __init__(self, *args, **kwargs):
+                    # Check if this is trying to load from the same model file
+                    if args and len(args) > 0 and isinstance(args[0], str):
+                        model_path = args[0]
+                        
+                        # If we're loading the same model, return the singleton
+                        if (SandhiPreprocessor._word2vec_singleton_instance is not None and 
+                            SandhiPreprocessor._word2vec_model_path == model_path):
+                            # Copy singleton attributes to this instance
+                            for attr in dir(SandhiPreprocessor._word2vec_singleton_instance):
+                                if not attr.startswith('_'):
+                                    try:
+                                        setattr(self, attr, getattr(SandhiPreprocessor._word2vec_singleton_instance, attr))
+                                    except:
+                                        pass
+                            return
+                        
+                        # Create new singleton instance
+                        SandhiPreprocessor._word2vec_singleton_instance = SandhiPreprocessor._original_word2vec_class(*args, **kwargs)
+                        SandhiPreprocessor._word2vec_model_path = model_path
+                        
+                        # Copy singleton attributes to this instance
+                        for attr in dir(SandhiPreprocessor._word2vec_singleton_instance):
+                            if not attr.startswith('_'):
+                                try:
+                                    setattr(self, attr, getattr(SandhiPreprocessor._word2vec_singleton_instance, attr))
+                                except:
+                                    pass
+                    else:
+                        # For non-file initialization, create normal instance
+                        instance = SandhiPreprocessor._original_word2vec_class(*args, **kwargs)
+                        for attr in dir(instance):
+                            if not attr.startswith('_'):
+                                try:
+                                    setattr(self, attr, getattr(instance, attr))
+                                except:
+                                    pass
+                
+                def __getattr__(self, name):
+                    if SandhiPreprocessor._word2vec_singleton_instance:
+                        return getattr(SandhiPreprocessor._word2vec_singleton_instance, name)
+                    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+            
+            # Replace the Word2Vec class globally
+            gensim.models.Word2Vec = SingletonWord2Vec
+            self.logger.info("Word2Vec singleton enforcement installed globally")
+            
+        except Exception as e:
+            self.logger.warning(f"Failed to enforce Word2Vec singleton: {e}")
 
     def preprocess_text(self, text: str) -> SandhiSplitResult:
         """

@@ -248,6 +248,23 @@ class IASTTransliterator:
             issues_found=issues_found
         )
 
+    def transliterate_text(self, text: str) -> str:
+        """
+        Simple transliteration method for backward compatibility.
+        
+        Args:
+            text: Input text to transliterate
+            
+        Returns:
+            Transliterated text as string
+        """
+        try:
+            result = self.transliterate_to_iast(text)
+            return result.transliterated_text
+        except Exception as e:
+            self.logger.warning(f"Transliteration failed for '{text}': {e}")
+            return text  # Return original text if transliteration fails
+
     def validate_iast(self, text: str) -> List[str]:
         """
         Validate text for IAST compliance.

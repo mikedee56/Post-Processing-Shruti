@@ -656,11 +656,10 @@ class AdvancedTextNormalizer(TextNormalizer):
                 })
                 self.mcp_client = None
             
-            # Professional standards compliance per CEO directive
+            # Professional standards compliance per CEO directive - migrated to TechnicalQualityGate
             try:
-                from utils.professional_standards import ProfessionalStandardsValidator
-                self.professional_validator = ProfessionalStandardsValidator()
-                self.logger.debug("Professional standards validator initialized")
+                self.professional_validator = TechnicalQualityGate()
+                self.logger.debug("Professional standards quality gate initialized")
             except Exception as e:
                 self.error_handler.log_operation_warning("professional_validator_initialization", {
                     "error": str(e),
@@ -690,7 +689,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                 self.logger.debug("Advanced components initialized successfully")
             except Exception as e:
                 self.error_handler.handle_processing_error(
-                    e, "advanced_components_initialization", {"component": "advanced_components"}
+                    "advanced_components_initialization", e, {"component": "advanced_components"}
                 )
                 raise TextNormalizationError(f"Failed to initialize advanced components: {str(e)}")
             
@@ -700,7 +699,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                 self.logger.debug("Number processing mappings initialized")
             except Exception as e:
                 self.error_handler.handle_processing_error(
-                    e, "number_mappings_initialization", {"component": "number_mappings"}
+                    "number_mappings_initialization", e, {"component": "number_mappings"}
                 )
                 raise TextNormalizationError(f"Failed to initialize number mappings: {str(e)}")
             
@@ -724,7 +723,7 @@ class AdvancedTextNormalizer(TextNormalizer):
         except Exception as e:
             # Handle unexpected initialization errors
             self.error_handler.handle_processing_error(
-                e, "advanced_text_normalizer_initialization", 
+                "advanced_text_normalizer_initialization", e, 
                 {"correlation_id": correlation_id, "config": config}
             )
             raise TextNormalizationError(f"Unexpected error during AdvancedTextNormalizer initialization: {str(e)}")
@@ -761,6 +760,61 @@ class AdvancedTextNormalizer(TextNormalizer):
         except Exception as e:
             raise ConfigurationError(f"Configuration validation failed: {str(e)}")
     
+    def _initialize_advanced_components(self):
+        """Initialize advanced MCP components with error handling."""
+        try:
+            # Initialize quality gate validator for AC3 requirements
+            if not hasattr(self, 'quality_gate_validator') or self.quality_gate_validator is None:
+                try:
+                    from .quality_gate_validator import QualityGateValidator
+                    self.quality_gate_validator = QualityGateValidator()
+                    self.logger.debug("Quality gate validator initialized")
+                except ImportError:
+                    self.logger.warning("QualityGateValidator not available, continuing without quality gates")
+                    self.quality_gate_validator = None
+                except Exception as e:
+                    self.logger.warning(f"Failed to initialize quality gate validator: {e}")
+                    self.quality_gate_validator = None
+            
+            # Initialize advanced context processing features
+            self.enable_advanced_context = self.config.get('enable_advanced_context', True)
+            self.enable_performance_monitoring = self.config.get('enable_performance_monitoring', True)
+            
+            # Initialize all conversational pattern systems
+            try:
+                self._setup_rescission_patterns()
+                self.logger.debug("Rescission patterns initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize rescission patterns: {e}")
+                self.rescission_patterns = {}  # Initialize empty patterns as fallback
+            
+            try:
+                self._setup_partial_phrase_patterns()
+                self.logger.debug("Partial phrase patterns initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize partial phrase patterns: {e}")
+                self.partial_phrase_patterns = {}  # Initialize empty patterns as fallback
+            
+            try:
+                self._setup_meaningful_discourse_markers()
+                self.logger.debug("Meaningful discourse markers initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize meaningful discourse markers: {e}")
+                self.potentially_meaningful_markers = set()  # Initialize empty set as fallback
+            
+            # Initialize production caching for Story 5.1 variance reduction
+            if self.config.get('enable_production_caching', True):
+                try:
+                    self._initialize_production_caching()
+                    self.logger.debug("Production caching initialized")
+                except Exception as e:
+                    self.logger.warning(f"Failed to initialize production caching: {e}")
+            
+            self.logger.debug("Advanced components initialization completed")
+            
+        except Exception as e:
+            raise TextNormalizationError(f"Failed to initialize advanced components: {str(e)}")
+    
     def _initialize_number_mappings(self):
         """Initialize number processing mappings with error handling."""
         try:
@@ -777,7 +831,7 @@ class AdvancedTextNormalizer(TextNormalizer):
             
             # Compound number patterns for "twenty one", "thirty two", etc.
             self.compound_patterns = [
-                (r'\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+(one|two|three|four|five|six|seven|eight|nine)\b', self._convert_compound_number),
+                (r'\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\s+(one|two|three|four|five|six|seven|eight|nine)\b', self._convert_compound_numbers),
                 (r'\b(one|two|three|four|five|six|seven|eight|nine)\s+hundred\b', self._convert_hundred),
                 (r'\b(one|two|three|four|five|six|seven|eight|nine)\s+thousand\b', self._convert_thousand)
             ]
@@ -1274,7 +1328,7 @@ class AdvancedTextNormalizer(TextNormalizer):
         except Exception as e:
             # Handle unexpected processing errors
             self.error_handler.handle_processing_error(
-                e, "convert_numbers_with_context", 
+                "convert_numbers_with_context", e, 
                 {
                     "text_length": len(text),
                     "text_preview": text[:100] + "..." if len(text) > 100 else text,
@@ -1436,7 +1490,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                         
             except Exception as context_error:
                 self.error_handler.handle_processing_error(
-                    context_error, "context_classification", 
+                    "context_classification", context_error, 
                     {"text_preview": text[:100] + "..." if len(text) > 100 else text}
                 )
                 raise TextNormalizationError(f"Failed to classify number context: {str(context_error)}", original_text=text)
@@ -1467,7 +1521,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                     
             except Exception as processing_error:
                 self.error_handler.handle_processing_error(
-                    processing_error, "context_based_processing", 
+                    "context_based_processing", processing_error, 
                     {
                         "context_type": str(context_type) if context_type else None,
                         "unique_contexts": len(unique_contexts) if 'unique_contexts' in locals() else None,
@@ -1594,13 +1648,10 @@ class AdvancedTextNormalizer(TextNormalizer):
                 })
             
             # Handle unexpected processing errors
-            self.error_handler.handle_processing_error(
-                e, "convert_numbers_with_monitoring", 
-                {
+            self.error_handler.handle_processing_error("convert_numbers_with_monitoring", e, {
                     "text_preview": text[:100] + "..." if len(text) > 100 else text,
                     "processing_time_ms": processing_time_ms if 'processing_time_ms' in locals() else 0
-                }
-            )
+                })
             
             # Record failed processing decision if available
             try:
@@ -2354,6 +2405,35 @@ class AdvancedTextNormalizer(TextNormalizer):
         # Single numbers - use direct mapping
         return self.basic_numbers.get(word_num, word_num)
 
+    def _convert_compound_numbers(self, match):
+        """Convert compound numbers like 'twenty five' to '25'."""
+        groups = match.groups()
+        if len(groups) >= 2:
+            tens_word = groups[0].lower()
+            ones_word = groups[1].lower()
+            tens_value = int(self.basic_numbers.get(tens_word, '0'))
+            ones_value = int(self.basic_numbers.get(ones_word, '0'))
+            return str(tens_value + ones_value)
+        return match.group(0)
+
+    def _convert_hundred(self, match):
+        """Convert 'three hundred' to '300'."""
+        groups = match.groups()
+        if len(groups) >= 1:
+            number_word = groups[0].lower()
+            number_value = int(self.basic_numbers.get(number_word, '1'))
+            return str(number_value * 100)
+        return match.group(0)
+
+    def _convert_thousand(self, match):
+        """Convert 'five thousand' to '5000'."""
+        groups = match.groups()
+        if len(groups) >= 1:
+            number_word = groups[0].lower()
+            number_value = int(self.basic_numbers.get(number_word, '1'))
+            return str(number_value * 1000)
+        return match.group(0)
+
     def record_processing_decision(self, text: str, context_type: NumberContextType, confidence: float, result: str, processing_time_ms: float) -> Dict[str, Any]:
         """
         Record a processing decision for quality assurance tracking (Task 3.3).
@@ -2953,15 +3033,12 @@ class AdvancedTextNormalizer(TextNormalizer):
             raise
         except Exception as e:
             # Handle unexpected processing errors
-            self.error_handler.handle_processing_error(
-                e, "normalize_with_advanced_tracking", 
-                {
+            self.error_handler.handle_processing_error("normalize_with_advanced_tracking", e, {
                     "text_length": len(text),
                     "word_count": len(text.split()) if text.strip() else 0,
                     "text_preview": text[:100] + "..." if len(text) > 100 else text,
                     "correlation_id": operation_correlation_id
-                }
-            )
+                })
             raise TextNormalizationError(
                 f"Unexpected error during advanced normalization tracking: {str(e)}", 
                 original_text=text
@@ -4369,10 +4446,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                         self.logger.debug("MCP processing completed with no changes")
                         
                 except Exception as mcp_error:
-                    self.error_handler.handle_processing_error(
-                        mcp_error, "mcp_number_processing", 
-                        {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text}
-                    )
+                    self.error_handler.handle_processing_error("mcp_number_processing", mcp_error, {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text})
                     self.error_handler.log_operation_warning("mcp_processing_fallback", {
                         "error": str(mcp_error),
                         "fallback": "Continuing with traditional number processing"
@@ -4395,10 +4469,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                     self.logger.debug("Conversational nuances handling not available")
                     
             except Exception as conv_error:
-                self.error_handler.handle_processing_error(
-                    conv_error, "conversational_nuances_processing", 
-                    {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text}
-                )
+                self.error_handler.handle_processing_error("conversational_nuances_processing", conv_error, {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text})
                 self.error_handler.log_operation_warning("conversational_processing_fallback", {
                     "error": str(conv_error),
                     "fallback": "Skipping conversational nuances processing"
@@ -4454,10 +4525,7 @@ class AdvancedTextNormalizer(TextNormalizer):
                     corrections_applied.extend(base_result.changes_applied)
                     
             except Exception as base_error:
-                self.error_handler.handle_processing_error(
-                    base_error, "base_normalization", 
-                    {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text}
-                )
+                self.error_handler.handle_processing_error("base_normalization", base_error, {"text_preview": current_text[:100] + "..." if len(current_text) > 100 else current_text})
                 self.error_handler.log_operation_warning("base_normalization_fallback", {
                     "error": str(base_error),
                     "fallback": "Skipping base normalization"
@@ -4539,13 +4607,10 @@ class AdvancedTextNormalizer(TextNormalizer):
             raise
         except Exception as e:
             # Handle unexpected normalization errors
-            self.error_handler.handle_processing_error(
-                e, "normalize_with_monitoring", 
-                {
+            self.error_handler.handle_processing_error("normalize_with_monitoring", e, {
                     "text_preview": text[:100] + "..." if len(text) > 100 else text,
                     "word_count": len(text.split()) if text else 0
-                }
-            )
+                })
             
             self.error_handler.log_operation_warning("normalization_error_fallback", {
                 "error": str(e),
@@ -4956,8 +5021,8 @@ class AdvancedTextNormalizer(TextNormalizer):
         
         return max(0.0, min(1.0, quality))
 
-# Professional standards validator imported from separate module to avoid circular imports
-from utils.professional_standards import ProfessionalStandardsValidator, PerformanceValidator
+# Professional standards implementation - migrated to TechnicalQualityGate
+from utils.professional_standards import TechnicalQualityGate
 
 
 @dataclass

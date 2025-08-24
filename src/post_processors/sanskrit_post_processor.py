@@ -10,6 +10,7 @@ import re
 import json
 import yaml
 import time
+import uuid
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
@@ -43,6 +44,9 @@ from post_processors.academic_polish_processor import AcademicPolishProcessor
 from ner_module.yoga_vedanta_ner import YogaVedantaNER
 from ner_module.capitalization_engine import CapitalizationEngine
 from ner_module.ner_model_manager import NERModelManager, SuggestionSource
+
+# Import Professional Performance Optimizer (Story 5.x Performance Excellence)
+from utils.professional_performance_optimizer import ProfessionalPerformanceOptimizer, PerformanceConfig
 
 
 @dataclass
@@ -228,6 +232,45 @@ class SanskritPostProcessor:
             
             # Fuzzy matching threshold (legacy)
             self.fuzzy_threshold = self.config.get('fuzzy_threshold', 80)
+            
+            # Initialize Professional Performance Optimizer (Critical for <10% variance compliance)
+            self.enable_performance_optimization = self.config.get('enable_performance_optimization', True)
+            if self.enable_performance_optimization:
+                performance_config = PerformanceConfig(
+                    variance_target=self.config.get('performance_variance_target', 0.10),  # <10% requirement
+                    warmup_iterations=self.config.get('performance_warmup_iterations', 5),
+                    enable_resource_pooling=self.config.get('enable_resource_pooling', True),
+                    enable_caching=self.config.get('enable_performance_caching', True),
+                    enable_preallocation=self.config.get('enable_resource_preallocation', True),
+                    enable_gc_optimization=self.config.get('enable_gc_optimization', True),
+                    enable_threading_optimization=self.config.get('enable_threading_optimization', True)
+                )
+                
+                self.performance_optimizer = ProfessionalPerformanceOptimizer(performance_config)
+                
+                # Apply professional performance optimizations immediately
+                try:
+                    optimization_result = self.performance_optimizer.optimize_processor(self)
+                    
+                    if optimization_result['professional_standards_compliant']:
+                        self.logger.info("Professional Standards Architecture compliance achieved")
+                        self.logger.info(f"Performance variance target: <{performance_config.variance_target*100}%")
+                        self.logger.info(f"Cold start elimination: {optimization_result['cold_start_eliminated']}")
+                    else:
+                        self.logger.warning("Professional Standards Architecture compliance not yet achieved")
+                        self.logger.warning("Performance optimization may require additional tuning")
+                    
+                    self._performance_optimization_applied = True
+                    self._performance_baseline = optimization_result.get('performance_baseline')
+                    
+                except Exception as optimization_error:
+                    self.logger.error(f"Performance optimization failed: {optimization_error}")
+                    self._performance_optimization_applied = False
+                    # Continue initialization without optimization
+            else:
+                self.performance_optimizer = None
+                self._performance_optimization_applied = False
+                self.logger.info("Professional performance optimization disabled")
             
             self._error_handler.log_operation_success("initialization", {
                 'session_correlation_id': self.session_correlation_id,
@@ -1984,4 +2027,87 @@ class SanskritPostProcessor:
             return {
                 'error': str(e),
                 'system_info': {'story_version': '2.1', 'status': 'error'}
+            }
+
+    def get_professional_performance_report(self) -> Dict[str, Any]:
+        """
+        Get Professional Standards Architecture performance report.
+        
+        Returns:
+            Comprehensive performance compliance report
+        """
+        try:
+            if not self.enable_performance_optimization or not self.performance_optimizer:
+                return {
+                    'professional_standards_architecture': {
+                        'compliance_status': False,
+                        'reason': 'Performance optimization disabled'
+                    },
+                    'performance_optimization_enabled': False
+                }
+            
+            # Get detailed performance report from optimizer
+            performance_report = self.performance_optimizer.get_performance_report()
+            
+            # Add processor-specific metrics
+            processing_stats = self.get_processing_stats()
+            
+            # Combine reports with Professional Standards Architecture context
+            report = {
+                'professional_standards_architecture': performance_report['professional_standards_architecture'],
+                'performance_metrics': performance_report['performance_metrics'],
+                'optimization_status': performance_report['optimization_status'],
+                'ceo_directive_alignment': performance_report['ceo_directive_alignment'],
+                'processor_integration': {
+                    'optimization_applied': self._performance_optimization_applied,
+                    'performance_baseline': self._performance_baseline,
+                    'processing_statistics': processing_stats
+                },
+                'compliance_summary': {
+                    'variance_target': self.performance_optimizer.config.variance_target,
+                    'professional_standards_met': performance_report['professional_standards_architecture']['compliance_status'],
+                    'production_ready': (
+                        performance_report['professional_standards_architecture']['compliance_status'] and
+                        self._performance_optimization_applied
+                    )
+                }
+            }
+            
+            return report
+            
+        except Exception as e:
+            self.logger.error(f"Error generating professional performance report: {e}")
+            return {
+                'error': str(e),
+                'professional_standards_architecture': {'compliance_status': False, 'reason': 'Report generation error'}
+            }
+    
+    def validate_professional_performance_compliance(self, target_variance: float = 0.10) -> Dict[str, Any]:
+        """
+        Validate Professional Standards Architecture compliance.
+        
+        Args:
+            target_variance: Maximum acceptable variance (default: 10%)
+            
+        Returns:
+            Compliance validation results
+        """
+        try:
+            if not self.enable_performance_optimization or not self.performance_optimizer:
+                return {
+                    'professional_standards_compliant': False,
+                    'reason': 'Performance optimization not enabled',
+                    'ceo_directive_alignment': 'NOT_VERIFIED'
+                }
+            
+            # Use the optimizer's validation method
+            from utils.professional_performance_optimizer import validate_performance_compliance
+            return validate_performance_compliance(self, target_variance)
+            
+        except Exception as e:
+            self.logger.error(f"Error validating professional performance compliance: {e}")
+            return {
+                'professional_standards_compliant': False,
+                'error': str(e),
+                'ceo_directive_alignment': 'ERROR'
             }

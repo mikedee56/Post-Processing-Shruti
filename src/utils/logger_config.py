@@ -427,3 +427,38 @@ def get_logger(name: str, config: Optional[Dict[str, Any]] = None) -> logging.Lo
     logger_config = ProcessingLoggerConfig(config)
     logger_config.setup_logging()  # Ensure logging is configured
     return logging.getLogger(name)
+
+
+def setup_test_logging(log_level: Union[str, int] = "WARNING", log_dir: Optional[Path] = None) -> None:
+    """
+    Setup minimal logging configuration for tests.
+    
+    Configures logging to suppress verbose output during test execution
+    while ensuring critical errors are still captured.
+    
+    Args:
+        log_level: Logging level for tests (default: WARNING) - string or integer
+        log_dir: Optional directory for test logs
+    """
+    # Convert log level to numeric level
+    if isinstance(log_level, str):
+        numeric_level = getattr(logging, log_level.upper(), logging.WARNING)
+    else:
+        numeric_level = log_level
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=numeric_level,
+        format='%(levelname)s: %(message)s',
+        force=True  # Override any existing configuration
+    )
+    
+    # Set specific test logger levels
+    logging.getLogger('utils').setLevel(logging.ERROR)
+    logging.getLogger('post_processors').setLevel(logging.ERROR)
+    logging.getLogger('sanskrit_hindi_identifier').setLevel(logging.ERROR)
+    logging.getLogger('ner_module').setLevel(logging.ERROR)
+    
+    # If log_dir is specified, create it
+    if log_dir:
+        log_dir.mkdir(parents=True, exist_ok=True)

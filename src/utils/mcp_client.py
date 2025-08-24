@@ -14,7 +14,7 @@ import httpx
 import websockets
 from pydantic import BaseModel, ValidationError
 
-from utils.professional_standards import ProfessionalStandardsValidator
+from utils.professional_standards import TechnicalQualityGate
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ class MCPSessionManager:
         self.websocket = None
         self.session_id = None
         self.connection_start_time = None
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         
     async def connect(self) -> bool:
         """Establish MCP connection with professional validation"""
@@ -183,7 +183,7 @@ class MCPClient:
         self.session_manager = MCPSessionManager(self.config)
         self.circuit_breaker = MCPCircuitBreaker(self.config)
         self.performance_metrics = MCPPerformanceMetrics()
-        self.professional_validator = ProfessionalStandardsValidator()
+        self.professional_validator = TechnicalQualityGate()
         self.connection_pool = []
         self.request_cache = {}
         

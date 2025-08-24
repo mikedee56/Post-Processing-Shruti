@@ -224,7 +224,7 @@ class ErrorHandler:
             message=error_msg,
             operation=operation,
             original_error=error,
-            context=context,
+            details=context,
             severity=ErrorSeverity.MEDIUM,
             component=self.component_name
         )
@@ -692,6 +692,34 @@ class PerformanceError(BaseProcessingException):
             self.details['actual_value'] = actual_value
 
 
+class QualityError(BaseProcessingException):
+    """Errors related to quality gate failures and validation issues."""
+    
+    def __init__(self, message: str, quality_metric: Optional[str] = None,
+                 expected_threshold: Optional[float] = None, actual_score: Optional[float] = None, **kwargs):
+        # Extract parameters from kwargs to avoid conflicts
+        severity = kwargs.pop('severity', ErrorSeverity.MEDIUM)
+        component = kwargs.pop('component', 'quality_gate')
+        
+        super().__init__(
+            message,
+            severity=severity,
+            category=ErrorCategory.VALIDATION,
+            component=component,
+            **kwargs
+        )
+        self.quality_metric = quality_metric
+        self.expected_threshold = expected_threshold
+        self.actual_score = actual_score
+        
+        if quality_metric:
+            self.details['quality_metric'] = quality_metric
+        if expected_threshold is not None:
+            self.details['expected_threshold'] = expected_threshold
+        if actual_score is not None:
+            self.details['actual_score'] = actual_score
+
+
 class MemoryError(BaseProcessingException):
     """Errors related to memory allocation and management."""
     
@@ -755,6 +783,38 @@ class MCPIntegrationError(NetworkError):
         self.mcp_operation = mcp_operation
         if mcp_operation:
             self.details['mcp_operation'] = mcp_operation
+
+
+class MCPError(MCPIntegrationError):
+    """Alias for MCPIntegrationError for backward compatibility."""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(
+            message,
+            **kwargs
+        )
+
+
+class MCPConnectionError(MCPIntegrationError):
+    """MCP connection-specific errors."""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(
+            message,
+            mcp_operation="connection",
+            **kwargs
+        )
+
+
+class MCPTimeoutError(MCPIntegrationError):
+    """MCP timeout-specific errors."""
+    
+    def __init__(self, message: str, **kwargs):
+        super().__init__(
+            message,
+            mcp_operation="timeout",
+            **kwargs
+        )
 
 
 # Utility Functions for Exception Handling
