@@ -118,8 +118,8 @@ class TestResearchValidationMetrics(unittest.TestCase):
         
         self.assertIsNotNone(result)
         self.assertEqual(result.text_analyzed, sanskrit_text)
-        self.assertGreaterEqual(result.linguistic_accuracy, 0.0)
-        self.assertLessEqual(result.linguistic_accuracy, 1.0)
+        self.assertGreaterEqual(result.linguistic_accuracy_score, 0.0)
+        self.assertLessEqual(result.linguistic_accuracy_score, 1.0)
         self.assertGreaterEqual(result.phonetic_accuracy, 0.0)
         self.assertGreaterEqual(result.morphological_accuracy, 0.0)
     

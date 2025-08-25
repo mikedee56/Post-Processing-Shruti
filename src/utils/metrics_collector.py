@@ -454,3 +454,372 @@ class MetricsCollector:
         self.current_session.total_corrections_applied = sum(
             sum(fm.corrections_applied.values()) for fm in self.current_session.file_metrics
         )
+
+@dataclass
+class SemanticProcessingMetrics:
+    """Metrics specific to semantic processing operations (Story 3.0)."""
+    
+    # Basic semantic processing metrics
+    terms_identified: int = 0
+    terms_processed: int = 0 
+    embeddings_generated: int = 0
+    embeddings_cached: int = 0
+    relationships_discovered: int = 0
+    
+    # Performance metrics
+    semantic_processing_time: float = 0.0
+    embedding_generation_time: float = 0.0
+    similarity_search_time: float = 0.0
+    cache_lookup_time: float = 0.0
+    
+    # Quality metrics  
+    domain_classification_accuracy: float = 0.0
+    semantic_confidence_scores: List[float] = field(default_factory=list)
+    average_semantic_confidence: float = 0.0
+    
+    # Cache performance
+    cache_hit_ratio: float = 0.0
+    cache_misses: int = 0
+    cache_hits: int = 0
+    
+    # Infrastructure health
+    vector_db_available: bool = False
+    redis_cache_available: bool = False
+    pgvector_extension_active: bool = False
+    
+    # Resource utilization
+    memory_usage_mb: float = 0.0
+    cpu_usage_percent: float = 0.0
+    
+    # Error tracking
+    semantic_processing_errors: List[str] = field(default_factory=list)
+    fallback_mode_activated: bool = False
+    
+    def calculate_performance_overhead(self, base_processing_time: float) -> float:
+        """Calculate the performance overhead as a percentage."""
+        if base_processing_time <= 0:
+            return 0.0
+        return (self.semantic_processing_time / base_processing_time) * 100
+    
+    def meets_performance_target(self, base_processing_time: float, target_overhead: float = 5.0) -> bool:
+        """Check if semantic processing meets the <5% overhead target."""
+        return self.calculate_performance_overhead(base_processing_time) <= target_overhead
+    
+    def get_cache_efficiency_score(self) -> float:
+        """Calculate cache efficiency score (0-100)."""
+        if self.cache_hits + self.cache_misses == 0:
+            return 0.0
+        return (self.cache_hits / (self.cache_hits + self.cache_misses)) * 100
+
+
+class SemanticMetricsCollector:
+    """
+    Specialized metrics collector for semantic processing operations (Story 3.0).
+    
+    Monitors performance, quality, and infrastructure health for semantic features
+    while ensuring the <5% overhead requirement is maintained.
+    """
+    
+    def __init__(self, config: Optional[Dict] = None):
+        self.logger = logging.getLogger(__name__)
+        self.config = config or {}
+        
+        # Performance targets from Story 3.0
+        self.target_overhead_percent = self.config.get('semantic_overhead_target', 5.0)
+        self.target_cache_hit_ratio = self.config.get('semantic_cache_hit_target', 95.0)
+        
+        # Current semantic metrics
+        self.current_semantic_metrics: Optional[SemanticProcessingMetrics] = None
+        
+        # Session aggregates
+        self.session_semantic_metrics: List[SemanticProcessingMetrics] = []
+        
+        # Performance monitoring
+        self.semantic_timers: Dict[str, float] = {}
+        
+        # Alert thresholds
+        self.overhead_alert_threshold = self.config.get('overhead_alert_threshold', 7.0)  # Alert at 7%
+        self.cache_alert_threshold = self.config.get('cache_alert_threshold', 85.0)  # Alert below 85%
+    
+    def start_semantic_processing(self) -> SemanticProcessingMetrics:
+        """Start tracking semantic processing metrics for a segment."""
+        self.current_semantic_metrics = SemanticProcessingMetrics()
+        
+        # Check infrastructure availability
+        self.current_semantic_metrics.vector_db_available = self._check_vector_db_health()
+        self.current_semantic_metrics.redis_cache_available = self._check_redis_health()
+        self.current_semantic_metrics.pgvector_extension_active = self._check_pgvector_extension()
+        
+        return self.current_semantic_metrics
+    
+    def end_semantic_processing(self, base_processing_time: float) -> SemanticProcessingMetrics:
+        """Complete semantic processing metrics and calculate performance overhead."""
+        if not self.current_semantic_metrics:
+            self.logger.warning("No active semantic metrics to end")
+            return SemanticProcessingMetrics()
+        
+        # Calculate final metrics
+        if self.current_semantic_metrics.semantic_confidence_scores:
+            self.current_semantic_metrics.average_semantic_confidence = sum(
+                self.current_semantic_metrics.semantic_confidence_scores
+            ) / len(self.current_semantic_metrics.semantic_confidence_scores)
+        
+        # Calculate cache hit ratio
+        total_cache_operations = (self.current_semantic_metrics.cache_hits + 
+                                self.current_semantic_metrics.cache_misses)
+        if total_cache_operations > 0:
+            self.current_semantic_metrics.cache_hit_ratio = (
+                self.current_semantic_metrics.cache_hits / total_cache_operations * 100
+            )
+        
+        # Performance overhead validation
+        overhead = self.current_semantic_metrics.calculate_performance_overhead(base_processing_time)
+        if overhead > self.overhead_alert_threshold:
+            self.logger.warning(
+                f"Semantic processing overhead ({overhead:.1f}%) exceeds alert threshold "
+                f"({self.overhead_alert_threshold}%)"
+            )
+        
+        # Cache performance validation  
+        if (self.current_semantic_metrics.cache_hit_ratio < self.cache_alert_threshold and 
+            total_cache_operations > 0):
+            self.logger.warning(
+                f"Semantic cache hit ratio ({self.current_semantic_metrics.cache_hit_ratio:.1f}%) "
+                f"below alert threshold ({self.cache_alert_threshold}%)"
+            )
+        
+        # Store in session aggregates
+        self.session_semantic_metrics.append(self.current_semantic_metrics)
+        
+        metrics = self.current_semantic_metrics
+        self.current_semantic_metrics = None
+        
+        return metrics
+    
+    def start_semantic_timer(self, operation: str) -> None:
+        """Start timing a semantic operation."""
+        self.semantic_timers[f"semantic_{operation}"] = time.time()
+    
+    def end_semantic_timer(self, operation: str) -> float:
+        """End timing a semantic operation and update metrics."""
+        timer_key = f"semantic_{operation}"
+        if timer_key not in self.semantic_timers:
+            self.logger.warning(f"Semantic timer for '{operation}' was not started")
+            return 0.0
+        
+        elapsed = time.time() - self.semantic_timers[timer_key]
+        del self.semantic_timers[timer_key]
+        
+        # Update current metrics if active
+        if self.current_semantic_metrics:
+            if operation == 'processing':
+                self.current_semantic_metrics.semantic_processing_time += elapsed
+            elif operation == 'embedding_generation':
+                self.current_semantic_metrics.embedding_generation_time += elapsed
+            elif operation == 'similarity_search':
+                self.current_semantic_metrics.similarity_search_time += elapsed
+            elif operation == 'cache_lookup':
+                self.current_semantic_metrics.cache_lookup_time += elapsed
+        
+        return elapsed
+    
+    def record_semantic_term_identified(self, term: str, confidence: float, domain: str = "") -> None:
+        """Record identification of a semantic term."""
+        if not self.current_semantic_metrics:
+            return
+            
+        self.current_semantic_metrics.terms_identified += 1
+        self.current_semantic_metrics.semantic_confidence_scores.append(confidence)
+        
+        # Update domain classification accuracy tracking
+        if domain and confidence > 0.8:  # High confidence domain classification
+            self.current_semantic_metrics.domain_classification_accuracy += 1
+    
+    def record_semantic_term_processed(self, processing_successful: bool) -> None:
+        """Record processing of a semantic term."""
+        if not self.current_semantic_metrics:
+            return
+            
+        if processing_successful:
+            self.current_semantic_metrics.terms_processed += 1
+        else:
+            self.current_semantic_metrics.semantic_processing_errors.append(
+                f"Term processing failed at {datetime.now().isoformat()}"
+            )
+    
+    def record_embedding_operation(self, generated: bool, cached: bool) -> None:
+        """Record embedding generation or cache hit."""
+        if not self.current_semantic_metrics:
+            return
+            
+        if generated:
+            self.current_semantic_metrics.embeddings_generated += 1
+        if cached:
+            self.current_semantic_metrics.embeddings_cached += 1
+    
+    def record_cache_operation(self, hit: bool) -> None:
+        """Record cache hit or miss."""
+        if not self.current_semantic_metrics:
+            return
+            
+        if hit:
+            self.current_semantic_metrics.cache_hits += 1
+        else:
+            self.current_semantic_metrics.cache_misses += 1
+    
+    def record_relationship_discovered(self, relationship_type: str, confidence: float) -> None:
+        """Record discovery of a semantic relationship."""
+        if not self.current_semantic_metrics:
+            return
+            
+        self.current_semantic_metrics.relationships_discovered += 1
+        self.current_semantic_metrics.semantic_confidence_scores.append(confidence)
+    
+    def record_fallback_mode(self, reason: str) -> None:
+        """Record when semantic processing falls back to traditional processing."""
+        if not self.current_semantic_metrics:
+            return
+            
+        self.current_semantic_metrics.fallback_mode_activated = True
+        self.current_semantic_metrics.semantic_processing_errors.append(
+            f"Fallback activated: {reason}"
+        )
+        self.logger.info(f"Semantic processing fallback activated: {reason}")
+    
+    def generate_semantic_performance_report(self) -> Dict[str, Any]:
+        """Generate comprehensive semantic processing performance report."""
+        if not self.session_semantic_metrics:
+            return {
+                'semantic_processing': 'No semantic processing metrics available',
+                'infrastructure_status': self._get_infrastructure_status()
+            }
+        
+        # Aggregate session metrics
+        total_terms = sum(m.terms_identified for m in self.session_semantic_metrics)
+        total_processed = sum(m.terms_processed for m in self.session_semantic_metrics)
+        total_semantic_time = sum(m.semantic_processing_time for m in self.session_semantic_metrics)
+        
+        # Performance analysis
+        overhead_percentages = [
+            m.calculate_performance_overhead(m.semantic_processing_time + 1.0)  # Avoid division by zero
+            for m in self.session_semantic_metrics if m.semantic_processing_time > 0
+        ]
+        
+        avg_overhead = sum(overhead_percentages) / len(overhead_percentages) if overhead_percentages else 0.0
+        max_overhead = max(overhead_percentages) if overhead_percentages else 0.0
+        
+        # Cache performance
+        total_cache_ops = sum(m.cache_hits + m.cache_misses for m in self.session_semantic_metrics)
+        total_cache_hits = sum(m.cache_hits for m in self.session_semantic_metrics)
+        session_cache_hit_ratio = (total_cache_hits / total_cache_ops * 100) if total_cache_ops > 0 else 0.0
+        
+        # Quality analysis
+        all_confidence_scores = []
+        for m in self.session_semantic_metrics:
+            all_confidence_scores.extend(m.semantic_confidence_scores)
+        
+        avg_semantic_confidence = (sum(all_confidence_scores) / len(all_confidence_scores) 
+                                 if all_confidence_scores else 0.0)
+        
+        report = {
+            'semantic_processing_summary': {
+                'total_terms_identified': total_terms,
+                'total_terms_processed': total_processed,
+                'processing_success_rate': f"{(total_processed / total_terms * 100):.1f}%" if total_terms > 0 else "0%",
+                'total_semantic_processing_time': f"{total_semantic_time:.3f}s",
+                'average_time_per_term': f"{(total_semantic_time / total_terms):.3f}s" if total_terms > 0 else "N/A"
+            },
+            'performance_analysis': {
+                'average_overhead_percent': f"{avg_overhead:.2f}%",
+                'maximum_overhead_percent': f"{max_overhead:.2f}%",
+                'meets_target_overhead': avg_overhead <= self.target_overhead_percent,
+                'target_overhead': f"{self.target_overhead_percent}%",
+                'performance_grade': self._calculate_performance_grade(avg_overhead)
+            },
+            'cache_performance': {
+                'session_cache_hit_ratio': f"{session_cache_hit_ratio:.1f}%",
+                'total_cache_operations': total_cache_ops,
+                'total_cache_hits': total_cache_hits,
+                'meets_cache_target': session_cache_hit_ratio >= self.target_cache_hit_ratio,
+                'target_cache_hit_ratio': f"{self.target_cache_hit_ratio}%"
+            },
+            'quality_metrics': {
+                'average_semantic_confidence': f"{avg_semantic_confidence:.3f}",
+                'total_confidence_samples': len(all_confidence_scores),
+                'total_relationships_discovered': sum(m.relationships_discovered for m in self.session_semantic_metrics)
+            },
+            'infrastructure_status': self._get_infrastructure_status(),
+            'error_analysis': {
+                'total_errors': sum(len(m.semantic_processing_errors) for m in self.session_semantic_metrics),
+                'fallback_activations': sum(1 for m in self.session_semantic_metrics if m.fallback_mode_activated),
+                'error_rate': f"{(sum(len(m.semantic_processing_errors) for m in self.session_semantic_metrics) / total_terms * 100):.2f}%" if total_terms > 0 else "0%"
+            }
+        }
+        
+        return report
+    
+    def _check_vector_db_health(self) -> bool:
+        """Check if vector database is available and healthy."""
+        try:
+            from database.vector_database import get_vector_database_manager
+            vector_db = get_vector_database_manager()
+            status = vector_db.get_health_status()
+            return status.get('database_connected', False) and status.get('schema_initialized', False)
+        except Exception as e:
+            self.logger.debug(f"Vector database health check failed: {e}")
+            return False
+    
+    def _check_redis_health(self) -> bool:
+        """Check if Redis cache is available and healthy."""
+        try:
+            # This will be implemented when Redis is added in future stories
+            # For now, return False to indicate Redis not yet implemented
+            return False
+        except Exception as e:
+            self.logger.debug(f"Redis health check failed: {e}")
+            return False
+    
+    def _check_pgvector_extension(self) -> bool:
+        """Check if pgvector extension is active."""
+        try:
+            from database.vector_database import get_vector_database_manager
+            vector_db = get_vector_database_manager()
+            return vector_db._pgvector_available
+        except Exception as e:
+            self.logger.debug(f"pgvector extension check failed: {e}")
+            return False
+    
+    def _get_infrastructure_status(self) -> Dict[str, Any]:
+        """Get current infrastructure status for reporting."""
+        return {
+            'vector_database_available': self._check_vector_db_health(),
+            'redis_cache_available': self._check_redis_health(),
+            'pgvector_extension_active': self._check_pgvector_extension(),
+            'infrastructure_health_score': self._calculate_infrastructure_health_score()
+        }
+    
+    def _calculate_infrastructure_health_score(self) -> float:
+        """Calculate infrastructure health score (0-100)."""
+        components = [
+            self._check_vector_db_health(),
+            self._check_pgvector_extension(),
+            # Redis will be worth more points when implemented in future stories
+        ]
+        
+        active_components = sum(1 for component in components if component)
+        return (active_components / len(components)) * 100
+    
+    def _calculate_performance_grade(self, overhead_percent: float) -> str:
+        """Calculate performance grade based on overhead percentage."""
+        if overhead_percent <= 2.0:
+            return "A+ (Excellent)"
+        elif overhead_percent <= 3.0:
+            return "A (Very Good)" 
+        elif overhead_percent <= 5.0:
+            return "B (Good - Meets Target)"
+        elif overhead_percent <= 7.0:
+            return "C (Fair - Above Target)"
+        elif overhead_percent <= 10.0:
+            return "D (Poor)"
+        else:
+            return "F (Unacceptable)"

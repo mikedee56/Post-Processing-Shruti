@@ -23,6 +23,7 @@ class ScriptureSource(Enum):
     BHAGAVAD_GITA = "bhagavad_gita"
     UPANISHADS = "upanishads" 
     YOGA_SUTRAS = "yoga_sutras"
+    RAMAYANA = "ramayana"  # Added for comprehensive scripture coverage
     VEDAS = "vedas"
     PURANAS = "puranas"
 
@@ -110,10 +111,12 @@ class CanonicalTextManager:
     
     def _load_canonical_texts(self) -> None:
         """Load canonical texts from scripture database files."""
+        # Updated to use comprehensive scripture databases for academic excellence
         scripture_files = {
-            ScriptureSource.BHAGAVAD_GITA: "bhagavad_gita.yaml",
-            ScriptureSource.UPANISHADS: "upanishads.yaml",
-            ScriptureSource.YOGA_SUTRAS: "yoga_sutras.yaml"
+            ScriptureSource.BHAGAVAD_GITA: "bhagavad_gita_comprehensive.yaml",
+            ScriptureSource.UPANISHADS: "upanishads_comprehensive.yaml", 
+            ScriptureSource.YOGA_SUTRAS: "yoga_sutras_comprehensive.yaml",
+            ScriptureSource.RAMAYANA: "ramayana_comprehensive.yaml"
         }
         
         for source, filename in scripture_files.items():
@@ -121,9 +124,16 @@ class CanonicalTextManager:
             if file_path.exists():
                 self._load_scripture_file(file_path, source)
             else:
-                self.logger.warning(f"Scripture file not found: {file_path}")
-                # Create sample file structure
-                self._create_sample_scripture_file(file_path, source)
+                self.logger.warning(f"Comprehensive scripture file not found: {file_path}")
+                # Try fallback to basic version
+                basic_filename = filename.replace("_comprehensive", "")
+                basic_file_path = self.scripture_dir / basic_filename
+                if basic_file_path.exists():
+                    self.logger.info(f"Using basic scripture file as fallback: {basic_file_path}")
+                    self._load_scripture_file(basic_file_path, source)
+                else:
+                    # Create sample file structure
+                    self._create_sample_scripture_file(file_path, source)
     
     def _load_scripture_file(self, file_path: Path, source: ScriptureSource) -> None:
         """Load a single scripture file."""
@@ -385,47 +395,114 @@ class CanonicalTextManager:
         scored_matches.sort(key=lambda x: x[0], reverse=True)
         return [verse for score, verse in scored_matches[:limit]]
     
-    def get_verse_candidates(self, text: str, source: Optional[ScriptureSource] = None,
-                           max_candidates: int = 5) -> List[CanonicalVerse]:
+    def get_verse_candidates(self, query: str, max_candidates: int = 10) -> List[VerseCandidate]:
         """
-        Get potential verse candidates for a given text.
+        Get verse candidates for a given query text using comprehensive scripture database.
         
         Args:
-            text: Input text to match
-            source: Specific scripture source to search (optional)
-            max_candidates: Maximum candidates to return
+            query: Query text to match
+            max_candidates: Maximum number of candidates to return
             
         Returns:
-            List of candidate verses with relevance scoring
+            List of VerseCandidate objects sorted by confidence
         """
         candidates = []
+        query_lower = query.lower().strip()
         
-        # Text-based lookup
-        text_matches = self.lookup_verse_by_text(text)
-        candidates.extend(text_matches)
+        if not query_lower or len(self.canonical_verses) == 0:
+            return candidates
         
-        # Variation lookup
-        variation_match = self.lookup_verse_by_variation(text)
-        if variation_match:
-            candidates.append(variation_match)
+        # Enhanced matching using the loaded comprehensive database
+        query_words = set(query_lower.split())
         
-        # Content search
-        content_matches = self.search_verses_by_content(text, limit=max_candidates)
-        candidates.extend(content_matches)
+        for verse in self.canonical_verses.values():
+            confidence_score = 0.0
+            match_factors = []
+            
+            # 1. Direct canonical text matching
+            canonical_lower = verse.canonical_text.lower()
+            canonical_words = set(canonical_lower.split())
+            
+            # Word overlap scoring (40% weight)
+            word_overlap = len(query_words & canonical_words) / max(len(query_words), 1)
+            confidence_score += word_overlap * 0.4
+            if word_overlap > 0:
+                match_factors.append(f"canonical_overlap:{word_overlap:.2f}")
+            
+            # 2. Substring matching (20% weight) 
+            if query_lower in canonical_lower:
+                confidence_score += 0.2
+                match_factors.append("canonical_substring")
+            
+            # 3. Transliteration matching (20% weight)
+            if verse.transliteration:
+                transliteration_lower = verse.transliteration.lower()
+                transliteration_words = set(transliteration_lower.split())
+                trans_overlap = len(query_words & transliteration_words) / max(len(query_words), 1)
+                confidence_score += trans_overlap * 0.2
+            
+            if trans_overlap > 0:
+                match_factors.append(f"transliteration_overlap:{trans_overlap:.2f}")
+            
+            if query_lower in transliteration_lower:
+                confidence_score += 0.1
+                match_factors.append("transliteration_substring")
         
-        # Filter by source if specified
-        if source:
-            candidates = [v for v in candidates if v.source == source]
+        # 4. Variation matching (15% weight)
+        for variation in verse.variations:
+            variation_lower = variation.lower()
+            if query_lower in variation_lower or any(word in variation_lower for word in query_words):
+                confidence_score += 0.15
+                match_factors.append(f"variation_match:{variation}")
+                break
         
-        # Remove duplicates
-        seen = set()
-        unique_candidates = []
-        for verse in candidates:
-            if verse.id not in seen:
-                seen.add(verse.id)
-                unique_candidates.append(verse)
+        # 5. Tag matching (5% weight)
+        tag_matches = sum(1 for tag in verse.tags if any(word in tag.lower() for word in query_words))
+        if tag_matches > 0:
+            confidence_score += min(tag_matches * 0.025, 0.05)
+            match_factors.append(f"tag_matches:{tag_matches}")
         
-        return unique_candidates[:max_candidates]
+        # Only include candidates with meaningful confidence scores
+        if confidence_score > 0.1:
+            # Determine match strength
+            if confidence_score >= 0.7:
+                match_strength = "high"
+            elif confidence_score >= 0.4:
+                match_strength = "medium"
+            else:
+                match_strength = "low"
+            
+            # Determine source provenance (for hybrid matching pipeline)
+            if verse.source == ScriptureSource.BHAGAVAD_GITA:
+                provenance = "gold"  # Highest authority
+            elif verse.source in [ScriptureSource.UPANISHADS, ScriptureSource.YOGA_SUTRAS]:
+                provenance = "silver"  # High authority
+            else:
+                provenance = "bronze"  # Standard authority
+            
+            candidate = VerseCandidate(
+                source=verse.source,
+                chapter=verse.chapter,
+                verse=verse.verse,
+                canonical_text=verse.canonical_text,
+                confidence_score=min(confidence_score, 1.0),  # Cap at 1.0
+                match_strength=match_strength,
+                metadata={
+                    'source_provenance': provenance,
+                    'transliteration': verse.transliteration,
+                    'translation': verse.translation,
+                    'match_factors': match_factors,
+                    'tags': verse.tags,
+                    'verse_id': verse.id
+                }
+            )
+            
+            candidates.append(candidate)
+        
+        # Sort by confidence score (descending) and return top candidates
+        candidates.sort(key=lambda v: v.confidence_score, reverse=True)
+        
+        return candidates[:max_candidates]
     
     def get_verse_context(self, verse: CanonicalVerse, context_verses: int = 2) -> List[CanonicalVerse]:
         """

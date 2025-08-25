@@ -17,12 +17,26 @@ from .data_migration import (
     DatabaseMigrator,
     initialize_migration_system
 )
+from .vector_database import (
+    VectorDatabaseManager,
+    SemanticTerm,
+    TermRelationship,
+    SemanticContext,
+    get_vector_database_manager
+)
 
 __all__ = [
     # Database Management
     'ProductionDatabaseManager',
     'DatabaseConnectionPool', 
     'initialize_database_production',
+    
+    # Vector Database (Story 3.0)
+    'VectorDatabaseManager',
+    'SemanticTerm',
+    'TermRelationship',
+    'SemanticContext',
+    'get_vector_database_manager',
     
     # Storage Management
     'ProductionStorageManager',
@@ -51,6 +65,13 @@ def initialize_database_storage_infrastructure(config: dict) -> dict:
         if database_config:
             db_manager = initialize_database_production(database_config)
             components['database'] = db_manager
+            
+        # Initialize vector database (Story 3.0)
+        if database_config.get('enable_semantic_features', False):
+            vector_db_manager = get_vector_database_manager()
+            # Initialize schema if needed
+            vector_db_manager.initialize_schema()
+            components['vector_database'] = vector_db_manager
             
         # Initialize storage production setup  
         storage_config = config.get('storage', {})

@@ -597,7 +597,7 @@ class AutomatedBenchmarkSuite:
             
             return {
                 'iast_compliance': iast_validation.compliance_score,
-                'linguistic_accuracy': linguistic_validation.linguistic_accuracy,
+                'linguistic_accuracy': linguistic_validation.linguistic_accuracy_score,
                 'critical_issues': len([i for i in iast_validation.issues_found 
                                       if i.severity.value == 'critical'])
             }

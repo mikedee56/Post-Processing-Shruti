@@ -771,6 +771,35 @@ class SanskritPostProcessor:
                 metrics.errors_encountered.append(f"Sanskrit/Hindi correction error: {sanskrit_error}")
                 # Continue processing
             
+            # Step 3.5: Semantic Infrastructure Processing (Story 3.0)
+            if self._is_semantic_processing_enabled():
+                self.metrics_collector.start_timer('semantic_processing')
+                
+                try:
+                    semantic_result = self._apply_semantic_processing(processed_segment.text, metrics)
+                    processed_segment.text = semantic_result.get('processed_text', processed_segment.text)
+                    
+                    # Track semantic processing metrics
+                    semantic_metrics = semantic_result.get('metrics', {})
+                    if semantic_metrics.get('terms_identified', 0) > 0:
+                        self.metrics_collector.update_correction_count(metrics, "semantic_terms_identified", semantic_metrics['terms_identified'])
+                        all_corrections_applied.append("semantic_processing")
+                    
+                    if semantic_metrics.get('relationships_found', 0) > 0:
+                        self.metrics_collector.update_correction_count(metrics, "semantic_relationships", semantic_metrics['relationships_found'])
+                    
+                    metrics.semantic_processing_time = self.metrics_collector.end_timer('semantic_processing')
+                    
+                    self.logger.debug(f"Semantic processing completed: {semantic_metrics.get('terms_identified', 0)} terms identified, "
+                                    f"{semantic_metrics.get('relationships_found', 0)} relationships found")
+                                    
+                except Exception as e:
+                    semantic_error = self._error_handler.handle_processing_error("semantic_processing", e, {
+                        'text_preview': processed_segment.text[:100]
+                    })
+                    metrics.errors_encountered.append(f"Semantic processing error: {semantic_error}")
+                    metrics.semantic_processing_time = self.metrics_collector.end_timer('semantic_processing')
+            
             # Step 4: Apply legacy Sanskrit/Hindi corrections (backward compatibility)
             self.metrics_collector.start_timer('legacy_correction')
             
@@ -1961,6 +1990,108 @@ class SanskritPostProcessor:
             self.logger.error(f"Error during QA validation: {e}")
             # Return original segments if QA validation fails
             return segments
+
+    def _is_semantic_processing_enabled(self) -> bool:
+        """
+        Check if semantic processing features are enabled.
+        
+        Returns:
+            True if semantic processing should be applied, False otherwise
+        """
+        try:
+            # Check feature flag from config
+            if not self.config.get('enable_semantic_features', False):
+                return False
+            
+            # Check if semantic database infrastructure is available
+            try:
+                from database.vector_database import get_vector_database_manager
+                vector_db = get_vector_database_manager()
+                health_status = vector_db.get_health_status()
+                
+                # Require database connection and schema initialization
+                return (health_status.get('database_connected', False) and 
+                       health_status.get('schema_initialized', False))
+                       
+            except ImportError:
+                self.logger.debug("Vector database components not available")
+                return False
+            except Exception as e:
+                self.logger.debug(f"Semantic infrastructure check failed: {e}")
+                return False
+                
+        except Exception as e:
+            self.logger.error(f"Error checking semantic processing enablement: {e}")
+            return False
+
+    def _apply_semantic_processing(self, text: str, metrics) -> Dict[str, Any]:
+        """
+        Apply semantic processing to text segment.
+        
+        Args:
+            text: Text to process semantically
+            metrics: Metrics object for tracking
+            
+        Returns:
+            Dictionary containing processed text and semantic metrics
+        """
+        semantic_result = {
+            'processed_text': text,  # Default to original text
+            'metrics': {
+                'terms_identified': 0,
+                'relationships_found': 0,
+                'processing_time': 0.0,
+                'cache_hits': 0
+            }
+        }
+        
+        try:
+            from database.vector_database import get_vector_database_manager
+            import time
+            
+            start_time = time.time()
+            vector_db = get_vector_database_manager()
+            
+            # Identify potential Sanskrit/Hindi terms in the text
+            # For now, use basic word splitting - this will be enhanced in Story 3.1
+            words = text.split()
+            semantic_terms_found = []
+            
+            for word in words:
+                # Clean word for semantic analysis
+                clean_word = word.strip('.,!?";:').lower()
+                
+                # Skip very short words or common English words
+                if len(clean_word) < 3 or clean_word in {'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one', 'our', 'had', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'may', 'say', 'she', 'use', 'way'}:
+                    continue
+                
+                # Check if this could be a Sanskrit/Hindi term
+                # Look for characteristic patterns (this is basic - will be enhanced in Story 3.1)
+                if any(char in clean_word for char in ['ā', 'ī', 'ū', 'ṛ', 'ṃ', 'ḥ']) or clean_word in self.corrections:
+                    semantic_terms_found.append({
+                        'term': clean_word,
+                        'position': text.find(word),
+                        'domain': 'spiritual'  # Default domain - will be enhanced
+                    })
+            
+            # Update metrics
+            processing_time = time.time() - start_time
+            semantic_result['metrics'] = {
+                'terms_identified': len(semantic_terms_found),
+                'relationships_found': 0,  # Will be implemented in Story 3.1
+                'processing_time': processing_time,
+                'cache_hits': 0  # Will be implemented with Redis caching
+            }
+            
+            self.logger.debug(f"Semantic processing identified {len(semantic_terms_found)} potential terms in {processing_time:.4f}s")
+            
+        except ImportError:
+            self.logger.debug("Vector database not available for semantic processing")
+        except Exception as e:
+            self.logger.warning(f"Semantic processing failed, continuing with original text: {e}")
+            # Graceful degradation - return original text on any error
+        
+        return semantic_result
 
     def get_sanskrit_hindi_processing_report(self) -> Dict[str, Any]:
         """
