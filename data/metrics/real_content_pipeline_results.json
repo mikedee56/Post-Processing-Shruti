@@ -1,25 +1,25 @@
 {
   "test_suite": "real_content_pipeline",
-  "timestamp": 1755321839.9439518,
+  "timestamp": 1755765806.6325963,
   "total_tests": 3,
   "successful_tests": 3,
-  "total_processing_time": 4.287739276885986,
+  "total_processing_time": 5.359035015106201,
   "results": [
     {
       "test_name": "yoga_lecture_1",
-      "processing_time": 1.4001774787902832,
+      "processing_time": 1.885538101196289,
       "input_segments": 5,
       "output_segments": 5,
       "quality_improvements": {
         "filler_words_removed": 1.0,
         "numbers_converted": 1.0,
         "sanskrit_terms_corrected": 0.0,
-        "capitalization_improved": 2.0
+        "capitalization_improved": 3.0
       },
       "accuracy_metrics": {
         "segments_modified": 5,
-        "average_confidence": 0.6386440840930571,
-        "processing_time": 1.399176836013794
+        "average_confidence": 0.6286440840930572,
+        "processing_time": 1.8845303058624268
       },
       "integration_points_tested": [
         "sanskrit_post_processor"
@@ -30,7 +30,7 @@
     },
     {
       "test_name": "yoga_lecture_2",
-      "processing_time": 1.1882679462432861,
+      "processing_time": 1.3101627826690674,
       "input_segments": 5,
       "output_segments": 5,
       "quality_improvements": {
@@ -40,9 +40,9 @@
         "capitalization_improved": 2.0
       },
       "accuracy_metrics": {
-        "segments_modified": 4,
-        "average_confidence": 0.6662436209908307,
-        "processing_time": 1.1872656345367432
+        "segments_modified": 5,
+        "average_confidence": 0.6462436209908307,
+        "processing_time": 1.309154748916626
       },
       "integration_points_tested": [
         "sanskrit_post_processor"
@@ -53,19 +53,19 @@
     },
     {
       "test_name": "yoga_lecture_3",
-      "processing_time": 1.699293851852417,
+      "processing_time": 2.1633341312408447,
       "input_segments": 5,
       "output_segments": 5,
       "quality_improvements": {
         "filler_words_removed": 0.0,
         "numbers_converted": 0.0,
         "sanskrit_terms_corrected": 0.0,
-        "capitalization_improved": 0.0
+        "capitalization_improved": 1.0
       },
       "accuracy_metrics": {
-        "segments_modified": 3,
+        "segments_modified": 4,
         "average_confidence": 0.7164444444444444,
-        "processing_time": 1.699293851852417
+        "processing_time": 2.1623334884643555
       },
       "integration_points_tested": [
         "sanskrit_post_processor"

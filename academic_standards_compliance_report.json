@@ -1,0 +1,28 @@
+{
+  "academic_compliance_report": {
+    "timestamp": "2025-08-23 17:56:52",
+    "overall_academic_score": 0.7496913580246912,
+    "iast_transliteration": {
+      "tests_executed": 18,
+      "average_compliance": 0.8907407407407406,
+      "iso15919_compliant": 14,
+      "total_tests": 18
+    },
+    "sanskrit_linguistics": {
+      "segments_tested": 8,
+      "average_accuracy": 0.9583333333333333,
+      "capitalization_accuracy": 0.8958333333333333
+    },
+    "canonical_verses": {
+      "test_cases": 5,
+      "verses_identified": 0,
+      "average_accuracy": 0.4
+    }
+  },
+  "expert_recommendations": [
+    "IAST TRANSLITERATION: Good compliance, minor improvements needed",
+    "SANSKRIT LINGUISTICS: Good linguistic processing accuracy",
+    "CANONICAL VERSES: Requires improvement",
+    "OVERALL: System meets basic academic requirements"
+  ]
+}
