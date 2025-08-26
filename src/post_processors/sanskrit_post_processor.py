@@ -776,7 +776,7 @@ class SanskritPostProcessor:
                 self.metrics_collector.start_timer('semantic_processing')
                 
                 try:
-                    semantic_result = self._apply_semantic_processing(processed_segment.text, metrics)
+                    semantic_result = self._apply_semantic_processing_sync(processed_segment.text, metrics)
                     processed_segment.text = semantic_result.get('processed_text', processed_segment.text)
                     
                     # Track semantic processing metrics
@@ -2024,9 +2024,9 @@ class SanskritPostProcessor:
             self.logger.error(f"Error checking semantic processing enablement: {e}")
             return False
 
-    def _apply_semantic_processing(self, text: str, metrics) -> Dict[str, Any]:
+    def _apply_semantic_processing_sync(self, text: str, metrics) -> Dict[str, Any]:
         """
-        Apply semantic processing to text segment.
+        Synchronous wrapper for async semantic processing.
         
         Args:
             text: Text to process semantically
@@ -2035,58 +2035,240 @@ class SanskritPostProcessor:
         Returns:
             Dictionary containing processed text and semantic metrics
         """
+        try:
+            import asyncio
+            
+            # Check if we're already in an async context
+            try:
+                loop = asyncio.get_running_loop()
+                # We're in an async context, need to run in thread pool
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(
+                        asyncio.run,
+                        self._apply_semantic_processing(text, metrics)
+                    )
+                    return future.result(timeout=10)  # 10-second timeout
+            except RuntimeError:
+                # No running loop, we can create a new one
+                return asyncio.run(self._apply_semantic_processing(text, metrics))
+                
+        except Exception as e:
+            self.logger.warning(f"Semantic processing sync wrapper failed: {e}")
+            # Return basic result with original text
+            return {
+                'processed_text': text,
+                'metrics': {
+                    'terms_identified': 0,
+                    'terms_analyzed': 0,
+                    'relationships_found': 0,
+                    'validations_performed': 0,
+                    'processing_time': 0.0,
+                    'cache_hits': 0,
+                    'domain_classifications': {},
+                    'validation_scores': [],
+                    'semantic_enhancements_applied': 0
+                },
+                'semantic_analysis': {
+                    'domains_detected': [],
+                    'term_relationships': [],
+                    'validation_results': [],
+                    'suggested_improvements': []
+                }
+            }
+
+    async def _apply_semantic_processing(self, text: str, metrics) -> Dict[str, Any]:
+        """
+        Apply enhanced semantic processing to text segment using SemanticAnalyzer and ContextualValidator.
+        
+        Args:
+            text: Text to process semantically
+            metrics: Metrics object for tracking
+            
+        Returns:
+            Dictionary containing processed text and comprehensive semantic metrics
+        """
         semantic_result = {
-            'processed_text': text,  # Default to original text
+            'processed_text': text,  # Start with original text
             'metrics': {
                 'terms_identified': 0,
+                'terms_analyzed': 0,
                 'relationships_found': 0,
+                'validations_performed': 0,
                 'processing_time': 0.0,
-                'cache_hits': 0
+                'cache_hits': 0,
+                'domain_classifications': {},
+                'validation_scores': [],
+                'semantic_enhancements_applied': 0
+            },
+            'semantic_analysis': {
+                'domains_detected': [],
+                'term_relationships': [],
+                'validation_results': [],
+                'suggested_improvements': []
             }
         }
         
         try:
-            from database.vector_database import get_vector_database_manager
             import time
+            import asyncio
+            from semantic_analysis.semantic_analyzer import SemanticAnalyzer, DomainType
             
             start_time = time.time()
-            vector_db = get_vector_database_manager()
             
-            # Identify potential Sanskrit/Hindi terms in the text
-            # For now, use basic word splitting - this will be enhanced in Story 3.1
+            # Initialize semantic analyzer if not already done
+            if not hasattr(self, '_semantic_analyzer') or self._semantic_analyzer is None:
+                self._semantic_analyzer = SemanticAnalyzer()
+                await self._semantic_analyzer.initialize()
+            
+            # Step 1: Identify Sanskrit/Hindi terms using existing lexicon + semantic analysis
+            potential_terms = []
             words = text.split()
-            semantic_terms_found = []
             
-            for word in words:
-                # Clean word for semantic analysis
-                clean_word = word.strip('.,!?";:').lower()
+            for i, word in enumerate(words):
+                # Clean word for analysis
+                clean_word = word.strip('.,!?\\";:()[]{}').lower()
                 
                 # Skip very short words or common English words
-                if len(clean_word) < 3 or clean_word in {'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one', 'our', 'had', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'may', 'say', 'she', 'use', 'way'}:
+                if len(clean_word) < 3 or clean_word in {'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'her', 'was', 'one', 'our', 'had', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'may', 'say', 'she', 'use', 'way', 'with', 'have', 'this', 'will', 'your', 'from', 'they', 'know', 'want', 'been', 'good', 'much', 'some', 'time', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'many', 'over', 'such', 'take', 'than', 'them', 'well', 'were'}:
                     continue
                 
-                # Check if this could be a Sanskrit/Hindi term
-                # Look for characteristic patterns (this is basic - will be enhanced in Story 3.1)
-                if any(char in clean_word for char in ['ā', 'ī', 'ū', 'ṛ', 'ṃ', 'ḥ']) or clean_word in self.corrections:
-                    semantic_terms_found.append({
+                # Check if term is in our lexicon or has Sanskrit/Hindi characteristics
+                is_lexicon_term = clean_word in self.corrections
+                has_sanskrit_chars = any(char in clean_word for char in ['\u0101', '\u012b', '\u016b', '\u1e5b', '\u1e43', '\u1e25', '\u015b', '\u1e63'])
+                
+                if is_lexicon_term or has_sanskrit_chars or len(clean_word) >= 5:
+                    potential_terms.append({
                         'term': clean_word,
-                        'position': text.find(word),
-                        'domain': 'spiritual'  # Default domain - will be enhanced
+                        'original_word': word,
+                        'position': i,
+                        'text_position': text.find(word),
+                        'context_window': ' '.join(words[max(0, i-2):min(len(words), i+3)])
                     })
             
-            # Update metrics
+            semantic_result['metrics']['terms_identified'] = len(potential_terms)
+            
+            # Step 2: Semantic analysis for each identified term
+            processed_text = text
+            semantic_enhancements = []
+            
+            for term_data in potential_terms:
+                try:
+                    # FIXED: Use correct method name with proper parameters
+                    analysis = await self._semantic_analyzer.analyze_term_in_context(
+                        term=term_data['term'],
+                        context=term_data['context_window']
+                    )
+                    
+                    semantic_result['metrics']['terms_analyzed'] += 1
+                    
+                    # Track domain classification
+                    domain_name = analysis.primary_domain.value
+                    if domain_name not in semantic_result['metrics']['domain_classifications']:
+                        semantic_result['metrics']['domain_classifications'][domain_name] = 0
+                    semantic_result['metrics']['domain_classifications'][domain_name] += 1
+                    
+                    # Collect detected domains
+                    if analysis.primary_domain not in semantic_result['semantic_analysis']['domains_detected']:
+                        semantic_result['semantic_analysis']['domains_detected'].append(analysis.primary_domain)
+                    
+                    # Step 3: Contextual validation if we have a potential correction
+                    if term_data['term'] in self.corrections:
+                        corrected_term = self.corrections[term_data['term']]
+                        
+                        # Validate the correction using semantic context
+                        if hasattr(self._semantic_analyzer, 'contextual_validator'):
+                            validation = await self._semantic_analyzer.contextual_validator.validate_translation(
+                                original_term=term_data['term'],
+                                translated_term=corrected_term,
+                                context=term_data['context_window'],
+                                domain=analysis.primary_domain
+                            )
+                            
+                            semantic_result['metrics']['validations_performed'] += 1
+                            semantic_result['metrics']['validation_scores'].append(validation.confidence_score)
+                            semantic_result['semantic_analysis']['validation_results'].append({
+                                'term': term_data['term'],
+                                'translation': corrected_term,
+                                'confidence': validation.confidence_score,
+                                'issues': [issue.issue_type for issue in validation.issues_identified],
+                                'domain': analysis.primary_domain.value
+                            })
+                            
+                            # Apply enhancement if validation confidence is high enough (>0.7)
+                            if validation.confidence_score > 0.7 and not validation.issues_identified:
+                                # Replace term in text
+                                processed_text = processed_text.replace(term_data['original_word'], corrected_term)
+                                semantic_enhancements.append({
+                                    'original': term_data['original_word'],
+                                    'enhanced': corrected_term,
+                                    'confidence': validation.confidence_score,
+                                    'domain': analysis.primary_domain.value
+                                })
+                                semantic_result['metrics']['semantic_enhancements_applied'] += 1
+                            
+                            # Collect suggestions for improvement
+                            if validation.suggestions:
+                                semantic_result['semantic_analysis']['suggested_improvements'].extend([
+                                    {
+                                        'term': term_data['term'],
+                                        'suggestion': suggestion,
+                                        'confidence': validation.confidence_score
+                                    }
+                                    for suggestion in validation.suggestions
+                                ])
+                    
+                    # Step 4: Identify term relationships
+                    if hasattr(self._semantic_analyzer, 'relationship_graph'):
+                        relationships = await self._semantic_analyzer.get_term_relationships(
+                            term_data['term'], 
+                            domain=analysis.primary_domain
+                        )
+                        if relationships:
+                            semantic_result['metrics']['relationships_found'] += len(relationships)
+                            semantic_result['semantic_analysis']['term_relationships'].extend([
+                                {
+                                    'source_term': term_data['term'],
+                                    'related_term': rel.target_term,
+                                    'relationship_type': rel.relationship_type.value,
+                                    'strength': rel.strength_score,
+                                    'domain': analysis.primary_domain.value
+                                }
+                                for rel in relationships
+                            ])
+                
+                except Exception as e:
+                    self.logger.warning(f"Semantic analysis failed for term '{term_data['term']}': {e}")
+                    continue
+            
+            # Update processed text in result
+            semantic_result['processed_text'] = processed_text
+            
+            # Update final metrics
             processing_time = time.time() - start_time
-            semantic_result['metrics'] = {
-                'terms_identified': len(semantic_terms_found),
-                'relationships_found': 0,  # Will be implemented in Story 3.1
-                'processing_time': processing_time,
-                'cache_hits': 0  # Will be implemented with Redis caching
-            }
+            semantic_result['metrics']['processing_time'] = processing_time
             
-            self.logger.debug(f"Semantic processing identified {len(semantic_terms_found)} potential terms in {processing_time:.4f}s")
+            # Track cache performance
+            if hasattr(self._semantic_analyzer, '_cache_stats'):
+                cache_stats = self._semantic_analyzer._cache_stats
+                semantic_result['metrics']['cache_hits'] = cache_stats.get('hits', 0)
             
-        except ImportError:
-            self.logger.debug("Vector database not available for semantic processing")
+            # Log semantic processing summary
+            enhancements_count = semantic_result['metrics']['semantic_enhancements_applied']
+            self.logger.debug(
+                f"Semantic processing: {semantic_result['metrics']['terms_analyzed']}/{semantic_result['metrics']['terms_identified']} terms analyzed, "
+                f"{enhancements_count} enhancements applied, {processing_time:.3f}s"
+            )
+            
+            # Update metrics object if provided
+            if metrics and hasattr(metrics, 'semantic_analysis_time'):
+                metrics.semantic_analysis_time = processing_time
+                metrics.semantic_terms_processed = semantic_result['metrics']['terms_analyzed']
+                metrics.semantic_enhancements_applied = enhancements_count
+        
+        except ImportError as e:
+            self.logger.debug(f"Semantic analysis components not available: {e}")
+            # Graceful degradation - return original text
         except Exception as e:
             self.logger.warning(f"Semantic processing failed, continuing with original text: {e}")
             # Graceful degradation - return original text on any error
