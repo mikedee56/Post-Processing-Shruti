@@ -65,6 +65,73 @@ class ProcessingConfig:
         'backup_dir': 'data/backups',
         'preserve_structure': True
     })
+    
+    # Story 3.5: Semantic feature configuration with gradual rollout support
+    semantic_features: Dict[str, Any] = field(default_factory=lambda: {
+        # Master feature flag for all semantic capabilities
+        'enable_semantic_features': False,
+        
+        # Gradual rollout flags - allows per-feature enablement
+        'feature_flags': {
+            'semantic_analysis': False,          # Story 3.1 - Core semantic processing
+            'domain_classification': False,      # Story 3.1 - Domain-specific processing  
+            'academic_qa_framework': False,      # Story 3.2 - Quality gates
+            'expert_review_queue': False,        # Story 3.2.1 - Expert review routing
+            'term_relationship_mapping': False,  # Story 3.1 - Relationship graph
+            'contextual_validation': False,      # Story 3.1 - Translation validation
+            'performance_monitoring': True,      # Story 3.4 - Always enabled for metrics
+        },
+        
+        # Rollout percentages (0-100) for A/B testing
+        'rollout_percentages': {
+            'semantic_analysis': 0,
+            'domain_classification': 0, 
+            'academic_qa_framework': 0,
+            'expert_review_queue': 0,
+            'term_relationship_mapping': 0,
+            'contextual_validation': 0
+        },
+        
+        # Performance thresholds
+        'performance_limits': {
+            'max_semantic_processing_time_ms': 100,  # Per segment
+            'max_cache_miss_ratio': 0.05,           # 95% cache hit requirement
+            'max_memory_usage_mb': 512,             # Memory limit
+            'circuit_breaker_threshold': 5,         # Failures before fallback
+        },
+        
+        # Infrastructure settings
+        'infrastructure': {
+            'redis_enabled': True,
+            'vector_database_enabled': False,  # Gradual rollout
+            'batch_processing_enabled': True,
+            'graceful_degradation_enabled': True,
+        },
+        
+        # Backward compatibility settings
+        'compatibility': {
+            'preserve_legacy_api': True,         # Keep existing API contracts
+            'legacy_fallback_enabled': True,    # Fallback to pre-semantic processing
+            'maintain_output_format': True,     # Preserve existing output structure
+            'performance_regression_threshold': 0.05,  # Max 5% performance impact
+        }
+    })
+    
+    # Academic validation settings (Story 3.2)
+    academic_validation: Dict[str, Any] = field(default_factory=lambda: {
+        'enabled': False,  # Gradual rollout
+        'quality_thresholds': {
+            'minimum_quality_score': 0.7,
+            'minimum_compliance_score': 0.8, 
+            'minimum_iast_compliance': 0.8,
+        },
+        'validation_timeout_ms': 50,  # Story 3.2 requirement
+        'expert_review_routing': {
+            'complexity_threshold': 0.8,
+            'confidence_threshold': 0.6,
+            'automatic_routing_enabled': False,  # Manual control initially
+        }
+    })
 
 
 class ConfigLoader:

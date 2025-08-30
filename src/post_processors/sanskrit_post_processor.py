@@ -48,6 +48,10 @@ from ner_module.ner_model_manager import NERModelManager, SuggestionSource
 # Import Professional Performance Optimizer (Story 5.x Performance Excellence)
 from utils.professional_performance_optimizer import ProfessionalPerformanceOptimizer, PerformanceConfig
 
+# Import Story 3.5 Semantic Feature Management
+from utils.semantic_feature_manager import SemanticFeatureManager, SemanticFeature, SemanticProcessingContext
+from utils.semantic_compatibility_layer import SemanticCompatibilityLayer, create_compatibility_layer
+
 
 @dataclass
 class TranscriptSegment:
@@ -185,6 +189,21 @@ class SanskritPostProcessor:
                 enable_context_validation=self.config.get('enable_context_validation', True),
                 max_corrections_per_segment=self.config.get('max_corrections_per_segment', 10)
             )
+            
+            # Initialize Story 3.5 Semantic Feature Management
+            try:
+                from utils.config_manager import ConfigurationManager
+                config_manager = ConfigurationManager(config_file_path=config_path)
+                self.semantic_feature_manager = SemanticFeatureManager(config_manager)
+                
+                # Initialize compatibility layer for backward compatibility
+                self.semantic_compatibility_layer = create_compatibility_layer(self.semantic_feature_manager)
+                
+                self.logger.info("Story 3.5 Semantic Feature Management with compatibility layer initialized")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize semantic feature manager: {e}")
+                self.semantic_feature_manager = None
+                self.semantic_compatibility_layer = create_compatibility_layer(None)  # Fallback compatibility
             
             # Initialize Story 3.2 Academic Quality Assurance Framework
             self.enable_qa_framework = self.config.get('enable_qa_framework', True)
@@ -815,7 +834,15 @@ class SanskritPostProcessor:
                 self.metrics_collector.start_timer('semantic_processing')
                 
                 try:
-                    semantic_result = self._apply_semantic_processing_sync(processed_segment.text, metrics)
+                    # Create enhanced context for semantic processing
+                    segment_context = {
+                        'segment_id': f"{self.session_correlation_id}_{getattr(segment, 'index', 0)}",
+                        'content_domain': 'spiritual',  # Default for Yoga Vedanta content
+                        'complexity': len(all_corrections_applied) / 10.0,  # Rough complexity estimate
+                        'previous_errors': metrics.errors_encountered[-5:] if metrics.errors_encountered else []
+                    }
+                    
+                    semantic_result = self._apply_semantic_processing_sync(processed_segment.text, metrics, segment_context)
                     processed_segment.text = semantic_result.get('processed_text', processed_segment.text)
                     
                     # Track semantic processing metrics
@@ -2137,16 +2164,31 @@ class SanskritPostProcessor:
             # Return original segments if QA validation fails
             return segments
 
-    def _is_semantic_processing_enabled(self) -> bool:
+    def _is_semantic_processing_enabled(self, feature: Optional['SemanticFeature'] = None, context: Optional['SemanticProcessingContext'] = None) -> bool:
         """
-        Check if semantic processing features are enabled.
+        Check if semantic processing features are enabled with advanced feature flag support.
         
+        Args:
+            feature: Specific semantic feature to check (optional)
+            context: Processing context for decision making (optional)
+            
         Returns:
             True if semantic processing should be applied, False otherwise
         """
         try:
-            # Check feature flag from config
-            if not self.config.get('enable_semantic_features', False):
+            # Use advanced feature flag management if available
+            if hasattr(self, 'semantic_feature_manager') and self.semantic_feature_manager:
+                if feature:
+                    # Check specific feature
+                    result = self.semantic_feature_manager.is_feature_enabled(feature, context)
+                    return result.enabled
+                else:
+                    # Check if any semantic features are enabled
+                    enabled_features = self.semantic_feature_manager.get_enabled_features(context)
+                    return len(enabled_features) > 0
+            
+            # Legacy fallback - check basic config flag
+            if not self.config.get('semantic_features', {}).get('enable_semantic_features', False):
                 return False
             
             # Check if semantic database infrastructure is available
@@ -2156,53 +2198,77 @@ class SanskritPostProcessor:
                 health_status = vector_db.get_health_status()
                 
                 # Require database connection and schema initialization
-                return (health_status.get('database_connected', False) and 
-                       health_status.get('schema_initialized', False))
+                infrastructure_ready = (health_status.get('database_connected', False) and 
+                                      health_status.get('schema_initialized', False))
+                
+                # Check graceful degradation settings
+                if not infrastructure_ready:
+                    semantic_config = self.config.get('semantic_features', {})
+                    graceful_degradation = semantic_config.get('infrastructure', {}).get('graceful_degradation_enabled', True)
+                    
+                    if graceful_degradation:
+                        self.logger.debug("Semantic infrastructure not ready, but graceful degradation enabled")
+                        return False  # Fallback to non-semantic processing
+                    
+                return infrastructure_ready
                        
             except ImportError:
-                self.logger.debug("Vector database components not available")
+                self.logger.debug("Vector database components not available - using legacy processing")
                 return False
             except Exception as e:
                 self.logger.debug(f"Semantic infrastructure check failed: {e}")
-                return False
+                
+                # Check if fallback is enabled
+                semantic_config = self.config.get('semantic_features', {})
+                if semantic_config.get('compatibility', {}).get('legacy_fallback_enabled', True):
+                    return False  # Use legacy processing
+                else:
+                    raise  # Re-raise if fallback disabled
                 
         except Exception as e:
             self.logger.error(f"Error checking semantic processing enablement: {e}")
-            return False
+            
+            # Conservative fallback - check compatibility settings
+            try:
+                semantic_config = self.config.get('semantic_features', {})
+                if semantic_config.get('compatibility', {}).get('legacy_fallback_enabled', True):
+                    return False  # Safe fallback to legacy processing
+                else:
+                    raise  # Re-raise if fallback disabled
+            except:
+                return False  # Ultimate fallback
 
-    def _apply_semantic_processing_sync(self, text: str, metrics) -> Dict[str, Any]:
+    def _apply_semantic_processing_sync(self, text: str, metrics, segment_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        Synchronous wrapper for async semantic processing.
+        Enhanced synchronous wrapper for async semantic processing with feature flag support.
         
         Args:
             text: Text to process semantically
             metrics: Metrics object for tracking
+            segment_context: Additional context for processing decisions
             
         Returns:
             Dictionary containing processed text and semantic metrics
         """
+        start_time = time.time()
+        
         try:
-            import asyncio
+            # Create semantic processing context
+            processing_context = SemanticProcessingContext(
+                segment_id=segment_context.get('segment_id') if segment_context else None,
+                user_session_id=self.session_correlation_id,
+                content_domain=segment_context.get('content_domain', 'spiritual') if segment_context else 'spiritual',
+                processing_complexity=segment_context.get('complexity', 0.0) if segment_context else 0.0,
+                previous_errors=segment_context.get('previous_errors', []) if segment_context else []
+            )
             
-            # Check if we're already in an async context
-            try:
-                loop = asyncio.get_running_loop()
-                # We're in an async context, need to run in thread pool
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(
-                        asyncio.run,
-                        self._apply_semantic_processing(text, metrics)
-                    )
-                    return future.result(timeout=10)  # 10-second timeout
-            except RuntimeError:
-                # No running loop, we can create a new one
-                return asyncio.run(self._apply_semantic_processing(text, metrics))
-                
-        except Exception as e:
-            self.logger.warning(f"Semantic processing sync wrapper failed: {e}")
-            # Return basic result with original text
-            return {
+            # Check which semantic features are enabled
+            enabled_features = {}
+            if self.semantic_feature_manager:
+                enabled_features = self.semantic_feature_manager.get_enabled_features(processing_context)
+            
+            # Initialize result structure
+            result = {
                 'processed_text': text,
                 'metrics': {
                     'terms_identified': 0,
@@ -2213,15 +2279,190 @@ class SanskritPostProcessor:
                     'cache_hits': 0,
                     'domain_classifications': {},
                     'validation_scores': [],
-                    'semantic_enhancements_applied': 0
+                    'semantic_enhancements_applied': 0,
+                    'features_used': list(enabled_features.keys()) if enabled_features else []
                 },
                 'semantic_analysis': {
                     'domains_detected': [],
                     'term_relationships': [],
                     'validation_results': [],
-                    'suggested_improvements': []
+                    'suggested_improvements': [],
+                    'feature_flags_applied': [f.name for f in enabled_features.keys()] if enabled_features else []
                 }
             }
+            
+            # Apply enabled semantic features progressively
+            processed_text = text
+            
+            # Feature: Semantic Analysis (Story 3.1)
+            if SemanticFeature.SEMANTIC_ANALYSIS in enabled_features:
+                feature_start = time.time()
+                try:
+                    # Apply semantic analysis processing
+                    semantic_result = self._apply_feature_semantic_analysis(processed_text, processing_context)
+                    processed_text = semantic_result.get('processed_text', processed_text)
+                    
+                    # Update metrics
+                    result['metrics']['terms_identified'] = semantic_result.get('terms_identified', 0)
+                    result['metrics']['terms_analyzed'] = semantic_result.get('terms_analyzed', 0)
+                    result['semantic_analysis']['domains_detected'] = semantic_result.get('domains_detected', [])
+                    result['metrics']['semantic_enhancements_applied'] += 1
+                    
+                    feature_time = (time.time() - feature_start) * 1000
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.SEMANTIC_ANALYSIS, feature_time, success=True
+                    )
+                    
+                except Exception as e:
+                    self.logger.warning(f"Semantic analysis feature failed: {e}")
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.SEMANTIC_ANALYSIS, (time.time() - feature_start) * 1000, success=False
+                    )
+            
+            # Feature: Domain Classification (Story 3.1)  
+            if SemanticFeature.DOMAIN_CLASSIFICATION in enabled_features:
+                feature_start = time.time()
+                try:
+                    domain_result = self._apply_feature_domain_classification(processed_text, processing_context)
+                    result['metrics']['domain_classifications'] = domain_result.get('classifications', {})
+                    result['semantic_analysis']['domains_detected'].extend(domain_result.get('domains', []))
+                    result['metrics']['semantic_enhancements_applied'] += 1
+                    
+                    feature_time = (time.time() - feature_start) * 1000
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.DOMAIN_CLASSIFICATION, feature_time, success=True
+                    )
+                    
+                except Exception as e:
+                    self.logger.warning(f"Domain classification feature failed: {e}")
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.DOMAIN_CLASSIFICATION, (time.time() - feature_start) * 1000, success=False
+                    )
+            
+            # Feature: Term Relationship Mapping (Story 3.1)
+            if SemanticFeature.TERM_RELATIONSHIP_MAPPING in enabled_features:
+                feature_start = time.time()
+                try:
+                    relationship_result = self._apply_feature_relationship_mapping(processed_text, processing_context)
+                    result['metrics']['relationships_found'] = relationship_result.get('relationships_count', 0)
+                    result['semantic_analysis']['term_relationships'] = relationship_result.get('relationships', [])
+                    result['metrics']['semantic_enhancements_applied'] += 1
+                    
+                    feature_time = (time.time() - feature_start) * 1000
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.TERM_RELATIONSHIP_MAPPING, feature_time, success=True
+                    )
+                    
+                except Exception as e:
+                    self.logger.warning(f"Term relationship mapping feature failed: {e}")
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.TERM_RELATIONSHIP_MAPPING, (time.time() - feature_start) * 1000, success=False
+                    )
+            
+            # Feature: Contextual Validation (Story 3.1)
+            if SemanticFeature.CONTEXTUAL_VALIDATION in enabled_features:
+                feature_start = time.time()
+                try:
+                    validation_result = self._apply_feature_contextual_validation(processed_text, processing_context)
+                    result['metrics']['validations_performed'] = validation_result.get('validations_count', 0)
+                    result['metrics']['validation_scores'] = validation_result.get('validation_scores', [])
+                    result['semantic_analysis']['validation_results'] = validation_result.get('validation_results', [])
+                    result['semantic_analysis']['suggested_improvements'] = validation_result.get('improvements', [])
+                    result['metrics']['semantic_enhancements_applied'] += 1
+                    
+                    feature_time = (time.time() - feature_start) * 1000
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.CONTEXTUAL_VALIDATION, feature_time, success=True
+                    )
+                    
+                except Exception as e:
+                    self.logger.warning(f"Contextual validation feature failed: {e}")
+                    self.semantic_feature_manager.record_performance_metrics(
+                        SemanticFeature.CONTEXTUAL_VALIDATION, (time.time() - feature_start) * 1000, success=False
+                    )
+            
+            # Update final results
+            result['processed_text'] = processed_text
+            result['metrics']['processing_time'] = (time.time() - start_time) * 1000
+            
+            # Log feature usage
+            if enabled_features:
+                feature_names = [f.name for f in enabled_features.keys()]
+                self.logger.debug(f"Semantic features applied: {', '.join(feature_names)}")
+            else:
+                self.logger.debug("No semantic features enabled - using legacy processing")
+            
+            return result
+            
+        except Exception as e:
+            self.logger.warning(f"Semantic processing sync wrapper failed: {e}")
+            
+            # Check if legacy fallback is enabled
+            if self.semantic_feature_manager and self.semantic_feature_manager.should_use_legacy_fallback():
+                self.logger.info("Using legacy fallback for semantic processing")
+            
+            # Return basic result with original text (backward compatibility)
+            return {
+                'processed_text': text,
+                'metrics': {
+                    'terms_identified': 0,
+                    'terms_analyzed': 0,
+                    'relationships_found': 0,
+                    'validations_performed': 0,
+                    'processing_time': (time.time() - start_time) * 1000,
+                    'cache_hits': 0,
+                    'domain_classifications': {},
+                    'validation_scores': [],
+                    'semantic_enhancements_applied': 0,
+                    'features_used': [],
+                    'fallback_used': True
+                },
+                'semantic_analysis': {
+                    'domains_detected': [],
+                    'term_relationships': [],
+                    'validation_results': [],
+                    'suggested_improvements': [],
+                    'feature_flags_applied': [],
+                    'error': str(e)
+                }
+            }
+
+    def _apply_feature_semantic_analysis(self, text: str, context: SemanticProcessingContext) -> Dict[str, Any]:
+        """Apply semantic analysis feature (Story 3.1)."""
+        # Placeholder for future Story 3.1 implementation
+        # This method will be enhanced when Story 3.1 is implemented
+        return {
+            'processed_text': text,
+            'terms_identified': 0,
+            'terms_analyzed': 0,
+            'domains_detected': []
+        }
+    
+    def _apply_feature_domain_classification(self, text: str, context: SemanticProcessingContext) -> Dict[str, Any]:
+        """Apply domain classification feature (Story 3.1)."""
+        # Placeholder for future Story 3.1 implementation
+        return {
+            'classifications': {},
+            'domains': []
+        }
+    
+    def _apply_feature_relationship_mapping(self, text: str, context: SemanticProcessingContext) -> Dict[str, Any]:
+        """Apply term relationship mapping feature (Story 3.1)."""
+        # Placeholder for future Story 3.1 implementation
+        return {
+            'relationships_count': 0,
+            'relationships': []
+        }
+    
+    def _apply_feature_contextual_validation(self, text: str, context: SemanticProcessingContext) -> Dict[str, Any]:
+        """Apply contextual validation feature (Story 3.1)."""
+        # Placeholder for future Story 3.1 implementation
+        return {
+            'validations_count': 0,
+            'validation_scores': [],
+            'validation_results': [],
+            'improvements': []
+        }
 
     async def _apply_semantic_processing(self, text: str, metrics) -> Dict[str, Any]:
         """
