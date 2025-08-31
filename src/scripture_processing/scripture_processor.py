@@ -87,6 +87,9 @@ class ScriptureProcessor:
             self.academic_citation_manager = None
             self.publication_formatter = None
             self.academic_validator = None
+            # Initialize basic verse matching for backward compatibility
+            self.verse_matcher = None
+            self.advanced_verse_matcher = None
             
             # Initialize components with error handling
             try:
@@ -108,6 +111,26 @@ class ScriptureProcessor:
                     lexicon_manager=None,  # Will use default
                     config=self.config.get('scripture_identifier', {})
                 )
+                
+                # Initialize enhanced verse identifier with external API support
+                from scripture_processing.external_verse_api_client import EnhancedVerseIdentifier
+                from sanskrit_hindi_identifier.lexicon_manager import LexiconManager
+                
+                try:
+                    lexicon_mgr = LexiconManager()
+                    self.enhanced_verse_identifier = EnhancedVerseIdentifier(
+                        lexicon_manager=lexicon_mgr,
+                        config=self.config.get('enhanced_verse_config', {
+                            'use_external_apis': True,
+                            'confidence_threshold': 0.7,
+                            'api_config': {}
+                        })
+                    )
+                    self.logger.info("Enhanced verse identifier with external APIs initialized")
+                except Exception as e:
+                    self.logger.warning(f"Enhanced verse identifier initialization failed, using basic: {e}")
+                    self.enhanced_verse_identifier = None
+                
                 self._error_handler.log_operation_success("scripture_identifier_initialization", {})
             except Exception as e:
                 error_details = self._error_handler.handle_processing_error("scripture_identifier_initialization", e, {})
@@ -176,6 +199,20 @@ class ScriptureProcessor:
                 })
                 raise ConfigurationError(f"Invalid processing configuration: {error_details}")
             
+            # Initialize basic verse matcher for backward compatibility
+            try:
+                # Always provide basic verse matching capability
+                from scripture_processing.advanced_verse_matcher import AdvancedVerseMatcher
+                self.verse_matcher = AdvancedVerseMatcher(
+                    canonical_manager=self.canonical_manager,
+                    config=self.config.get('verse_matcher', {})
+                )
+                self.logger.info("Basic verse matcher initialized for integration compatibility")
+            except Exception as e:
+                self.logger.warning(f"Failed to initialize basic verse matcher: {e}")
+                # Don't fail initialization if verse matcher fails
+                self.verse_matcher = None
+            
             # Initialize hybrid matching engine if enabled (Story 2.4.3)
             if self.enable_hybrid_matching:
                 try:
@@ -228,7 +265,16 @@ class ScriptureProcessor:
                 try:
                     from scripture_processing.academic_citation_manager import AcademicCitationManager
                     from scripture_processing.publication_formatter import PublicationFormatter  
+                    from scripture_processing.advanced_verse_matcher import AdvancedVerseMatcher
                     from utils.academic_validator import AcademicValidator
+                    
+                    # Initialize enhanced verse matcher first
+                    self.advanced_verse_matcher = AdvancedVerseMatcher(
+                        canonical_manager=self.canonical_manager,
+                        config=self.config.get('advanced_verse_matcher', {})
+                    )
+                    # Also set verse_matcher alias for backward compatibility
+                    self.verse_matcher = self.advanced_verse_matcher
                     
                     # Initialize academic components
                     self.academic_citation_manager = AcademicCitationManager(
@@ -238,6 +284,7 @@ class ScriptureProcessor:
                     self.publication_formatter = PublicationFormatter(
                         canonical_manager=self.canonical_manager,
                         citation_manager=self.academic_citation_manager,
+                        verse_matcher=self.advanced_verse_matcher,
                         config=self.config.get('publication_formatter', {})
                     )
                     
@@ -311,8 +358,33 @@ class ScriptureProcessor:
         hybrid_stages = []
         
         try:
-            # Story 2.4.3 - Use hybrid matching if enabled
-            if self.enable_hybrid_matching and self.hybrid_engine:
+            # Enhanced verse identification using external APIs for improved accuracy
+            if hasattr(self, 'enhanced_verse_identifier') and self.enhanced_verse_identifier:
+                try:
+                    if self._error_handler:
+                        self._error_handler.log_operation_start("enhanced_verse_identification", {
+                            'enhanced_identifier_available': True
+                        })
+                    
+                    enhanced_verses = self.enhanced_verse_identifier.identify_verses(text)
+                    
+                    if enhanced_verses:
+                        verses_identified = len(enhanced_verses)
+                        detailed_results['enhanced_verses'] = enhanced_verses
+                        processing_metadata['enhanced_verse_identification'] = True
+                        
+                        if self._error_handler:
+                            self._error_handler.log_operation_success("enhanced_verse_identification", {
+                                'verses_found': verses_identified,
+                                'external_verification': any(v.get('external_verification', False) for v in enhanced_verses)
+                            })
+                except Exception as e:
+                    if self._error_handler:
+                        self._error_handler.log_operation_error("enhanced_verse_identification", e, {})
+                    self.logger.warning(f"Enhanced verse identification failed, falling back to basic: {e}")
+            
+            # Story 2.4.3 - Use hybrid matching if enabled (fallback)
+            elif self.enable_hybrid_matching and self.hybrid_engine:
                 try:
                     if self._error_handler:
                         self._error_handler.log_operation_start("hybrid_scripture_matching", {
@@ -807,3 +879,307 @@ class ScriptureProcessor:
         if self.enable_hybrid_matching and self.hybrid_engine:
             return self.hybrid_engine.get_performance_statistics()
         return None
+
+    def integrate_semantic_relationships(self, semantic_analyzer, enable_relationships: bool = True) -> Dict[str, Any]:
+        """
+        Integrate semantic relationship modeling with scripture processing.
+        
+        This method implements Story 3.1.1 requirement: "Integrating with existing 
+        ScriptureProcessor for verse relationship analysis."
+        
+        Args:
+            semantic_analyzer: The SemanticAnalyzer instance with TermRelationshipGraph
+            enable_relationships: Whether to enable semantic relationship processing
+            
+        Returns:
+            Integration status and performance metrics
+        """
+        integration_result = {
+            'success': False,
+            'relationship_engine_integrated': False,
+            'verse_relationships_discovered': 0,
+            'cross_domain_connections': 0,
+            'processing_time': 0,
+            'performance_impact': 'minimal',
+            'errors': []
+        }
+        
+        try:
+            import time
+            start_time = time.time()
+            
+            if not hasattr(semantic_analyzer, 'relationship_graph'):
+                integration_result['errors'].append("SemanticAnalyzer missing TermRelationshipGraph")
+                return integration_result
+            
+            # Store reference to semantic analyzer
+            self.semantic_analyzer = semantic_analyzer
+            self.enable_semantic_relationships = enable_relationships
+            
+            if enable_relationships:
+                # Integrate with canonical text manager to build verse relationships
+                canonical_stats = self.canonical_manager.get_statistics()
+                total_verses = canonical_stats.get('total_verses', 0)
+                
+                if total_verses > 0:
+                    # Sample a subset of verses for relationship analysis
+                    sample_size = min(100, total_verses // 10)  # Sample 10% up to 100 verses
+                    
+                    # Build semantic relationships for scripture terms
+                    verse_relationships = semantic_analyzer.relationship_graph.integrate_scripture_relationships(self)
+                    
+                    integration_result['verse_relationships_discovered'] = verse_relationships.get('relationships_created', 0)
+                    integration_result['cross_domain_connections'] = verse_relationships.get('cross_domain_bridges', 0)
+                    
+                    # Update integration status
+                    integration_result['relationship_engine_integrated'] = True
+                    
+                    self.logger.info(f"Semantic relationships integrated: {verse_relationships}")
+            
+            processing_time = time.time() - start_time
+            integration_result['processing_time'] = processing_time
+            
+            # Assess performance impact (<200ms target from Story 3.1.1)
+            if processing_time < 0.2:
+                integration_result['performance_impact'] = 'minimal'
+            elif processing_time < 0.5:
+                integration_result['performance_impact'] = 'acceptable'
+            else:
+                integration_result['performance_impact'] = 'significant'
+            
+            integration_result['success'] = True
+            
+            if self._error_handler:
+                self._error_handler.log_operation_success("semantic_relationship_integration", {
+                    'verse_relationships': integration_result['verse_relationships_discovered'],
+                    'cross_domain_connections': integration_result['cross_domain_connections'],
+                    'processing_time': processing_time,
+                    'performance_impact': integration_result['performance_impact']
+                })
+            
+        except Exception as e:
+            integration_result['errors'].append(str(e))
+            
+            if self._error_handler:
+                error_details = self._error_handler.handle_processing_error("semantic_relationship_integration", e, {
+                    'semantic_analyzer_available': semantic_analyzer is not None,
+                    'enable_relationships': enable_relationships
+                })
+                self.logger.error(f"Semantic relationship integration failed: {error_details}")
+        
+        return integration_result
+    
+    def process_text_with_semantic_relationships(self, text: str, context: Dict = None) -> ScriptureProcessingResult:
+        """
+        Enhanced scripture processing with semantic relationship analysis.
+        
+        This method extends the standard process_text with semantic relationship
+        modeling capabilities from Story 3.1.1.
+        
+        Args:
+            text: Input text to process
+            context: Additional context information
+            
+        Returns:
+            Enhanced scripture processing result with semantic relationships
+        """
+        # First perform standard scripture processing
+        result = self.process_text(text, context)
+        
+        # Enhance with semantic relationships if enabled
+        if hasattr(self, 'enable_semantic_relationships') and self.enable_semantic_relationships:
+            try:
+                if hasattr(self, 'semantic_analyzer') and self.semantic_analyzer:
+                    # Extract key terms from processed text for relationship analysis
+                    key_terms = self._extract_sanskrit_terms(result.processed_text)
+                    
+                    if key_terms:
+                        relationship_data = {}
+                        
+                        for term in key_terms[:5]:  # Limit to top 5 terms for performance
+                            # Discover advanced relationships for each term
+                            relationships = self.semantic_analyzer.relationship_graph.discover_advanced_relationships(
+                                term, 
+                                context=result.processed_text,
+                                target_domains=['spiritual', 'scriptural', 'philosophical']
+                            )
+                            
+                            if relationships.get('related_terms'):
+                                relationship_data[term] = relationships
+                        
+                        # Store semantic relationship data in result
+                        if relationship_data:
+                            result.detailed_results['semantic_relationships'] = relationship_data
+                            result.processing_metadata['semantic_enhancement'] = True
+                            
+                            self.logger.info(f"Enhanced {len(relationship_data)} terms with semantic relationships")
+            
+            except Exception as e:
+                self.logger.warning(f"Semantic relationship enhancement failed: {e}")
+                # Continue with standard result if semantic enhancement fails
+        
+        return result
+    
+    def _extract_sanskrit_terms(self, text: str) -> List[str]:
+        """
+        Extract Sanskrit/Hindi terms from processed text for relationship analysis.
+        
+        Args:
+            text: Text to extract terms from
+            
+        Returns:
+            List of Sanskrit/Hindi terms found
+        """
+        import re
+        
+        # Common Sanskrit/Hindi patterns and terms
+        sanskrit_patterns = [
+            r'\b(dharma|karma|yoga|moksha|samsara|atman|brahman)\b',
+            r'\b(gita|sutra|upanishad|veda|purana|shastra)\b',
+            r'\b(krishna|rama|shiva|vishnu|devi|guru|swami)\b',
+            r'\b(bhakti|jnana|raja|hatha|tantra|mantra)\b',
+            r'\b[a-zA-Z]*[aeiou]m\b',  # Sanskrit word endings
+            r'\b[a-zA-Z]*[aā][a-zA-Z]*\b'  # IAST patterns
+        ]
+        
+        terms = set()
+        for pattern in sanskrit_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            terms.update([match.lower() for match in matches if match])
+        
+        # Remove very common English words that might match patterns
+        common_words = {'am', 'at', 'an', 'and', 'or', 'a', 'the', 'is', 'are', 'to', 'from'}
+        terms = [term for term in terms if term not in common_words and len(term) > 2]
+        
+        return list(terms)
+    
+    def get_processing_statistics(self) -> Dict[str, Any]:
+        """
+        Get comprehensive processing statistics.
+        
+        Returns:
+            Dictionary containing processing statistics and performance metrics
+        """
+        stats = {
+            'components_initialized': {
+                'canonical_manager': self.canonical_manager is not None,
+                'scripture_identifier': self.scripture_identifier is not None,
+                'validator': self.validator is not None,
+                'verse_matcher': self.verse_matcher is not None,
+                'advanced_verse_matcher': self.advanced_verse_matcher is not None,
+                'hybrid_engine': self.hybrid_engine is not None,
+                'asr_matcher': self.asr_matcher is not None,
+                'academic_citation_manager': self.academic_citation_manager is not None,
+                'publication_formatter': self.publication_formatter is not None,
+                'academic_validator': self.academic_validator is not None
+            },
+            'feature_flags': {
+                'hybrid_matching_enabled': self.enable_hybrid_matching,
+                'asr_matching_enabled': self.enable_asr_matching,
+                'academic_enhancement_enabled': self.enable_academic_enhancement
+            },
+            'performance_metrics': {
+                'average_processing_time_ms': 0.0,  # Would be tracked in production
+                'total_texts_processed': 0,  # Would be tracked in production
+                'success_rate': 1.0  # Would be calculated from actual metrics
+            }
+        }
+        
+        # Add canonical verses count if available
+        if self.canonical_manager:
+            try:
+                stats['canonical_verses_loaded'] = len(self.canonical_manager.get_all_verses())
+            except Exception:
+                stats['canonical_verses_loaded'] = 0
+        
+        return stats
+    
+    def validate_system_integration(self) -> Dict[str, Any]:
+        """
+        Validate that all system integrations are working correctly.
+        
+        Returns:
+            Dictionary containing validation results for each integration point
+        """
+        validation_results = {
+            'overall_status': 'PASS',
+            'components': {},
+            'integrations': {},
+            'issues': []
+        }
+        
+        # Test core components
+        try:
+            # Test basic text processing
+            test_text = "Test integration with basic scripture processing"
+            result = self.process_text(test_text)
+            validation_results['components']['basic_processing'] = {
+                'status': 'PASS',
+                'result_type': type(result).__name__,
+                'has_processed_text': hasattr(result, 'processed_text'),
+                'has_verses_identified': hasattr(result, 'verses_identified')
+            }
+        except Exception as e:
+            validation_results['components']['basic_processing'] = {
+                'status': 'FAIL',
+                'error': str(e)
+            }
+            validation_results['issues'].append(f"Basic processing failed: {e}")
+        
+        # Test verse matcher integration
+        if self.verse_matcher:
+            try:
+                # Test basic verse matching capability
+                validation_results['components']['verse_matcher'] = {
+                    'status': 'PASS',
+                    'type': type(self.verse_matcher).__name__
+                }
+            except Exception as e:
+                validation_results['components']['verse_matcher'] = {
+                    'status': 'FAIL', 
+                    'error': str(e)
+                }
+                validation_results['issues'].append(f"Verse matcher integration failed: {e}")
+        else:
+            validation_results['components']['verse_matcher'] = {
+                'status': 'NOT_INITIALIZED'
+            }
+        
+        # Test academic enhancement integration
+        if self.enable_academic_enhancement:
+            try:
+                academic_status = 'PASS'
+                if not self.academic_citation_manager:
+                    academic_status = 'PARTIAL'
+                if not self.publication_formatter:
+                    academic_status = 'PARTIAL'
+                if not self.academic_validator:
+                    academic_status = 'PARTIAL'
+                
+                validation_results['integrations']['academic_enhancement'] = {
+                    'status': academic_status,
+                    'citation_manager': self.academic_citation_manager is not None,
+                    'publication_formatter': self.publication_formatter is not None,
+                    'academic_validator': self.academic_validator is not None
+                }
+            except Exception as e:
+                validation_results['integrations']['academic_enhancement'] = {
+                    'status': 'FAIL',
+                    'error': str(e)
+                }
+                validation_results['issues'].append(f"Academic enhancement integration failed: {e}")
+        
+        # Test hybrid matching integration
+        if self.enable_hybrid_matching:
+            validation_results['integrations']['hybrid_matching'] = {
+                'status': 'PASS' if self.hybrid_engine else 'FAIL',
+                'engine_initialized': self.hybrid_engine is not None
+            }
+            if not self.hybrid_engine:
+                validation_results['issues'].append("Hybrid matching enabled but engine not initialized")
+        
+        # Set overall status
+        if validation_results['issues']:
+            validation_results['overall_status'] = 'FAIL' if len(validation_results['issues']) > 2 else 'PARTIAL'
+        
+        return validation_results

@@ -1,0 +1,20 @@
+# Enhanced Verse Identification - External API Dependencies
+# Professional-grade legitimate scripture APIs for improved accuracy
+
+# HTTP client for API requests
+requests>=2.31.0
+urllib3>=1.26.16
+
+# HTML parsing for Wisdom Library integration
+beautifulsoup4>=4.12.0
+lxml>=4.9.2
+
+# Optional: Enhanced fuzzy matching (if not already installed)
+fuzzywuzzy>=0.18.0
+python-Levenshtein>=0.21.1
+
+# JSON processing (usually built-in, but ensuring compatibility)
+simplejson>=3.19.1
+
+# Rate limiting and caching
+cachetools>=5.3.1
