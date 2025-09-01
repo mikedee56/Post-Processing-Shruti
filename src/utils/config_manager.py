@@ -812,7 +812,7 @@ def test_config_manager():
             manager.set('logging.level', 'INVALID')
             manager._validate_configuration(manager.config)
         except ValidationError as e:
-            print(f"Validation caught invalid value: {e.message}")
+            print(f"Validation caught invalid value: {str(e)}")
         
         # Test configuration report
         report = manager.get_configuration_report()

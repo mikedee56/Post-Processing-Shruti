@@ -1,33 +1,36 @@
-# Scriptural Verses Lexicon
-# This file contains scriptural verses and their canonical text
-
 entries:
-  - original_term: "bhagavad gita chapter 2 verse 25"
-    variations: ["bhagavad gita 2.25", "gita chapter two verse twenty five"]
-    transliteration: "Bhagavad Gītā 2.25"
-    is_proper_noun: true
-    is_verse: true
-    category: "verse_reference"
-    canonical_text: "avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ nānuśocitum arhasi ||"
-    confidence: 1.0
-    source_authority: "IAST"
-
-  - original_term: "bhagavad gita chapter 2 verse 26"
-    variations: ["bhagavad gita 2.26", "gita chapter two verse twenty six"]
-    transliteration: "Bhagavad Gītā 2.26"
-    is_proper_noun: true
-    is_verse: true
-    category: "verse_reference"
-    canonical_text: "atha cainaṃ nitya-jātaṃ nityaṃ vā manyase mṛtam | tathāpi tvaṃ mahā-bāho naivaṃ śocitum arhasi ||"
-    confidence: 1.0
-    source_authority: "IAST"
-
-  - original_term: "bhagavad gita chapter 1"
-    variations: ["bhagavad gita first chapter", "gita chapter one"]
-    transliteration: "Bhagavad Gītā chapter 1"
-    is_proper_noun: true
-    is_verse: false
-    category: "chapter_reference"
-    canonical_text: ""
-    confidence: 1.0
-    source_authority: "IAST"
+- canonical_text: avyakto 'yam acintyo 'yam avikāryo 'yam ucyate | tasmād evaṃ viditvainaṃ
+    nānuśocitum arhasi ||
+  category: reference
+  confidence: 1.0
+  is_proper_noun: true
+  is_verse: true
+  original_term: bhagavad gita chapter 2 verse 25
+  source_authority: IAST
+  transliteration: Bhagavad Gītā 2.25
+  variations:
+  - bhagavad gita 2.25
+  - gita chapter two verse twenty five
+- canonical_text: atha cainaṃ nitya-jātaṃ nityaṃ vā manyase mṛtam | tathāpi tvaṃ mahā-bāho
+    naivaṃ śocitum arhasi ||
+  category: reference
+  confidence: 1.0
+  is_proper_noun: true
+  is_verse: true
+  original_term: bhagavad gita chapter 2 verse 26
+  source_authority: IAST
+  transliteration: Bhagavad Gītā 2.26
+  variations:
+  - bhagavad gita 2.26
+  - gita chapter two verse twenty six
+- canonical_text: ''
+  category: reference
+  confidence: 1.0
+  is_proper_noun: true
+  is_verse: false
+  original_term: bhagavad gita chapter 1
+  source_authority: IAST
+  transliteration: Bhagavad Gītā chapter 1
+  variations:
+  - bhagavad gita first chapter
+  - gita chapter one

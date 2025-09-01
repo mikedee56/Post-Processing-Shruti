@@ -13,6 +13,7 @@ scipy>=1.10.0
 # Note: iNLTK and IndicNLP Library for Indic language support
 inltk>=0.1.0
 indic-nlp-library>=0.81
+beautifulsoup4>=4.11.0
 
 # Story 2.4 Research Enhancement Dependencies
 sanskrit_parser>=0.1.0  # Sanskrit sandhi splitting - Story 2.4.1 dependency

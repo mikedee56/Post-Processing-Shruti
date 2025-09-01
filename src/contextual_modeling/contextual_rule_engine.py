@@ -397,14 +397,18 @@ class ContextualRuleEngine:
         if 'validate_sequence' in rule.conditions and rule.conditions['validate_sequence']:
             # For chapter-verse sequences, validate the numbers are reasonable
             if 'chapter' in rule.pattern and 'verse' in rule.pattern:
-                groups = match.groups()
-                if len(groups) >= 4:
-                    chapter_num = int(groups[1]) if groups[1].isdigit() else 0
-                    verse_num = int(groups[3]) if groups[3].isdigit() else 0
-                    
-                    # Bhagavad Gita has 18 chapters, verses vary by chapter
-                    if 1 <= chapter_num <= 18 and 1 <= verse_num <= 100:
-                        return re.sub(rule.pattern, rule.replacement, match.group(0))
+                try:
+                    groups = match.groups()
+                    if len(groups) >= 4:
+                        chapter_num = int(groups[1]) if groups[1].isdigit() else 0
+                        verse_num = int(groups[3]) if groups[3].isdigit() else 0
+                        
+                        # Bhagavad Gita has 18 chapters, verses vary by chapter
+                        if 1 <= chapter_num <= 18 and 1 <= verse_num <= 100:
+                            return re.sub(rule.pattern, rule.replacement, match.group(0))
+                except (AttributeError, IndexError) as e:
+                    self.logger.warning(f"Failed to access match groups: {str(e)}")
+                    return match.group(0) if hasattr(match, 'group') else str(match)
         
         return re.sub(rule.pattern, rule.replacement, match.group(0))
 

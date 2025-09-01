@@ -442,6 +442,43 @@ class MetricsCollector:
             self.logger.error(f"Error loading session metrics: {e}")
             return None
     
+    def record_batch_processing(self, processing_result) -> None:
+        """
+        Record batch processing results for Epic 4 integration.
+        
+        Args:
+            processing_result: BatchProcessor ProcessingResult object
+        """
+        try:
+            # Extract metrics from batch result
+            batch_metrics = {
+                'batch_id': processing_result.batch_id,
+                'total_files': processing_result.total_files,
+                'processed_files': processing_result.processed_files,
+                'failed_files': processing_result.failed_files,
+                'success_rate': processing_result.success_rate,
+                'throughput': processing_result.throughput,
+                'processing_time': processing_result.processing_time,
+                'start_time': processing_result.start_time.isoformat() if processing_result.start_time else None,
+                'end_time': processing_result.end_time.isoformat() if processing_result.end_time else None,
+                'errors': processing_result.errors,
+                'metrics': processing_result.metrics
+            }
+            
+            # Save batch metrics to file for Epic 4 reporting
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"batch_{processing_result.batch_id}_metrics_{timestamp}.json"
+            filepath = self.metrics_dir / filename
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(batch_metrics, f, indent=2, ensure_ascii=False, default=str)
+            
+            self.logger.info(f"Recorded batch processing metrics: {processing_result.batch_id}")
+            self.logger.debug(f"Batch metrics saved to: {filepath}")
+            
+        except Exception as e:
+            self.logger.error(f"Error recording batch processing metrics: {e}")
+
     def _calculate_session_aggregates(self) -> None:
         """Calculate aggregated session metrics."""
         if not self.current_session:

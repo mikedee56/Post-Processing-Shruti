@@ -178,9 +178,9 @@ class SlackNotificationChannel(NotificationChannel_ABC):
         return bool(config.get('webhook_url') or config.get('bot_token'))
     
     async def send_notification(self, message: NotificationMessage, contact: ExpertContact) -> bool:
-        """Send Slack notification."""
-        if not (self.webhook_url or self.bot_token):
-            return False
+        """Send notification to Slack channel."""
+        import requests
+        import json
         
         try:
             # Format message for Slack
@@ -195,13 +195,40 @@ class SlackNotificationChannel(NotificationChannel_ABC):
             else:
                 slack_message["channel"] = self.channel
             
-            # Send via webhook
+            # Send via webhook (preferred method)
             if self.webhook_url:
                 response = requests.post(self.webhook_url, json=slack_message, timeout=10)
                 return response.status_code == 200
             
-            # TODO: Implement bot token method if needed
-            return False
+            # Send via bot token as fallback
+            elif self.bot_token:
+                headers = {
+                    'Authorization': f'Bearer {self.bot_token}',
+                    'Content-Type': 'application/json'
+                }
+                
+                bot_message = {
+                    "channel": slack_message["channel"],
+                    "text": slack_message["text"],
+                    "username": slack_message["username"],
+                    "icon_emoji": slack_message["icon_emoji"]
+                }
+                
+                response = requests.post(
+                    'https://slack.com/api/chat.postMessage',
+                    headers=headers,
+                    json=bot_message,
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    return result.get('ok', False)
+                return False
+            
+            else:
+                logging.warning("No webhook URL or bot token configured for Slack notifications")
+                return False
             
         except Exception as e:
             logging.error(f"Failed to send Slack notification: {e}")

@@ -284,14 +284,17 @@ def test_end_to_end_integration():
                 self.citations = []
         
         mock_doc = MockDocument(scripture_result.processed_text)
-        formatted_doc = publication_formatter.format_for_publication(mock_doc)
+        formatted_doc = publication_formatter.format_for_publication(
+            mock_doc.content, 
+            title=mock_doc.title
+        )
         print("✅ Publication formatting completed")
         
         # Step 4: Validate academic compliance
         validation_result = academic_validator.validate_academic_compliance(
             scripture_result.processed_text
         )
-        print(f"✅ Academic validation: compliance score {validation_result.get('compliance_score', 'N/A')}")
+        print(f"✅ Academic validation: compliance score {getattr(validation_result, 'overall_score', 'N/A')}")
         
         # Test integration points
         integration_points = [

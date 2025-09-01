@@ -96,7 +96,7 @@ def process_single(ctx, input_file: str, output_file: str, config: Optional[str]
                 "configuration_loading", e, 
                 {"config_path": config, "context_config": ctx.obj.get('config_path')}
             )
-            click.echo(f"ERROR: Configuration error: {validation_error.message}", err=True)
+            click.echo(f"ERROR: Configuration error: {str(validation_error)}", err=True)
             logger.error("Configuration loading failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -109,7 +109,7 @@ def process_single(ctx, input_file: str, output_file: str, config: Optional[str]
                 "processor_initialization", e,
                 {"config_path": str(config_path) if config_path else None}
             )
-            click.echo(f"ERROR: Processor initialization failed: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Processor initialization failed: {str(processing_error)}", err=True)
             logger.error("Processor initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -123,7 +123,7 @@ def process_single(ctx, input_file: str, output_file: str, config: Optional[str]
                 "srt_file_processing", e,
                 {"input_file": input_file, "output_file": output_file}
             )
-            click.echo(f"ERROR: File processing failed: {processing_error.message}", err=True)
+            click.echo(f"ERROR: File processing failed: {str(processing_error)}", err=True)
             logger.error("SRT processing failed", error=str(e), 
                         input_file=input_file, output_file=output_file,
                         correlation_id=correlation_id)
@@ -155,7 +155,7 @@ def process_single(ctx, input_file: str, output_file: str, config: Optional[str]
             "unexpected_cli_error", e,
             {"operation": "process_single", "input_file": input_file}
         )
-        click.echo(f"ERROR: Unexpected error during processing: {critical_error.message}", err=True)
+        click.echo(f"ERROR: Unexpected error during processing: {str(critical_error)}", err=True)
         logger.error("Unexpected CLI error", error=str(e), 
                     operation="process_single", correlation_id=correlation_id)
         sys.exit(1)
@@ -201,7 +201,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                 "ingestion_system_initialization", e,
                 {"config_path": str(config_path) if config_path else None}
             )
-            click.echo(f"ERROR: Failed to initialize file ingestion system: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to initialize file ingestion system: {str(processing_error)}", err=True)
             logger.error("File ingestion system initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -214,7 +214,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                 "batch_processor_initialization", e,
                 {"config_path": str(config_path) if config_path else None}
             )
-            click.echo(f"ERROR: Failed to initialize processor: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to initialize processor: {str(processing_error)}", err=True)
             logger.error("Batch processor initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -227,7 +227,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                 "output_manager_initialization", e,
                 {"output_dir": output_dir}
             )
-            click.echo(f"ERROR: Failed to initialize output manager: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to initialize output manager: {str(processing_error)}", err=True)
             logger.error("Output manager initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -242,7 +242,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                 "file_discovery", e,
                 {"input_dir": input_dir}
             )
-            click.echo(f"ERROR: Failed to discover files: {validation_error.message}", err=True)
+            click.echo(f"ERROR: Failed to discover files: {str(validation_error)}", err=True)
             logger.error("File discovery failed", error=str(e), 
                         input_dir=input_dir, correlation_id=correlation_id)
             sys.exit(1)
@@ -318,7 +318,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                             logger.error("Failed to process individual file", 
                                        file_path=str(file_path), error=str(e),
                                        batch_id=batch_id, correlation_id=correlation_id)
-                            click.echo(f"ERROR: Failed to process {file_path}: {processing_error.message}")
+                            click.echo(f"ERROR: Failed to process {file_path}: {str(processing_error)}")
                         
                         pbar.update(1)
                     
@@ -330,7 +330,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
                 "batch_processing_loop", e,
                 {"total_files": len(files_to_process), "batch_size": batch_size}
             )
-            click.echo(f"ERROR: Critical error in batch processing: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Critical error in batch processing: {str(processing_error)}", err=True)
             logger.error("Critical batch processing error", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -368,7 +368,7 @@ def process_batch(ctx, input_dir: str, output_dir: str, batch_size: int, dry_run
             "unexpected_batch_error", e,
             {"operation": "process_batch", "input_dir": input_dir, "output_dir": output_dir}
         )
-        click.echo(f"ERROR: Unexpected error during batch processing: {critical_error.message}", err=True)
+        click.echo(f"ERROR: Unexpected error during batch processing: {str(critical_error)}", err=True)
         logger.error("Unexpected batch processing error", error=str(e), 
                     operation="process_batch", correlation_id=correlation_id)
         sys.exit(1)
@@ -405,7 +405,7 @@ def stats(ctx):
                 "stats_processor_initialization", e,
                 {"config_path": str(config_path) if config_path else None}
             )
-            click.echo(f"ERROR: Failed to initialize processor for statistics: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to initialize processor for statistics: {str(processing_error)}", err=True)
             logger.error("Stats processor initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -418,7 +418,7 @@ def stats(ctx):
                 "stats_data_retrieval", e,
                 {"processor_type": type(processor).__name__}
             )
-            click.echo(f"ERROR: Failed to retrieve processing statistics: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to retrieve processing statistics: {str(processing_error)}", err=True)
             logger.error("Stats data retrieval failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -481,7 +481,7 @@ def stats(ctx):
                 "stats_display_formatting", e,
                 {"stats_data_keys": list(stats_data.keys()) if isinstance(stats_data, dict) else "non-dict"}
             )
-            click.echo(f"ERROR: Error formatting statistics display: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Error formatting statistics display: {str(processing_error)}", err=True)
             logger.error("Statistics display formatting failed", error=str(e), correlation_id=correlation_id)
             
             # Fallback: display raw statistics
@@ -503,7 +503,7 @@ def stats(ctx):
             "unexpected_stats_error", e,
             {"operation": "stats"}
         )
-        click.echo(f"ERROR: Unexpected error retrieving statistics: {critical_error.message}", err=True)
+        click.echo(f"ERROR: Unexpected error retrieving statistics: {str(critical_error)}", err=True)
         logger.error("Unexpected statistics error", error=str(e), 
                     operation="stats", correlation_id=correlation_id)
         sys.exit(1)
@@ -537,7 +537,7 @@ def validate(directory: str):
                 "validation_ingestion_system_init", e,
                 {"directory": directory}
             )
-            click.echo(f"ERROR: Failed to initialize file ingestion system: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Failed to initialize file ingestion system: {str(processing_error)}", err=True)
             logger.error("Validation ingestion system initialization failed", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -552,7 +552,7 @@ def validate(directory: str):
                 "srt_file_discovery", e,
                 {"directory": directory}
             )
-            click.echo(f"ERROR: Failed to discover SRT files: {validation_error.message}", err=True)
+            click.echo(f"ERROR: Failed to discover SRT files: {str(validation_error)}", err=True)
             logger.error("SRT file discovery failed", error=str(e), 
                         directory=directory, correlation_id=correlation_id)
             sys.exit(1)
@@ -595,7 +595,7 @@ def validate(directory: str):
                                     "file_encoding_validation", encoding_error,
                                     {"file_path": str(file_path), "encoding_tried": "utf-8,latin-1"}
                                 )
-                                validation_errors.append(f"{file_path}: Encoding error - {validation_error.message}")
+                                validation_errors.append(f"{file_path}: Encoding error - {str(validation_error)}")
                                 invalid_files += 1
                                 pbar.set_postfix({'valid': valid_files, 'invalid': invalid_files})
                                 logger.error("File encoding validation failed", 
@@ -651,9 +651,9 @@ def validate(directory: str):
                             {"file_path": str(file_path)}
                         )
                         invalid_files += 1
-                        validation_errors.append(f"{file_path}: Processing error - {processing_error.message}")
+                        validation_errors.append(f"{file_path}: Processing error - {str(processing_error)}")
                         
-                        click.echo(f"ERROR: Error validating {file_path}: {processing_error.message}")
+                        click.echo(f"ERROR: Error validating {file_path}: {str(processing_error)}")
                         logger.error("Individual file validation error", 
                                    file_path=str(file_path), error=str(e), correlation_id=correlation_id)
                     
@@ -665,7 +665,7 @@ def validate(directory: str):
                 "validation_processing_loop", e,
                 {"total_files": len(srt_files), "directory": directory}
             )
-            click.echo(f"ERROR: Critical error during validation: {processing_error.message}", err=True)
+            click.echo(f"ERROR: Critical error during validation: {str(processing_error)}", err=True)
             logger.error("Critical validation loop error", error=str(e), correlation_id=correlation_id)
             sys.exit(1)
         
@@ -713,7 +713,7 @@ def validate(directory: str):
             "unexpected_validation_error", e,
             {"operation": "validate", "directory": directory}
         )
-        click.echo(f"ERROR: Unexpected error during validation: {critical_error.message}", err=True)
+        click.echo(f"ERROR: Unexpected error during validation: {str(critical_error)}", err=True)
         logger.error("Unexpected validation error", error=str(e), 
                     operation="validate", directory=directory, correlation_id=correlation_id)
         sys.exit(1)

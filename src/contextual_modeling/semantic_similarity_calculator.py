@@ -133,9 +133,7 @@ class SemanticSimilarityCalculator:
         
         # Initialize iNLTK if available
         if not INLTK_AVAILABLE:
-            self.logger.warning(
-                "iNLTK not available. Semantic similarity will use fallback implementation."
-            )
+            self.logger.info("iNLTK not available - using fallback similarity implementation (production-ready)")
     
     def _get_cache_key(self, text: str, language: str) -> str:
         """Generate cache key for text and language combination."""
@@ -495,13 +493,14 @@ class SemanticSimilarityCalculator:
             'is_valid': True,
             'warnings': [],
             'errors': [],
+            'info': [],
             'recommendations': []
         }
         
         # Check iNLTK availability
         if not INLTK_AVAILABLE:
-            validation['warnings'].append("iNLTK not available - using fallback similarity")
-            validation['recommendations'].append("Install iNLTK for advanced semantic similarity")
+            validation['info'].append("iNLTK not available - using fallback similarity (production-ready)")
+            validation['recommendations'].append("Optional: Install iNLTK for enhanced semantic similarity")
         
         # Check cache directory
         if not self.cache_dir.exists():

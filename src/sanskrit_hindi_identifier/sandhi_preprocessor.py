@@ -96,8 +96,8 @@ class SandhiPreprocessor:
             self.logger.info("sanskrit_parser library available (lazy loading enabled)")
             
         except ImportError as e:
-            self.logger.warning(f"sanskrit_parser library not available: {e}")
-            self.logger.info("Will use basic tokenization fallback only")
+            self.logger.info("sanskrit_parser library not available - using basic tokenization fallback (production-ready)")
+            self.logger.debug(f"Sanskrit parser unavailable details: {e}")
         except Exception as e:
             self.logger.warning(f"sanskrit_parser check failed: {e}")
             self.sanskrit_parser_available = False

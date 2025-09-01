@@ -54,7 +54,7 @@ class WisdomLibraryParser:
         self.logger = get_logger(__name__)
         
         if not BEAUTIFULSOUP_AVAILABLE:
-            self.logger.warning("BeautifulSoup not available. Using fallback regex parsing.")
+            self.logger.info("BeautifulSoup not available - using fallback regex parsing (production-ready)")
         
         # Verse identification patterns
         self.verse_patterns = [

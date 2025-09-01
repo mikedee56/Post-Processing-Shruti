@@ -441,7 +441,10 @@ class ConversationalPatternDetector:
     def _generate_rescission_correction(self, match, pattern_def: Dict) -> str:
         """Generate correction for rescission pattern."""
         strategy = pattern_def['strategy']
-        groups = match.groups()
+        try:
+            groups = match.groups()
+        except AttributeError:
+            return str(match)
         
         if strategy == 'keep_latter' and len(groups) >= 2:
             return groups[-1].strip()
@@ -458,15 +461,24 @@ class ConversationalPatternDetector:
         strategy = pattern_def['strategy']
         
         if strategy == 'remove_trailing_conjunction':
-            groups = match.groups()
+            try:
+                groups = match.groups()
+            except AttributeError:
+                return str(match)
             if groups:
                 return groups[0].strip()
         
         elif strategy == 'clean_interruption':
-            return match.group(1).strip() if match.groups() else match.group(0).strip()
+            try:
+                return match.group(1).strip() if match.groups() else match.group(0).strip()
+            except AttributeError:
+                return str(match).strip()
         
         elif strategy == 'clean_ellipsis':
-            return match.group(1).strip() if match.groups() else match.group(0).replace('...', '').strip()
+            try:
+                return match.group(1).strip() if match.groups() else match.group(0).replace('...', '').strip()
+            except AttributeError:
+                return str(match).replace('...', '').strip()
         
         return match.group(0)
     
@@ -475,12 +487,18 @@ class ConversationalPatternDetector:
         strategy = pattern_def['strategy']
         
         if strategy == 'remove_duplicate':
-            groups = match.groups()
+            try:
+                groups = match.groups()
+            except AttributeError:
+                return str(match)
             if groups:
                 return groups[0]
         
         elif strategy == 'remove_duplicate_phrase':
-            groups = match.groups()
+            try:
+                groups = match.groups()
+            except AttributeError:
+                return str(match)
             if groups:
                 return groups[0]
         
@@ -498,7 +516,10 @@ class ConversationalPatternDetector:
         strategy = pattern_def['strategy']
         
         if strategy == 'join_interrupted_thought':
-            groups = match.groups()
+            try:
+                groups = match.groups()
+            except AttributeError:
+                return str(match)
             if len(groups) >= 2:
                 return f"{groups[0].strip()} {groups[1].strip()}"
         

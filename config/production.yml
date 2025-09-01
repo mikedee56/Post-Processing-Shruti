@@ -1,0 +1,138 @@
+---
+# Production Configuration for Sanskrit ASR Post-Processing System
+# Version: v0.1.2
+# Last Updated: 2025-01-31
+
+system:
+  name: "Sanskrit ASR Post-Processing System"
+  version: "0.1.2"
+  environment: "production"
+  debug: false
+
+# Processing Configuration
+processing:
+  mode: "production"
+  batch_size: 100
+  max_workers: 4
+  timeout: 300
+  enable_caching: true
+  cache_ttl: 86400
+
+# Academic Processing Standards
+academic:
+  quality_threshold: 0.85
+  min_academic_score: 0.85
+  citation_format: "academic"
+  transliteration_standard: "IAST"
+  enable_strict_validation: true
+
+# Feature Configuration
+features:
+  epic_3_enabled: true
+  enhanced_verse_identification: true
+  academic_validation: true
+  publication_formatting: true
+  hybrid_matching: true
+  contextual_modeling: true
+  sandhi_preprocessing: true
+
+# Scripture Processing Configuration
+scripture:
+  canonical_sources: 15
+  verse_threshold: 0.8
+  enable_wisdom_library: true
+  wisdom_library:
+    base_url: "https://wisdomlib.org"
+    rate_limit: 100
+    timeout: 10
+    fallback_enabled: true
+
+# Language Processing
+language:
+  sanskrit_parser_enabled: false  # Optional dependency
+  inltk_enabled: false            # Optional dependency
+  fallback_mode: true
+  enable_phonetic_matching: true
+  sequence_alignment_enabled: true
+
+# Data Paths
+data:
+  lexicons_dir: "data/lexicons"
+  scriptures_dir: "data/scriptures"
+  processed_dir: "data/processed_srts"
+  metrics_dir: "data/metrics"
+  cache_dir: "data/semantic_cache"
+
+# Database Configuration
+database:
+  host: "postgres"
+  port: 5432
+  name: "sanskrit_db"
+  user: "sanskrit_user"
+  pool_size: 10
+  max_overflow: 20
+
+# Redis Configuration
+redis:
+  host: "redis"
+  port: 6379
+  db: 0
+  max_connections: 50
+
+# Monitoring Configuration
+monitoring:
+  enable_metrics: true
+  prometheus_enabled: true
+  grafana_enabled: true
+  jaeger_enabled: true
+  health_check_interval: 30
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "structured"
+  enable_file_logging: true
+  log_file: "/app/logs/sanskrit-processor.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Security Configuration
+security:
+  enable_cors: true
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://sanskrit-dashboard:3000"
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "sanskrit-processor"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8080
+  workers: 4
+  timeout: 30
+  enable_swagger: false  # Disabled in production
+
+# Airflow Configuration (Epic 4)
+airflow:
+  dags_folder: "/opt/airflow/dags"
+  executor: "LocalExecutor"
+  load_examples: false
+  enable_api: true
+
+# Error Handling
+error_handling:
+  max_retries: 3
+  retry_delay: 5
+  enable_fallback: true
+  log_errors: true
+
+# Performance Tuning
+performance:
+  enable_multiprocessing: true
+  cpu_bound_tasks: true
+  io_bound_tasks: false
+  memory_limit: "2GB"
+  gc_threshold: 1000

@@ -212,9 +212,10 @@ class CorrectionApplier:
                 self.logger.debug(f"Skipping protected word: {original_word}")
                 continue
                 
-            # ABSOLUTE PROTECTION: Skip very short words (length <= 6)
-            if len(original_word) <= 6:
-                self.logger.debug(f"Skipping short word: {original_word}")
+            # MODIFIED PROTECTION: Skip very short words (length <= 3) but allow proper nouns
+            is_proper_noun = candidate.metadata.get('is_proper_noun', False)
+            if len(original_word) <= 3 and not is_proper_noun:
+                self.logger.debug(f"Skipping short non-proper-noun word: {original_word}")
                 continue
             
             # ULTRA-STRICT confidence check - increased threshold

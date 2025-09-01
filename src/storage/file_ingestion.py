@@ -101,7 +101,11 @@ class FileIngestionSystem:
             errors.append(f"Filename doesn't match expected pattern: {self.config['file_naming']['srt_files']['pattern']}")
             return "", "", "", False, errors
         
-        lecture_id, date, speaker = match.groups()
+        try:
+            lecture_id, date, speaker = match.groups()
+        except (AttributeError, ValueError) as e:
+            errors.append(f"Failed to extract filename components: {str(e)}")
+            return "", "", "", False, errors
         
         # Validate lecture_id format
         if not re.match(r'^VED\d{3}$', lecture_id):

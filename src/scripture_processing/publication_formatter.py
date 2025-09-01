@@ -260,24 +260,63 @@ class PublicationFormatter:
     
     def __init__(
         self,
-        canonical_manager: CanonicalTextManager,
-        citation_manager: AcademicCitationManager,
-        verse_matcher: AdvancedVerseMatcher,
+        canonical_manager: Optional[CanonicalTextManager] = None,
+        citation_manager: Optional[AcademicCitationManager] = None,
+        verse_matcher: Optional[AdvancedVerseMatcher] = None,
         config: Optional[PublicationConfig] = None
     ):
         """
         Initialize the Publication Formatter.
         
         Args:
-            canonical_manager: Canonical text management system
-            citation_manager: Academic citation management system
-            verse_matcher: Advanced verse matching system
+            canonical_manager: Canonical text management system (auto-initialized if None)
+            citation_manager: Academic citation management system (auto-initialized if None)
+            verse_matcher: Advanced verse matching system (auto-initialized if None)
             config: Publication configuration
         """
         self.logger = get_logger(__name__)
-        self.canonical_manager = canonical_manager
-        self.citation_manager = citation_manager
-        self.verse_matcher = verse_matcher
+        
+        # Auto-initialize canonical manager first (required by other components)
+        if canonical_manager is None:
+            try:
+                self.canonical_manager = CanonicalTextManager()
+                self.logger.info("Auto-initialized CanonicalTextManager")
+            except Exception as e:
+                self.logger.warning(f"Failed to auto-initialize CanonicalTextManager: {e}")
+                self.canonical_manager = None
+        else:
+            self.canonical_manager = canonical_manager
+            
+        # Auto-initialize citation manager with canonical manager
+        if citation_manager is None:
+            try:
+                if self.canonical_manager is not None:
+                    self.citation_manager = AcademicCitationManager(self.canonical_manager)
+                    self.logger.info("Auto-initialized AcademicCitationManager")
+                else:
+                    self.logger.warning("Cannot initialize AcademicCitationManager without CanonicalTextManager")
+                    self.citation_manager = None
+            except Exception as e:
+                self.logger.warning(f"Failed to auto-initialize AcademicCitationManager: {e}")
+                self.citation_manager = None
+        else:
+            self.citation_manager = citation_manager
+            
+        # Auto-initialize verse matcher with canonical manager
+        if verse_matcher is None:
+            try:
+                if self.canonical_manager is not None:
+                    self.verse_matcher = AdvancedVerseMatcher(self.canonical_manager)
+                    self.logger.info("Auto-initialized AdvancedVerseMatcher")
+                else:
+                    self.logger.warning("Cannot initialize AdvancedVerseMatcher without CanonicalTextManager")
+                    self.verse_matcher = None
+            except Exception as e:
+                self.logger.warning(f"Failed to auto-initialize AdvancedVerseMatcher: {e}")
+                self.verse_matcher = None
+        else:
+            self.verse_matcher = verse_matcher
+            
         self.config = config or PublicationConfig()
         
         # Initialize quality assessment components
@@ -506,6 +545,14 @@ Please provide your review when convenient.
         citations = []
         
         try:
+            # Check if required components are available
+            if self.verse_matcher is None or self.citation_manager is None:
+                self.logger.info("Advanced citation processing unavailable - components not initialized")
+                return processed_content, citations
+            
+            # Import ContextualMatchingMode from the verse matcher module
+            from scripture_processing.advanced_verse_matcher import ContextualMatchingMode
+            
             # Split content into paragraphs for processing
             paragraphs = content.split('\n\n')
             processed_paragraphs = []
@@ -518,7 +565,7 @@ Please provide your review when convenient.
                 # Check for scriptural references in paragraph
                 verse_match_result = self.verse_matcher.match_verse_with_context(
                     paragraph,
-                    mode=self.verse_matcher.ContextualMatchingMode.PUBLICATION_READY
+                    mode=ContextualMatchingMode.PUBLICATION_READY
                 )
                 
                 if (verse_match_result.matched_verse and 

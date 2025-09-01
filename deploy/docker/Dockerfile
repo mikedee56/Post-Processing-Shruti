@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy requirements first for better caching
-COPY requirements.txt requirements-locked.txt ./
+COPY requirements.txt requirements-core.txt ./
 
 # Create virtual environment
 RUN python -m venv /opt/venv
@@ -21,7 +21,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements-locked.txt
+    pip install --no-cache-dir -r requirements-core.txt
 
 # Production stage
 FROM python:3.10-slim as production
@@ -59,5 +59,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Expose port
 EXPOSE 8080
 
-# Default command
-CMD ["python", "-m", "src.main", "api", "--host", "0.0.0.0", "--port", "8080"]
+# Default command - start web API server
+CMD ["python", "/app/src/web_api.py"]

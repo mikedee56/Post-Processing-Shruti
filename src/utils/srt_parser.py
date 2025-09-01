@@ -244,7 +244,10 @@ class SRTParser:
             return None
         
         # Extract timing
-        groups = timestamp_match.groups()
+        try:
+            groups = timestamp_match.groups()
+        except AttributeError:
+            raise ValueError("Invalid timestamp format - not a valid match object")
         start_time = self._time_components_to_seconds(
             int(groups[0]), int(groups[1]), int(groups[2]), int(groups[3])
         )

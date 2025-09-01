@@ -1,58 +1,213 @@
-# ASR Post-Processing Workflow Dependencies (Story 5.3 Locked Versions)
-# This file contains exact versions validated by dependency validator
-# Generated on: Story 5.3 Technical Debt Resolution
-
-# Core Python Dependencies
-python>=3.10
-
-# Data Processing Libraries (Validated Working)
-pandas==2.3.1
-numpy==1.26.4
-scipy==1.13.1
-
-# NLP and Language Processing
-# Note: Issues detected with some imports - using recommended versions
-inltk==0.9
-indic-nlp-library==0.92
-indic-transliteration==2.3.73  # Known import issues - use specific import paths
-
-# Story 2.4 Research Enhancement Dependencies
-sanskrit_parser==0.2.6  # Validated working with warnings
-
-# Text Processing and Fuzzy Matching (Validated Working)
-fuzzywuzzy==0.18.0
-python-Levenshtein==0.27.1
-rapidfuzz==3.13.0
-
-# File Format and Data Handling (Validated Working)
-pyyaml==6.0.2
-pysrt==1.1.2
+absl-py==2.3.0
+aiohappyeyeballs==2.6.1
+aiohttp==3.12.13
+aiosignal==1.3.2
+alembic==1.16.2
+antlr4-python3-runtime==4.9.3
+asteroid-filterbanks==0.4.0
+attrs==23.2.0
+audioread==3.0.1
+Automat==22.10.0
+av==14.4.0
+Babel==2.10.3
+backports.functools-lru-cache==2.0.0
+bcrypt==3.2.2
+bidict==0.23.1
+blinker==1.9.0
+braceexpand==0.1.7
+certifi==2023.11.17
+cffi==1.17.1
 chardet==5.2.0
-
-# Configuration and Utilities (Validated Working)
 click==8.2.1
-tqdm==4.67.1
 colorama==0.4.6
-
-# Testing Framework 
-pytest==8.4.1
-# pytest-cov>=4.0.0  # Not currently installed - add if needed
-
-# Development Tools (Optional - add if needed)
-# black>=23.0.0
-# flake8>=6.0.0
-# mypy>=1.0.0
-
-# Logging and Monitoring (Validated Working)
-structlog==25.4.0
-
-# Additional dependencies found in environment
-wheel==0.45.1
-setuptools==75.6.0
-pip==24.3.1
-
-# Story 5.3 Technical Debt Resolution Notes:
-# 1. indic-transliteration and indic-nlp-library have import issues
-# 2. Use specific import paths: from indic_transliteration.sanskritnumerals import digit_2_word
-# 3. Sanskrit parser shows warnings but core functionality works
-# 4. All other dependencies validated as working correctly
+coloredlogs==15.0.1
+colorlog==6.9.0
+configobj==5.0.8
+constantly==23.10.4
+contourpy==1.3.2
+cryptography==41.0.7
+ctranslate2==4.4.0
+cycler==0.12.1
+cytoolz==1.0.1
+decorator==5.2.1
+distro==1.9.0
+docopt==0.6.2
+editdistance==0.8.1
+einops==0.8.1
+faster-whisper==1.1.1
+ffmpeg-python==0.2.0
+filelock==3.18.0
+Flask==3.1.2
+flask-cors==6.0.1
+Flask-SocketIO==5.3.6
+flatbuffers==25.2.10
+fonttools==4.58.4
+frozenlist==1.7.0
+fsspec==2025.5.1
+future==1.0.0
+fuzzywuzzy==0.18.0
+greenlet==3.2.3
+grpcio==1.73.1
+# System package removed: gyp
+h11==0.16.0
+hf-xet==1.1.5
+httplib2==0.20.4
+huggingface-hub==0.33.1
+humanfriendly==10.0
+hydra-core==1.3.2
+hyperlink==21.0.0
+HyperPyYAML==1.2.2
+idna==3.6
+incremental==22.10.0
+indic-transliteration==2.3.69
+inflect==7.5.0
+intervaltree==3.1.0
+itsdangerous==2.2.0
+Jinja2==3.1.2
+jiwer==4.0.0
+joblib==1.5.1
+jsonpatch==1.32
+jsonpointer==2.0
+jsonschema==4.10.3
+julius==0.2.7
+kiwisolver==1.4.8
+# System packages removed: launchpadlib, lazr.restfulclient, lazr.uri
+lazy_loader==0.4
+Levenshtein==0.27.1
+lhotse==1.30.3
+librosa==0.11.0
+lightning==2.5.2
+lightning-utilities==0.14.3
+lilcom==1.8.1
+llvmlite==0.44.0
+Mako==1.3.10
+Markdown==3.8.2
+markdown-it-py==3.0.0
+MarkupSafe==2.1.5
+matplotlib==3.10.3
+mdurl==0.1.2
+more-itertools==10.7.0
+mpmath==1.3.0
+msgpack==1.1.1
+multidict==6.6.3
+# Large optional package removed: NeMo toolkit
+# System package removed: netifaces
+networkx==3.5
+nltk==3.9.1
+numba==0.61.2
+numpy==2.2.6
+nvidia-cublas-cu12==12.6.4.1
+nvidia-cuda-cupti-cu12==12.6.80
+nvidia-cuda-nvrtc-cu12==12.6.77
+nvidia-cuda-runtime-cu12==12.6.77
+nvidia-cudnn-cu12==9.5.1.17
+nvidia-cufft-cu12==11.3.0.4
+nvidia-cufile-cu12==1.11.1.6
+nvidia-curand-cu12==10.3.7.77
+nvidia-cusolver-cu12==11.7.1.2
+nvidia-cusparse-cu12==12.5.4.2
+nvidia-cusparselt-cu12==0.6.3
+nvidia-nccl-cu12==2.26.2
+nvidia-nvjitlink-cu12==12.6.85
+nvidia-nvtx-cu12==12.6.77
+oauthlib==3.2.2
+omegaconf==2.3.0
+onnx==1.18.0
+onnxruntime==1.22.0
+openai-whisper==20250625
+optuna==4.4.0
+packaging==25.0
+pandas==2.3.0
+pillow==11.3.0
+platformdirs==4.3.8
+pooch==1.8.2
+primePy==1.3
+propcache==0.3.2
+protobuf==6.31.1
+psutil==7.0.0
+pyannote.audio==3.3.2
+pyannote.core==5.0.0
+pyannote.database==5.1.3
+pyannote.metrics==3.2.1
+pyannote.pipeline==3.0.1
+pyasn1==0.4.8
+pyasn1-modules==0.2.8
+pycparser==2.22
+# System packages removed: pycurl, PyGObject
+Pygments==2.17.2
+PyHamcrest==2.1.0
+PyJWT==2.7.0
+pyOpenSSL==23.2.0
+pyparsing==3.1.1
+pyrsistent==0.20.0
+pyserial==3.5
+pysrt==1.1.2
+pysubs2==1.8.0
+# System package removed: python-apt
+python-dateutil==2.9.0.post0
+python-engineio==4.12.2
+python-Levenshtein==0.27.1
+python-socketio==5.9.0
+pytorch-lightning==2.5.2
+pytorch-metric-learning==2.8.1
+pytz==2024.1
+PyYAML==6.0.1
+RapidFuzz==3.13.0
+regex==2024.11.6
+requests==2.31.0
+rich==13.7.1
+roman==5.0
+ruamel.yaml==0.18.14
+ruamel.yaml.clib==0.2.12
+safetensors==0.5.3
+scikit-learn==1.7.0
+scipy==1.16.0
+semver==3.0.4
+sentence-transformers==5.0.0
+sentencepiece==0.2.0
+service-identity==24.1.0
+setuptools==68.1.2
+shellingham==1.5.4
+simple-websocket==1.1.0
+six==1.16.0
+sortedcontainers==2.4.0
+soundfile==0.13.1
+soxr==0.5.0.post1
+speechbrain==1.0.3
+SQLAlchemy==2.0.41
+sympy==1.14.0
+# System package removed: systemd-python
+tabulate==0.9.0
+tensorboard==2.19.0
+tensorboard-data-server==0.7.2
+tensorboardX==2.6.4
+text-unidecode==1.3
+threadpoolctl==3.6.0
+tiktoken==0.9.0
+tokenizers==0.21.2
+toml==0.10.2
+toolz==1.0.0
+torch==2.7.1
+torch-audiomentations==0.12.0
+torch_pitch_shift==1.2.5
+torchaudio==2.7.1
+torchmetrics==1.7.3
+tqdm==4.67.1
+transformers==4.53.0
+triton==3.3.1
+Twisted==24.3.0
+typeguard==4.4.4
+typer==0.16.0
+typing_extensions==4.14.0
+tzdata==2025.2
+# System packages removed: ubuntu-pro-client, unattended-upgrades
+urllib3==2.0.7
+wadllib==1.3.6
+webdataset==1.0.2
+Werkzeug==3.1.3
+wget==3.2
+whisperx==3.4.2
+wrapt==1.17.2
+wsproto==1.2.0
+yarl==1.20.1
+zope.interface==6.1

@@ -23,7 +23,7 @@ from fuzzywuzzy import fuzz, process
 # Import new components
 from utils.srt_parser import SRTParser, SRTSegment
 from utils.text_normalizer import TextNormalizer
-from utils.advanced_text_normalizer import AdvancedTextNormalizer
+from utils.advanced_text_normalizer import AdvancedTextNormalizer, create_advanced_normalizer
 from utils.conversational_pattern_detector import ConversationalPatternDetector
 from utils.contextual_number_processor import ContextualNumberProcessor
 from utils.processing_quality_validator import ProcessingQualityValidator
@@ -126,7 +126,7 @@ class SanskritPostProcessor:
             # Choose between basic and advanced text normalizer based on config
             use_advanced_normalization = self.config.get('use_advanced_normalization', True)
             if use_advanced_normalization:
-                self.text_normalizer = AdvancedTextNormalizer(self.config.get('text_normalization', {}))
+                self.text_normalizer = create_advanced_normalizer(self.config.get('text_normalization', {}))
             else:
                 self.text_normalizer = TextNormalizer(self.config.get('text_normalization', {}))
             
@@ -513,6 +513,7 @@ class SanskritPostProcessor:
 
     def _load_lexicon_file(self, lexicon_type: str, file_path: Path):
         """Load a specific lexicon file."""
+        import json  # Add missing import
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 if file_path.suffix.lower() == '.yaml':
@@ -1474,6 +1475,56 @@ class SanskritPostProcessor:
             segment.flag_reason = "Low confidence score"
         
         return segment
+
+    def process_text(self, text: str) -> str:
+        """
+        Process raw text string through the Sanskrit processing pipeline.
+        
+        This method provides a simplified API for processing text strings directly,
+        without requiring TranscriptSegment objects.
+        
+        Args:
+            text: Input text string to process
+            
+        Returns:
+            Processed text string with Sanskrit/Hindi corrections applied
+        """
+        try:
+            # Step 1: Normalize text (using base normalizer to avoid complex issues)
+            if hasattr(self.text_normalizer, 'base_normalizer') and self.text_normalizer.base_normalizer:
+                normalized_text = self.text_normalizer.base_normalizer.normalize_text(text)
+            else:
+                normalized_text = text
+            
+            # Step 2: Apply lexicon-based corrections
+            corrected_text, corrections = self._apply_lexicon_corrections(normalized_text)
+            
+            # Step 3: Apply proper noun capitalization
+            capitalized_text = self._apply_proper_noun_capitalization(corrected_text)
+            
+            # Step 4: Apply academic polish if enabled
+            if self.enable_academic_polish:
+                polished_text = self._apply_academic_polish(capitalized_text)
+            else:
+                polished_text = capitalized_text
+            
+            # Step 5: Apply enhanced Sanskrit/Hindi corrections
+            enhanced_result = self._apply_enhanced_sanskrit_hindi_corrections(polished_text)
+            
+            # Extract text from result if it's a dictionary
+            if isinstance(enhanced_result, dict):
+                final_text = enhanced_result.get('corrected_text', polished_text)
+            elif isinstance(enhanced_result, str):
+                final_text = enhanced_result
+            else:
+                # Fallback to previous step result
+                final_text = polished_text
+            
+            return final_text
+            
+        except Exception as e:
+            self.logger.error(f"Error processing text: {e}")
+            return text  # Return original text on error  # Return original text on error
 
     def start_processing_session(self, session_id: Optional[str] = None) -> str:
         """

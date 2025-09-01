@@ -474,7 +474,7 @@ def test_dependency_validator():
             DependencyStatus.MISSING: "[MISS]"
         }[result.status]
         
-        print(f"{status_symbol} {name} ({result.version or 'unknown'}): {result.message}")
+        print(f"{status_symbol} {name} ({result.version or 'unknown'}): {getattr(result, 'message', str(result))}")
 
 if __name__ == "__main__":
     test_dependency_validator()

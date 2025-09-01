@@ -49,3 +49,76 @@ entries:
     category: "concept"
     confidence: 1.0
     source_authority: "IAST"
+
+  # Critical ASR Error Corrections - User Identified
+  - original_term: "bhagavad"
+    variations: ["bhagat", "bhagvad", "bhagwad"]
+    transliteration: "Bhagavad"
+    is_proper_noun: true
+    category: "scripture"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "bhakti"
+    variations: ["baki", "bhakti yoga", "bakti"]
+    transliteration: "bhakti"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "dhyana"
+    variations: ["dhana", "dhyana yoga", "dhyan"]
+    transliteration: "dhyāna"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "jnana"
+    variations: ["ghan", "gyan", "jnana yoga"]
+    transliteration: "jñāna"
+    is_proper_noun: false
+    category: "practice"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "svadharma"
+    variations: ["suadharma", "swadharma", "sva dharma"]
+    transliteration: "svadharma"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "paradharma"
+    variations: ["paradarma", "para dharma", "paardharma"]
+    transliteration: "paradharma"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "sanchita"
+    variations: ["sanchetta", "sanchit", "sancita"]
+    transliteration: "sañcita"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "prarabdha"
+    variations: ["praabdha", "prabdha", "praarabdha"]
+    transliteration: "prārabdha"
+    is_proper_noun: false
+    category: "concept"
+    confidence: 1.0
+    source_authority: "IAST"
+
+  - original_term: "krishna"
+    variations: ["krishna", "krsna", "krishan"]
+    transliteration: "Kṛṣṇa"
+    is_proper_noun: true
+    category: "deity"
+    confidence: 1.0
+    source_authority: "IAST"

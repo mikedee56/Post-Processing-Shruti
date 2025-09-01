@@ -284,7 +284,10 @@ class ContextualNumberProcessor:
             
             if reference_type == 'chapter_verse':
                 # Pattern: "chapter two verse twenty five"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if len(groups) >= 2:
                     chapter_word = groups[0].lower()
                     verse_word = groups[1].lower()
@@ -307,7 +310,10 @@ class ContextualNumberProcessor:
             
             elif reference_type == 'verse_only':
                 # Pattern: "verse twenty five"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if groups:
                     verse_word = groups[0].lower()
                     verse_num = self._word_to_number(verse_word)
@@ -337,7 +343,10 @@ class ContextualNumberProcessor:
             
             if date_type == 'month_day_year':
                 # Pattern: "January first, two thousand five"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if len(groups) >= 3:
                     month = groups[0]
                     day_word = groups[1].lower()
@@ -371,7 +380,10 @@ class ContextualNumberProcessor:
             
             if time_type == 'quarter_past':
                 # Pattern: "quarter past two"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if groups:
                     hour_word = groups[0].lower()
                     hour_num = self.basic_numbers.get(hour_word)
@@ -391,7 +403,10 @@ class ContextualNumberProcessor:
             
             elif time_type == 'half_past':
                 # Pattern: "half past three"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if groups:
                     hour_word = groups[0].lower()
                     hour_num = self.basic_numbers.get(hour_word)
@@ -421,7 +436,10 @@ class ContextualNumberProcessor:
             
             if year_type == 'two_thousand':
                 # Pattern: "two thousand five"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if groups:
                     remainder_word = groups[0].lower() if groups[0] else ''
                     
@@ -443,7 +461,10 @@ class ContextualNumberProcessor:
             
             elif year_type == 'nineteen_hundreds':
                 # Pattern: "nineteen ninety five"
-                groups = match.groups()
+                try:
+                    groups = match.groups()
+                except AttributeError:
+                    return str(match)
                 if len(groups) >= 2:
                     tens_word = groups[0].lower()
                     ones_word = groups[1].lower()

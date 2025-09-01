@@ -682,7 +682,7 @@ class EnhancedVerseIdentifier:
         """Initialize enhanced verse identifier."""
         self.lexicon_manager = lexicon_manager
         self.config = config or {}
-        self.api_client = ExternalVerseAPIClient(config.get('api_config', {}))
+        self.api_client = ExternalVerseAPIClient(self.config.get('api_config', {}))
         self.error_handler = ErrorHandler(component="EnhancedVerseIdentifier")
         
         # Hybrid matching configuration

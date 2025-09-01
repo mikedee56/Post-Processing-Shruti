@@ -370,6 +370,8 @@ class ScriptureProcessor:
                     
                     if enhanced_verses:
                         verses_identified = len(enhanced_verses)
+                        # Initialize verse_matches for compatibility with downstream processing
+                        verse_matches = enhanced_verses
                         detailed_results['enhanced_verses'] = enhanced_verses
                         processing_metadata['enhanced_verse_identification'] = True
                         
@@ -378,10 +380,16 @@ class ScriptureProcessor:
                                 'verses_found': verses_identified,
                                 'external_verification': any(v.get('external_verification', False) for v in enhanced_verses)
                             })
+                    else:
+                        # No enhanced verses found, initialize empty verse_matches
+                        verse_matches = []
                 except Exception as e:
                     if self._error_handler:
                         self._error_handler.log_operation_error("enhanced_verse_identification", e, {})
                     self.logger.warning(f"Enhanced verse identification failed, falling back to basic: {e}")
+                    # Initialize empty verse_matches on error
+                    verse_matches = []
+                    verses_identified = 0
             
             # Story 2.4.3 - Use hybrid matching if enabled (fallback)
             elif self.enable_hybrid_matching and self.hybrid_engine:
