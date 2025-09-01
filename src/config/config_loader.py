@@ -161,29 +161,44 @@ class ConfigLoader:
     
     def _load_configuration(self):
         """Load configuration from all available sources."""
-        
-        # 1. Load from default configuration file if no specific file provided
-        if not self.config_file:
-            default_config_paths = [
-                Path('config/processing.yaml'),
-                Path('config/processing.json'),
-                Path('processing.yaml'),
-                Path('processing.json')
-            ]
+        try:
+            # 1. Load from default configuration file if no specific file provided
+            if not self.config_file:
+                default_config_paths = [
+                    Path('config/processing.yaml'),
+                    Path('config/processing.json'),
+                    Path('processing.yaml'),
+                    Path('processing.json')
+                ]
+                
+                for path in default_config_paths:
+                    if path.exists():
+                        self.config_file = path
+                        break
             
-            for path in default_config_paths:
-                if path.exists():
-                    self.config_file = path
-                    break
-        
-        # 2. Load from configuration file
-        if self.config_file and self.config_file.exists():
-            self._load_from_file(self.config_file)
-        
-        # 3. Override with environment variables
-        self._load_from_environment()
-        
-        self.logger.info(f"Configuration loaded from: {self.config_file or 'defaults'}")
+            # 2. Load from configuration file
+            if self.config_file and self.config_file.exists():
+                self._load_from_file(self.config_file)
+            else:
+                if self.config_file:
+                    self.logger.warning(f"Configuration file not found: {self.config_file}. Using defaults.")
+                else:
+                    self.logger.info("No configuration file specified. Using default configuration.")
+            
+            # 3. Override with environment variables
+            self._load_from_environment()
+            
+            # 4. Validate lexicon file paths and provide fallbacks
+            self._validate_and_setup_lexicon_paths()
+            
+            self.logger.info(f"Configuration loaded from: {self.config_file or 'defaults'}")
+            
+        except Exception as e:
+            self.logger.error(f"Error during configuration loading: {e}")
+            self.logger.info("Continuing with default configuration values")
+            # Ensure config is still usable with defaults
+            if not self.config:
+                self.config = ProcessingConfig()
     
     def _load_from_file(self, config_path: Path):
         """Load configuration from YAML or JSON file."""
@@ -260,6 +275,46 @@ class ConfigLoader:
             current[final_key] = value
         else:
             self.logger.warning(f"Cannot set configuration: {key_path}")
+    
+    def _validate_and_setup_lexicon_paths(self):
+        """Validate lexicon file paths and set up fallbacks if needed."""
+        base_path = Path('.')
+        default_lexicon_dir = base_path / 'data' / 'lexicons'
+        
+        # Check if lexicons directory exists
+        if not default_lexicon_dir.exists():
+            self.logger.warning(f"Default lexicon directory not found: {default_lexicon_dir}")
+            # Try to create it if it doesn't exist
+            try:
+                default_lexicon_dir.mkdir(parents=True, exist_ok=True)
+                self.logger.info(f"Created lexicon directory: {default_lexicon_dir}")
+            except Exception as e:
+                self.logger.error(f"Could not create lexicon directory: {e}")
+        
+        # Validate each lexicon file path
+        for lexicon_type, relative_path in self.config.lexicon_paths.items():
+            lexicon_path = base_path / relative_path
+            
+            if not lexicon_path.exists():
+                self.logger.warning(f"Lexicon file not found: {lexicon_path}")
+                # Try to find the file in the default directory
+                fallback_path = default_lexicon_dir / f"{lexicon_type}.yaml"
+                if fallback_path.exists():
+                    self.config.lexicon_paths[lexicon_type] = str(fallback_path)
+                    self.logger.info(f"Using fallback lexicon: {fallback_path}")
+                else:
+                    self.logger.warning(f"No fallback found for {lexicon_type} lexicon")
+            else:
+                self.logger.debug(f"Lexicon file found: {lexicon_path}")
+    
+    def exists(self) -> bool:
+        """
+        Check if the configuration has been loaded successfully.
+        
+        Returns:
+            bool: True if configuration is loaded, False otherwise
+        """
+        return self.config is not None and isinstance(self.config, ProcessingConfig)
     
     def get_config(self) -> ProcessingConfig:
         """Get the loaded configuration object."""
